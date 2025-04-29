@@ -1,0 +1,138 @@
+{# src/utb/AdminBundle/Resources/views/Admin/droit.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Droits
+{% endblock %}
+  
+  {% block administration_body %}
+
+           
+    <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+        <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_userProfilListe', {'locale': locale})}}">{{ 'admin.layout.menu.users'|trans }}</a> > 
+        {{ 'admin.layout.droit'|trans }}
+    </div>
+        
+  <div class="span-25">
+      <div id="toolbar3" class="coinsArrondis colorCadreArrondi bgGris">
+           <div class="span-21">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-cpanel.png')}}" alt="Profil" title="" /></div>
+			<div class="titreModule colorBleu"><h1>{{'profils.ajout.titre4'|trans({}, 'profils') }} <span>
+			{#: {{ 'profils.ajout.titre2'|trans({}, 'profils') }}</span>#}<h1></div>	
+			  <div class="clr"></div>
+			  </div>
+              <div class="span-3 last">
+
+				  <div class="ecartBoutons">&nbsp;</div>
+
+				  <div class="ecartBoutons">&nbsp;</div>
+
+				  <div class="boutonGestion">
+					  <div><a class="back" href=""><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+					  {{ 'admin.annuler'|trans}}</a>
+				  </div> 
+				  <div class="clr"></div>
+			  </div>
+              <div class="clr"></div>
+              </div>
+          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+ <div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+       <div class="MarginBottomBox"></div>
+
+
+        <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris" style="margin:10px;">
+             <div class="FrmAjoutArt colorCadreArrondi bgBlanc" style="margin:10px;">
+                 <div class="MarginBottomBox">
+          
+                  <div style="padding:10px;">
+                      <form method="POST" id="listDroitForm">
+                      <table class="listMenusCateg listArticlesRub">
+                          <!-- Entete -->
+                            <tr>
+							<td></td>
+                            {% for profile in listeProfiles %}
+                                    <td style="background:#eee"><h3 class="">{{profile.getLibProfil}}</h3></td>
+                            {% endfor %}
+                            </tr>
+                          <!-- fin Entete -->
+                          <!--tbody-->
+                          {% for module, act in actions %}
+                          <tr>
+                                <td class="titreList2">
+                                    {% set tab = module|split('|') %}
+                                    <div class="accessModuleName colorBleu">{{tab.0}}</div>
+                                    {% for a in act %}
+                                        <div {% if loop.index is even %} style="background:#F3F4EE;margin-top:5px;padding:4px 0px 4px 15px;" {% else %} style="padding:4px 0px 4px 15px;" {% endif %}>{{a.DescriptionAction}}</div>
+                                    {% endfor %}
+                                </td>
+                                {% for profile in listeProfiles %}
+                                    
+                                    <td style="padding-top:5px;">
+                                         {% for prof,modu in actionsByProfil %}
+                                            {% for md,ac in modu %}
+                                            {% set m = md|split('|') %}
+                                            {% if profile.getId==prof %} 
+                                                {% if m.0==tab.0 %}
+                                                <div>&nbsp;</div>
+                                                {% endif %}                                            
+                                                {% for val in ac %}
+                                                     {% if ac==act %}   
+                                                        {% set atab = val.idAction|split('|') %}
+                                                        <div {% if loop.index is even %} style="background:#F3F4EE;margin-top:5px;padding:4px 0px;" {% else %} style="padding:4px 0px;" {% endif %}><input type="checkbox" name="action_module_{{m.1}}_{{profile.getId}}[]" value="{{atab.0}}" {% if atab.1==1 %} checked="checked" {% endif %} id="" class=""></div>
+                                                    {% endif %} 
+                                                {% endfor %}
+                                            {% endif %}    
+                                            {% endfor %}
+                                         {% endfor %}
+                                    </td>
+                                {% endfor %}
+                          </tr>
+                          {% endfor %}
+                          <!--tbody-->
+                       </table>
+                        <div class="accessModuleName-submit">
+							<div id="wait"></div>
+							<input value="Sauvegarder" id="submit">
+						</div>
+                       </form>       
+                  </div>
+                 <div class="clr"></div>
+                                                        
+                  </div>
+
+              </div>
+
+
+       </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+
+                              </div>				<!--  FIN SPAN - 25 -->
+              <script>
+                    $("#submit").click(function(){
+                      	var html = "";
+                        html += "<div ><img src='{{ asset('img/wait.gif') }}' /></div>";  
+                      $("#wait").html(html);
+                      doDroitsProcess( $("#listDroitForm").serialize()  ); 
+                    });
+                    
+                    function doDroitsProcess( data ){
+                        $.ajax({
+                            type: "POST",
+                            url: "{{path('utb_admin_updateDroits')}}",
+                            data: {formdata:data},
+                            cache: false,
+                            success: function(data){
+                                            var resJson = jQuery.parseJSON(data);
+                                            if( resJson.result == "success")
+                                                    //loadListeDroits(resJson.idprofil);
+                                                        window.location = "{{path('utb_admin_droit')}}";
+                                            else
+                                                    alert("{{ 'menus.erreurtraitement'|trans({}, 'menus') }}");
+                            }
+                        });	
+                    }	
+                    
+              </script>  
+  {% endblock %}
+                            
+  

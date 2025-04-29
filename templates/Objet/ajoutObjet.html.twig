@@ -1,0 +1,95 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'objets.ajout.grandtitrepg'|trans({}, 'objets') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+     <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listeobjet', {'locale': locale})}}">{{ 'admin.layout.contact'|trans}} </a> > <a href="{{path('utb_admin_listeobjet', {'locale': locale})}}">{{'objets.ajout.titre1'|trans({}, 'objets')}}</a>  > {{'admin.ajouter'|trans()}}
+
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Profil" title="" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'objets.ajout.titre1'|trans({}, 'objets') }} <span>: {{ 'objets.ajout.titre2'|trans({}, 'objets') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+                              
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.ajouter'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a class="back" href="#" ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                        {# STATISTIQUES #}    
+                                        {{ information.stats(listestat) }} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                              <div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+                                                  <div class="MarginBottomBox">
+                                                      <form action=" {{ path("utb_admin_ajoutobjet") }} " method="post" {{ form_enctype(form) }} id="ajoutObjet">
+                                                           {{ form_errors(form.libObjet) }}
+                                                                <span class="colorBleu">{{ form_label(form.libObjet, 'objets.form.nom'|trans({}, 'objets')) }}</span> 
+								{{ form_widget(form.libObjet) }}<div class="clr"></div>
+                                                                <div class="ecartLabel">&nbsp;</div>
+                                                                
+                                                           {{ form_errors(form.descriptionObjet) }}
+                                                                <span class="colorBleu">{{ form_label(form.descriptionObjet, 'objets.form.desc'|trans({}, 'objets')) }}</span> 
+								{{ form_widget(form.descriptionObjet) }}
+                                                                <div class="ecartLabel">&nbsp;</div>
+																
+                                                           <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none"><a href=""></a>                                                                   
+                                                          </form>
+                                                      <div class="clr"></div>
+                                                  </div>
+
+                                              </div>
+
+
+                                          </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>			<!--  FIN  SPAN - 19 -->
+
+                          </div>				<!--  FIN SPAN - 25 -->
+  
+  
+
+  {% endblock %}

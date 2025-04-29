@@ -1,0 +1,92 @@
+{# src/utb/AdminBundle/Resources/views/Admin/arbre2.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.espaceadminaccueil'|trans}}
+{% endblock %}  
+        
+{% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}" > {{ 'admin.accueil'|trans}}</a> > {#<a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">#} {{ 'admin.layout.arbre'|trans({}, 'messages') }}</a> {# > <a href="#">{{ 'rubriques.rubrique'|trans({}, 'rubriques') }}</a>#}
+            </div>  
+     
+            <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    
+                                        {# BOX INFOS #}    
+                                        {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                    
+   
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">				<!-- TOUTE LA PAGE CENTRALE : MODULES + DETAILS -->
+		
+                <div id="sidetree">
+<div class="treeheader">&nbsp;</div>
+<div id="sidetreecontrol"><a href="?#">&nbsp;{{  'arbre.replier'|trans({}, 'arbre') }} </a> | <a href="?#">&nbsp;{{  'arbre.deplier'|trans({}, 'arbre') }}</a></div>
+
+<ul id="tree">
+    {% for rubrique in listerubrique %} 
+        {% if rubrique.nomRubrique|trim !='' %}
+	<li>
+            <a href="{{ path('utb_admin_detailrubrique',{'id': rubrique.id,'locale':locale}) }}"><strong><span class="ligneArbre">{{rubrique.nomRubrique}}</span></strong></a>
+            
+            <ul>
+            {% for rub in listessrubrique %}
+                {% if rub.idParent == rubrique.id %}
+                    {% if rub.nomRubrique|trim !='' %}
+                        <li>
+                            <a href="{{ path('utb_admin_detailrubrique',{'id': rub.id,'locale':locale}) }}">
+                                <strong><span class="ligneArbre">{{rub.nomRubrique}}</span></strong>
+                            </a>   
+                            <ul>
+                            {% for article in listearticle %}
+                               {% if article.titreArticle|trim !='' and article.idrubrique == rub.id %}     
+                                <li>
+                                     <a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}">
+                                        <span class="ligneArbre">{{article.titreArticle}}</span>
+                                     </a>
+                                </li>                                
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </ul>
+            
+            <ul>
+                {% for article in listearticle %}
+                   {% if article.titreArticle|trim !='' and article.idrubrique == rubrique.id %}     
+                    <li>
+                         <a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}">
+                            <span class="ligneArbre">{{article.titreArticle}}</span>
+                         </a>
+                    </li>                                
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            
+        </li>
+	{% endif %}
+    {% endfor %}
+
+</ul>
+</div>
+</div>                                    
+</div>
+                    <!-- FIN tableauBord -->
+            </div> 	<!-- FIN SPAN - 25 -->
+
+  {# On définit un nouveau block, que les vues du bundle pourront remplir #}
+               
+  {{ information.popupaddarticle(listeRubrique) }}                    
+                        
+  {% endblock %}

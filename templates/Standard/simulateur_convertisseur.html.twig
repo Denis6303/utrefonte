@@ -1,0 +1,237 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+  
+  {% block public_body %}						
+        <div class="span-24 marginBottom20p">
+		<div class="span-15" style="">
+                    
+			<div class="span-5">
+				<div class="boxSection homePage borderBotStyle box-particulier">
+					<h1 class="boxSection-titre bleuLink">
+                                            <a href="">                                         
+                                            </a></h1>
+					<div class="boxSection-icon"><img src="{{asset('img/site-img/crayon.png')}}" alt="" title=""/></div> 
+					<div class="boxSection-cnt  noUnderline">
+						<ul>
+                                                      
+                                                            </li>
+						</ul> 
+					</div>
+					<div class="divButmoore">
+						<a class="btmoore coinsArrondis " href=""><span>En savoir plus</span><span></span></a>
+					</div>
+				</div>
+			</div> 	
+			<div class="span-5">
+				<div class="boxSection homePage borderBotStyle box-professionnel"> 
+					<h1 class="boxSection-titre bleuLink"><a href=""{#Professionels#}></a></h1>
+					<div class="boxSection-icon"><img src="{{asset('img/site-img/coupe.png')}}" alt="" title=""/></div> 
+					<div class="boxSection-cnt  noUnderline"> 
+						<ul>
+                                                 <li>
+                                                            
+                                                        </li>   
+						</ul> 
+					</div>
+					<div class="divButmoore">
+						<a class="btmoore coinsArrondis " href=""><span>En savoir plus</span><span></span></a>
+					</div>
+				</div>
+			</div> 
+			<div class="span-5 last">
+				<div class="boxSection homePage borderBotStyle box-entreprise"> 
+					<h1 class="boxSection-titre bleuLink"><a  href=""></a></h1>
+					<div class="boxSection-icon"><img src="{{asset('img/site-img/fleur.png')}}" alt="" title=""/></div> 
+					<div class="boxSection-cnt  noUnderline"> 
+						<ul>
+                                                 <li>
+                                                           
+                                                 </li>
+						</ul> 
+					</div>
+					<div class="divButmoore">
+						<a class="btmoore coinsArrondis " href=""><span>En savoir plus</span><span></span></a>
+					</div>
+				</div>
+			</div>
+		</div>
+                
+                {# Bloc de pub/Actus/Accedez a mes comptes #}
+		<div class="span-9 last bgBlanc">
+                    <div id="videohd" style="display:none;">                               
+                        <a href="#">
+                           <iframe width="950" height="720" src="//www.youtube.com/embed/HxQBobaxGVY?rel=0" frameborder="0" allowfullscreen></iframe>
+                        </a>               
+                     </div>
+                        
+                        <div id="videohd2" style="display:none;">                               
+                        <a href="#">
+                             <iframe width="950" height="720" src="//www.youtube.com/embed/5DgDCM5MYpI?rel=0" frameborder="0" allowfullscreen></iframe>
+                        </a>               
+                     </div>
+                        
+                       <div class="span-4"> <h3>{{libcadre}}</h3> </div> 
+                      {#   <div class="span-4"> <h3>Nos voeux pour 2014</h3> </div> #}
+                    
+                        <div class="span-5 last">
+                            <strong>AGRANDIR</strong>  <a href="#videohd" class="fancybox red"> Video1 </a>
+                            <a href="#videohd2" class="fancybox red">| Video2 </a>                        
+                        </div>  
+                             <div class="span-9 ads">
+                                 <div class="ad left">                        
+                                       <a href="#">                                                          
+                                                       <img src="" />
+                                         
+                                                       
+                                                          <video id="example_video_1" class="video-js vjs-default-skin" controls preload="auto" width="345" height="267"
+                                                                poster="{{ asset('img/site-img/player.jpg')}}"
+                                                                data-setup='{ "controls": true, "autoplay": false}'>
+                                                             <source src="" type='video/mp4' />
+                                                          </video>
+                                                                               
+                                       </a>
+
+                                 </div>
+                             </div>
+                    
+                        <!-- FIN boxClientAuth borderBotStyle -->
+		</div>		<!-- FIN span-9 -->
+               {# Fin bloc de pub/Actus/Accedez a mes comptes #}
+                
+	</div> 		<!-- Fin span-24 Catégories clients - Particulier, Professionnel, Entreprise-->
+
+	<div class="span-24 marginBottom20p paddingBottom10p borderBotStyle bgBlanc"> <!-- Ligne Produits 1 -->
+            <div class="boxProduit-all leftSpace rightSpace"> 
+		<div class="boxProduit box-dynPrdSrv"> 
+                <h1 class="boxSection-titre gris-text">Informations</h1>
+                <div class="mhr"><hr></div><div class="clr"></div>
+                    <div class="">	<!-- boxProduit-cnt -->                                  
+                        <div class="navigIcon leftIcon"><span class="nextItem"><img src="{{asset('img/site-img/icon-next2.png')}}" alt="Précédent" /></span> </div>
+                        <div class="allProduitServices borderadius bordergris">
+                            <div class="carousel">
+                                <ul>                                     
+                                  <li>
+                                      <div class="onePrdSrv">
+                                          <h2 class="namePrdSrv"></h2>
+                                            <div class="descriptionPrdSrv">
+                                                <p>
+                                                  ddddddddddddddddddddddd
+                                                </p>
+                                          </div>
+                                          <div class="iconPrdSrv">     
+                                          </div>
+                                      </div>
+                                  </li>                                                         							
+                               </ul>
+                            </div>	<!-- FIN CAROUSEL -->
+                        </div>		
+                       <div class="navigIcon rightIcon"><span class="prevItem"><img src="{{asset('img/site-img/icon-prev2.png')}}" alt="Précédent" /></span> </div><div class="clr"></div>
+                    </div>		<!-- FIN boxProduit-cnt -->
+		</div>		<!-- FIN boxProduit box-dynPrdSrv -->
+                    
+		<div class="boxProduit box-cartes"> 
+                    <div class="boxProduit-cnt bgGrisatr1">
+                        <img src="" alt="" />
+                        <div class="boxProduit-foot bgGrisatr2" style="text-align:center;">
+                            <h1 class="title4 gris-text" style="text-align:center;">titre</h1>
+                        </div>
+                    </div>
+		</div>
+                <div class="boxProduit box-cartes"> 
+                    <div class="boxProduit-cnt bgGrisatr1">
+                       <img src="" alt="" title="" />
+                       <div class="boxProduit-foot bgGrisatr2">
+                            <h1 class="title4 gris-text" style="text-align:center;">titre2</h1>
+                       </div>
+                    </div>
+		</div><div class="clr"></div>
+            </div>			<!-- FIN boxProduit-all leftSpace rightSpace -->
+	</div>			<!-- FIN Ligne Produits 1 -->
+	<div class="span-24 marginBottom20p paddingBottom10p borderBotStyle bgBlanc"> <!-- Ligne Produits 1 -->
+            <div class="boxProduit-all leftSpace rightSpace"> 
+		<div class="boxProduit box-dynPrdSrv"> 
+                <h1 class="boxSection-titre gris-text">Informations</h1>
+                <div class="mhr"><hr></div><div class="clr"></div>
+                    <div class="">	<!-- boxProduit-cnt -->                                  
+                        <div class="navigIcon leftIcon"><span class="nextItem"><img src="{{asset('img/site-img/icon-next2.png')}}" alt="Précédent" /></span> </div>
+                        <div class="allProduitServices borderadius bordergris">
+                            <div class="carousel">
+                                <ul>                                     
+                                  <li>
+                                      <div class="onePrdSrv">
+                                          <h2 class="namePrdSrv"></h2>
+                                            <div class="descriptionPrdSrv">
+                                                <p>
+                                                  ddddddddddddddddddddddd
+                                                </p>
+                                          </div>
+                                          <div class="iconPrdSrv">     
+                                          </div>
+                                      </div>
+                                  </li>                                                         							
+                               </ul>
+                            </div>	<!-- FIN CAROUSEL -->
+                        </div>		
+                       <div class="navigIcon rightIcon"><span class="prevItem"><img src="{{asset('img/site-img/icon-prev2.png')}}" alt="Précédent" /></span> </div><div class="clr"></div>
+                    </div>		<!-- FIN boxProduit-cnt -->
+		</div>		<!-- FIN boxProduit box-dynPrdSrv -->
+                    
+		<div class="boxProduit box-cartes"> 
+                    <div class="boxProduit-cnt bgGrisatr1">
+                        <img src="" alt="" />
+                        <div class="boxProduit-foot bgGrisatr2" style="text-align:center;">
+                            <h1 class="title4 gris-text" style="text-align:center;">titre</h1>
+                        </div>
+                    </div>
+		</div>
+                <div class="boxProduit box-cartes"> 
+                    <div class="boxProduit-cnt bgGrisatr1">
+                       <img src="" alt="" title="" />
+                       <div class="boxProduit-foot bgGrisatr2">
+                            <h1 class="title4 gris-text" style="text-align:center;">titre2</h1>
+                       </div>
+                    </div>
+		</div><div class="clr"></div>
+            </div>			<!-- FIN boxProduit-all leftSpace rightSpace -->
+	</div>			<!-- FIN Ligne Produits 1 -->
+	
+	
+	<!-- LA DERNI7RE A ETE RETIREE ET MIS DANS LE FICHIER "saveIndexLine2" car il y avait trop de commentaires-->
+	 
+	 
+	<!-- Ligne Correspondants -->
+	<div class="span-24 marginBottom20p"> 
+		<div class="leftSpace rightSpace boxCorespdant">
+			<h1 class="boxSection-titre gris-text">Correspondants</h1><div class="mhr"><hr></div><div class="clr"></div>
+			<div class="slideCorespdant">
+                              <span><img src="{{ asset('img/site-img/correspHomePage/societe-generale.png')}}" alt="" title="" /></span>
+				<span><img src="{{ asset('img/site-img/correspHomePage/credit-agricole.png')}}" alt="" title="" /></span>
+				<span><img src="{{ asset('img/site-img/correspHomePage/fortis-bank.png')}}" alt="" title="" /></span>
+				<span><img src="{{ asset('img/site-img/correspHomePage/citibank.png')}}" alt="" title="" /></span>
+				<span><img src="{{ asset('img/site-img/correspHomePage/abn-amro.png')}}" alt="" title="" /></span>
+				<span><img src="{{ asset('img/site-img/correspHomePage/natixis.png')}}" alt="" title="" /></span>
+                        </div>
+			<div class="divButmoore" style="text-align:right;">
+                               
+				<a class="btmoore coinsArrondis " href=""><span>Voir tous nos correspondants</span><span></span></a>
+			</div>			
+		</div>
+	</div>		<!-- FIN Correspondants-->
+        
+    <script type="text/javascript"> 
+        $('.partieDesc').truncate({
+                width: 'auto',
+                token: '...',
+                side: 'right',
+                addclass: false,
+                addtitle: true,
+        });       
+    </script>  
+  
+  
+  {% endblock %}
+  

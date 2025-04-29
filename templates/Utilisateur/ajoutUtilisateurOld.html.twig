@@ -1,0 +1,220 @@
+{# src/utb/ClientBundle/Resources/views/ajoutUtilisateur.html.twig #}
+
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'utilisateur.ajout.grandtitrepg'|trans({}, 'utilisateurs') }}
+{% endblock %}
+
+  {% block administration_body %}
+  
+            <!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            <!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_client_accueil',{ 'locale': locale,'typePre':1 })}}"> {{ 'client.accueil'|trans}}</a> > 
+                <a href="{{path('utb_client_liste_utilisateur')}}">{{ 'utilisateur.ajout.utilisateurs'|trans({}, 'utilisateurs') }}</a> > {{ 'utilisateurs.ajout.grandtitrepg'|trans({}, 'utilisateurs') }}
+            </div>
+            
+            {% for contenu in app.session.flashbag.get('notice') %}            
+                {% if contenu == "emailerror" %}
+                    <div class="span-25">
+                        <div class="error errorMsg">                        
+                                {{ 'utilisateur.emailerror'|trans({}, 'utilisateurs') }}
+                        </div>    
+                    </div> 
+                {% endif %}
+
+                {% if contenu == "loginerror" %}
+                    <div class="span-25">
+                        <div class="error errorMsg">                        
+                                {{ 'utilisateur.loginerror'|trans({}, 'utilisateurs') }}
+                        </div>    
+                    </div> 
+                {% endif %}
+                {% if contenu == "emailformaterror" %}
+                    <div class="span-25">
+                        <div class="error errorMsg">                        
+                                {{ 'utilisateur.emailformaterror'|trans({}, 'utilisateurs') }}
+                        </div>    
+                    </div> 
+                {% endif %}
+                {% if contenu == "passworderror" %}
+                   <div class="span-25">
+                       <div class="error errorMsg">                        
+                               {{ 'utilisateur.passworderror'|trans({}, 'utilisateurs') }}
+                       </div>    
+                   </div> 
+                {% endif %}
+                {% if contenu == "smallpassworderror" %}
+                   <div class="span-25">
+                       <div class="error errorMsg">                        
+                               {{ 'utilisateur.smallpassworderror'|trans({}, 'utilisateurs') }}
+                       </div>    
+                   </div> 
+                {% endif %}
+            
+               {% if contenu == "errorsmalllogin" %}
+                   <div class="span-25">
+                       <div class="error errorMsg">                        
+                               {{ 'utilisateur.errorsmalllogin'|trans({}, 'utilisateurs') }}
+                       </div>    
+                   </div> 
+                {% endif %}           
+            
+            
+            {% endfor %}
+  
+                          
+   <div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-19">
+            <div class="logoModulePage"><img src="{{ asset('img/client-img/icon-48-user-add.png')}}" alt="" title="" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'utilisateur.ajout.titre1'|trans({}, 'utilisateurs') }} <span>:  {{ 'utilisateurs.ajout.titre2'|trans({}, 'utilisateurs') }}</span><h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+                        <div class="span-5 last">                                        
+
+                            <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                           <div class="boutonGestion">
+                                <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/client-img/icon-48-apply.png')}}" alt="Valider" title="Valider" /></div>
+                                {{ 'client.btnvalider'|trans}}</a>
+                            </div>
+							
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                             <div class="boutonGestion">
+                                  <div><a class="back" href="" ><img src="{{ asset('img/client-img/icon-48-cancel.png')}}" alt="Annuler" title="Annuler" /></div>
+                                  {{ 'client.annuler'|trans}}</a>
+                              </div>
+                            <div class="clr"></div>
+
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>	
+
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                        {#{ information.statsdynamique(listestat) }#} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+				<div class="colRightContentPadding">
+					<div class="FrmAjoutArt cadreInForm colorCadreArrondi bgBlanc labelLongAll">
+                                            <form action="{{ path('utb_client_ajout_utilisateur',{'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUser" name="ajoutUser">
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.email) }}
+                                                    {{ form_label(form.email, 'utilisateur.form.email'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.email) }}
+                                                    <div class="clr"></div>
+                                                    </div>
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.nomPrenom) }}
+                                                    {{ form_label(form.nomPrenom, 'utilisateur.form.nomPrenom'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.nomPrenom) }}
+                                                    <div class="clr"></div>
+                                                    </div>
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.telUtilisateur) }}
+                                                    {{ form_label(form.telUtilisateur, 'utilisateur.form.tel'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.telUtilisateur) }}
+                                                    <div class="clr"></div>
+                                                    </div>
+                                                
+                                                     <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.celUtilisateur) }}
+                                                    {{ form_label(form.celUtilisateur, 'utilisateur.form.cel'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.celUtilisateur) }}
+                                                    <div class="clr"></div>
+                                                    </div> 
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.adresseUtilisateur) }}
+                                                    {{ form_label(form.adresseUtilisateur, 'utilisateur.form.adresse'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.adresseUtilisateur) }}
+                                                    <div class="clr"></div>
+                                                    </div> 
+                                                    
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.username) }}
+                                                    {{ form_label(form.username, 'utilisateur.form.login'|trans({}, 'utilisateurs')) }}
+                                                    {{ form_widget(form.username) }}
+                                                    <div class="clr"></div>
+                                                    <span class="gris-comment"><em>{{'utilisateur.form.nbcaract'|trans({},'utilisateurs')}}</em></span>
+                                                    </div>
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.password) }}
+                                                    {{ form_label(form.password, 'utilisateur.form.pass'|trans({}, 'utilisateurs')) }} 
+                                                    {{ form_widget(form.password) }}
+                                                    <div class="clr"></div>
+                                                    <span class="gris-comment"><em>{{ 'utilisateur.form.nbcaract'|trans({},'utilisateurs')}}</em></span>
+                                                    </div>
+
+                                                    <div class="FrmAjoutArt">
+                                                    {{ form_errors(form.cpassword) }}
+                                                    {{ form_label(form.cpassword, 'utilisateur.form.cpass'|trans({}, 'utilisateurs')) }}
+                                                    {{ form_widget(form.cpassword) }}
+                                                    <div class="clr"></div>
+                                                    </div>
+
+                                                    <div class="FrmAjoutArt selectTypProfil">
+                                                    {{ form_errors(form.profil) }}
+                                                    {{ form_label(form.profil, 'utilisateur.form.profil'|trans({}, 'utilisateurs')) }}
+                                                    {{ form_widget(form.profil) }}
+                                                    <div class="clr"></div>
+                                                    </div>
+
+                                                    {#<div class="FrmAjoutArt">
+                                                    {{ form_errors(form.photo) }}
+                                                    {{ form_label(form.photo, 'utilisateur.form.photo'|trans({}, 'utilisateurs')) }}
+                                                    {{ form_widget(form.photo) }}
+                                                    <div class="clr"></div>
+                                                    </div>#}
+                                           <input type="submit" value="{{ 'client.ajouter'|trans}}" name="op" id="j_bouton" style="display: none"><a href=""></a>
+                                        </form>
+											</div>
+
+                                                 
+
+                                              </div>			<!-- FIN colRightContentPadding-->
+                                          </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                      </div>		<!--  FIN COL RIGHT -->
+                                  </div>			<!--  FIN  SPAN - 19 -->
+
+                              </div>				<!--  FIN SPAN - 25 -->
+
+  {# On définit un nouveau block, que les vues du bundle pourront remplir #}
+                              
+     <script>
+         $("#utb_clientbundle_utilisateurtype_profil").change(function(){
+             var valeur = $(document.getElementById('utb_clientbundle_utilisateurtype_profil')).val();
+             //alert(valeur);
+             if(valeur == {{idgestionnaireTwig}} ){
+                $("#fonds_container").show();
+             }
+             else{
+                 $("#fonds_container").hide();
+             }
+         })
+     </script>
+     
+  {% endblock %}

@@ -1,0 +1,137 @@
+{# src/utb/SiteBundle/Resources/views/site/correspondant.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Nos correspondants
+{% endblock %}
+  
+{% block public_body %}
+ 	<div class="span-24 marginBottom20p paddingTopBot20p bgBlanc">		<!-- borderBotStyle bgBlanc -->
+		<div class="all-orrespondants leftSpace">
+		<h1 class="titlePage title1 bleuLogo">{{ 'reseau.titre'|trans({}, 'site') }}</h1>
+	
+		<div class="devisesFilters rightSpace">
+              {% for sousrubrique in listesousrub %}          
+                                        {{allmacro.AfficherSousRubCorrespondant(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation)}}
+               {% endfor %}
+			   <img src="{{asset('img/site-img/all.jpg')}}" alt="" align="right" id="ALL" title="Tout Déselectionner"/>
+                           {% set currentPath = app.request.attributes.get('_route') %}
+							   {% if locale=="fr" %}  
+                <img src="{{asset('img/site-img/filtre.jpg')}}" alt="" align="right" />
+                {% else %}
+                <img src="{{asset('img/site-img/filtre_en.jpg')}}" alt="" align="right" />
+                {% endif  %}
+                <div class="clr"></div>
+		</div>
+		<div class="clr"></div>
+			
+		<div class="partners">		
+                        {% for article in listecorrespondance%}                    
+                                    <div class="partener {{article.nomRubrique}}">
+                                            <div class="partnerLogo">
+                                                    {% if article.urlMedia != "default_.png" %}
+                                                           <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title=""  />
+                                                          {# <img  style="float:right; margin-top:25px;" src="{{asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="" title="" />
+                                                          {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" />#}
+                                                    {% endif %}                                                
+                                                    
+                                            </div>
+                                            <div class="partenerDef">
+                                                    <div class="partenerNom">
+                                                        {{article.titreArticle|raw}}                                                    
+                                                    </div>
+                                                   
+                                                      <div class="partenerDevise">{{article.nomRubrique}}</div>
+                                                      <div class="partenerPays">{{article.descriptionArticle|raw}}</div>                                                                                                        
+                                            </div>
+                                    </div>                    
+                        {% endfor %}
+            	</div>	<!-- FIN DIV.parteners-->        
+		
+	</div>	<!-- FIN DIV.all-orrespondants-->
+	</div>	<!-- DIV.SPAN - 24 --> 
+  <script>
+       $(".devisesFilters").find("img").css({cursor:"pointer"});
+       $(".devisesFilters").find("img").click(function(){
+            //alert($(this).attr('id'));
+            var identifiant = $(this).attr('id');
+            if(identifiant === "ALL"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+            }
+            else if(identifiant === "XOF"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+                $(".partners").find(".XOF").css({border:"1px solid #2534bf"});
+                $(".partners").find(".XOF .partenerDevise").css({backgroundColor:"#2534bf", color:"#fff"});
+            }
+            else if(identifiant === "XAF"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+                $(".partners").find(".XAF").css({border:"1px solid #B00404"});
+                $(".partners").find(".XAF .partenerDevise").css({backgroundColor:"#B00404", color:"#fff"});
+            }
+            else if(identifiant === "EUR"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+                $(".partners").find(".EUR").css({border:"1px solid #ff8200"});
+                $(".partners").find(".EUR .partenerDevise").css({backgroundColor:"#ff8200", color:"#fff"});
+            }
+            else if(identifiant === "GBP"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+                $(".partners").find(".GBP").css({border:"1px solid #077980"});
+                $(".partners").find(".GBP .partenerDevise").css({backgroundColor:"#077980", color:"#fff"});
+            }
+            else if(identifiant === "USD"){
+                $(".partners .partener").css({border:"1px solid #e9f1f5"});
+                $(".partener .partenerDevise").css({backgroundColor:"#E2EAF7", color:"#555"});
+                $(".partners").find(".USD").css({border:"1px solid #41bf25"});
+                $(".partners").find(".USD .partenerDevise").css({backgroundColor:"#41bf25", color:"#fff"});
+            }
+            //$(".partener").css({border:"1px solid #000 "});
+       });
+       /*
+        jQuery.fn.extend({
+                dmark:	function (oConfig){
+                        var color = "#FF0000";
+                        for(c in oConfig){	
+                                if(c === "color") color = oConfig[c]; 
+                                
+                        }
+                        var prefix = Math.round(Math.random()*1000000);
+                        //alert(prefix);
+                        return this.each(function (){
+                                var oldTheme = $(".partenerDevise").css("backgroundColor");
+                                var flag = false;
+                                
+                                $(this).css({cursor:"pointer"}).click(function (){
+                                        if(!flag){
+                                                box = "." + $(this).attr("id");//Les box partenaires sÃ©lectionnÃ©s
+                                                //PremiÃ¨re phase : Initialisation; on restaure tout le thÃ¨me orignal avant toute nouvelle action
+                                                $(".partener").css({border:"1px solid " + oldTheme});
+                                                $(".partener .partenerDevise").css({backgroundColor:oldTheme, color:"#000000"}); 
+                                        //Activer les box
+                                                $(box).css({borderColor: color});
+                                                $(box + " .partenerDevise").css({backgroundColor: color, color:"#FFFFFF"});
+                                                //flag = true;
+                                        }else{
+                                                
+                                        }
+                                });
+                        });
+                }
+        });*/
+        /*
+        $(document).ready(function (){	
+                $("#XOF").dmark({color:"#2534bf"});
+                $("#EUR").dmark({color:"#ff8200"});
+                $("#USD").dmark({color:"#41bf25"});
+                $("#ALL").dmark({color:"#e9f1f5"});
+                $("#GBP").dmark({color:"#077980"});
+                $("#XAF").dmark({color:"#bf00bd"});
+        });      */
+</script>      
+  
+{% endblock %}
+  

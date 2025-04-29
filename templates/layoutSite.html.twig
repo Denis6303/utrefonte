@@ -1,0 +1,35 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }}- {{ 'acceuil.sitepublic'|trans({}, 'site') }}
+{% endblock %}
+
+
+  
+{% block menu_block %}  
+        
+        {% set lrubrique = app.request.get('lrubrique') %}
+          {% if lrubrique|length > 0 %}
+				{% if lrubrique[0].idGrandParent == 0 %} 
+					{% set unerubrique = lrubrique[0].id%}	
+				{% else %} 
+				  {% set unerubrique = lrubrique[0].idGrandParent%}
+				{% endif %} 
+				{{ render(controller( 'utbSiteBundle:Site:menu',{'locale': locale,'groupe':1,'idrub':unerubrique }   )) }}
+          {% else  %}
+            {{ render(controller( 'utbSiteBundle:Site:menu',{'locale': locale,'groupe':1,'idrub':0}   )) }}  
+          {% endif %} 
+  
+{% endblock %}
+{% block menubas_block %}
+  
+  {% set lrubrique = app.request.get('lrubrique') %}
+  
+        {% if lrubrique|length > 0 %} 
+          {{ render(controller( 'utbSiteBundle:Site:menu',{'locale': locale,'groupe':2,'idrub':lrubrique[0].id }   )) }}
+        {% else %}
+          {{ render(controller( 'utbSiteBundle:Site:menu',{'locale': locale,'groupe':2,'idrub':0}   )) }}  
+        {% endif %}
+  
+{% endblock %}

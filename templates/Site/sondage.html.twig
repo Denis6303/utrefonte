@@ -1,0 +1,66 @@
+
+     
+        
+            
+        
+ 
+                        {% for unsondage in sondage %}
+                            
+                        <div class="rightBox sondageBox  border-gris1">	<!-- NEWSLETTER-->
+                            <div class="rightBox-cnt butValideBordeau">
+                                 <h2 class="title-WithTopBar bar-bordeau capitaLetter">Sondage </h2>
+
+                                    <div class="sondageBox-cnt">
+                                            <div class="sondageBox-foot">
+
+                                                   <p>{{ unsondage.question}}</p>
+                                 
+                                                <form id="my_radio_box"> 
+                                                    <table>   
+                                                       {% for uneopinion in listeopinion %}
+                                                           <tr>
+                                                              <td><span> {{uneopinion.reponse}} </span></td>
+                                                              <td><input type="radio" name="opinion" id="{{uneopinion.id}}" value="{{uneopinion.id}}" /></td>
+                                                           </tr>
+                                                       {% endfor %}
+                                                    </table>
+                                               </form>
+                                                    <div class="clr"></div>
+                                            </div>
+                                    </div>
+                            </div>        
+                        </div>                                  
+                           
+                       {% endfor %}
+            
+   <script> 
+       
+            $( document ).ready(function() {
+                    $('#my_radio_box').change(function(){
+                        
+                   var opinionId= $("input[name='opinion']:checked").val();
+
+                        $.ajax({
+                           type: "POST",
+                            url: "{{ path('utb_admin_vote')}}",
+                            data: {opinionIds:opinionId},
+                            cache: false,
+                            success: function(data){
+                                  var resJson = jQuery.parseJSON(data);
+                                  if( resJson.result == "success"){
+                                       $(location).attr('href',"{{ path('utb_admin_resultatvote')}}");                                     
+                                  }      
+                                   else
+                                        alert("Vous avez deja voté");           
+                                        //console.log(data);
+                            }
+                      });            
+
+                    });
+          });
+                     
+    </script>
+  
+
+  
+

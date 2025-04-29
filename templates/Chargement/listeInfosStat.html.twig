@@ -1,0 +1,361 @@
+
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'chargement.infoschargement'|trans({}, 'chargement') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                    <a href="#"> {{ 'chargement.accueil'|trans({},'chargement') }}</a> > 
+                <a href="#"> {{ 'chargement.chargement'|trans({},'chargement') }}</a> >
+                {{ 'chargement.infos'|trans({},'chargement')}}
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-19">
+			<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-info.png')}}" alt="Objets" title="" /></div>
+			<div class="titreModule colorBleu"><h1>{{'Chargement.infos'|trans({},'chargement')}}utykre</h1></div>	
+					<div class="clr"></div>
+		</div>
+
+
+
+                        <div class="span-5 last">
+
+                          {#  <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getObjetsID(),1); return false;"><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.affiche2'|trans({}, 'messages') }}" title="{{ 'admin.affiche2'|trans({}, 'messages') }}" /></div>{{'admin.affiche2'|trans({}, 'messages')}} </a> 
+                            </div>
+                            <div class="ecartBoutons">&nbsp;</div>
+                            <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getObjetsID(),0); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.notaffiche2'|trans({}, 'messages') }}" title="{{ 'admin.notaffiche2'|trans({}, 'messages') }}" /></div>{{'admin.notaffiche2'|trans({}, 'messages')}}</a> 
+                            </div> 
+
+                            <div class="clr"></div> #}
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+         			<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+						<div class="colorCadreArrondi coinsArrondis bgGris">
+								<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+								  <div class="MarginBottomBox"></div> 
+									   <h3> {{'chargement.liste.compteinexistant'|trans({}, 'messages')}} </h3>
+									   <table class="listMenusCateg listArticlesRub">
+                                                                                    	<tr cospan ="2">
+												<th><input type="checkbox" class="checkall" name="checkall" /></th>
+												<th>{{'chargement.compteinexistant'|trans({}, 'messages')}} </th>
+												<th>{{'chargement.typecompte'|trans({}, 'messages')}}</th>												
+											</tr>	
+
+                                                                                        
+											{% for objet in cptesinexistants %}                                                                                                
+                                                                                            
+                                                                                            {% if (loop.index % 2) %}
+                                                                                                <tr>
+                                                                                            {% endif %}
+                                                                                                    <td>                                                                                                        
+                                                                                                        <input type="checkbox"  name="objet[]"  rel="objet_c" value="{{objet.id}}" />   
+                                                                                                    </td>
+                                                                                                    <td>    
+                                                                                                        {{objet.compte|raw }}   
+                                                                                                        &nbsp;&nbsp;&nbsp;
+													{% if objet.typeCompte ==1  %}															
+															{{'Chargement.afbw'|trans({}, 'chargement')}} 
+													{% elseif objet.typeCompte  ==2%}															
+															{{'Chargement.afbw2'|trans({}, 'chargement')}}
+													{% elseif objet.typeCompte  ==3%}															
+															{{'Chargement.uweb'|trans({}, 'chargement')}}
+													{% endif %}                                                                                                            
+                                                                                                        
+                                                                                                    </td>
+                                                                                                {% if (loop.index % 2) and loop.last %}
+                                                                                                    <td>&nbsp;</td>
+                                                                                                    <td>&nbsp;</td>
+                                                                                                {% endif %}
+                                                                                            {% if (loop.index0 % 2) or loop.last %}
+                                                                                               </tr>
+                                                                                            {% endif %}
+                                                                                 
+											{% else %}
+												 <tr>
+												   <td colspan="1">{{ 'chargement.file.none'|trans({}, 'chargement') }} </td>       
+												 </tr>       
+											{% endfor %} 
+                                                                                                 
+                                                                                                 
+									   </table>
+									   <div class="MarginBottomBox"></div>
+								</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+
+						</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+						
+						<div class="MarginBottomBox"></div>
+						<div class="MarginBottomBox"></div>
+						
+						<div class="colorCadreArrondi coinsArrondis bgGris">
+								<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+								  <div class="MarginBottomBox"></div> 
+									   <h3> {{'chargement.liste.operation'|trans({}, 'chargement')}} </h3>
+									   <table class="listMenusCateg listArticlesRub">
+											<tr>
+												<th><input type="checkbox" class="checkall" name="checkall" /></th>
+												<th>{{'chargement.nomprenom'|trans({}, 'chargement')}} </th>
+												<th>{{'chargement.numcpt'|trans({}, 'chargement')}}</th>
+												<th>{{'chargement.typecpte'|trans({}, 'chargement')}}</th>
+                                                                                                <th>{{'chargement.libop'|trans({}, 'chargement')}}</th>
+                                                                                                <th>{{'chargement.mtt'|trans({}, 'chargement')}}</th>
+                                                                                                <th>{{'chargement.dateval'|trans({}, 'chargement')}}</th>
+                                                                                                <th>{{'chargement.dateop'|trans({}, 'chargement')}}</th>
+											</tr>	
+                                                                                        
+											{% for operation in cptesoperations %} 
+												<tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+													<td class="statutArtList"> <input type="checkbox" name="operation[]"  rel="operation_c" value="{{operation.id}}" /> </td>
+													
+                                                                                                        <td class="titreList"> {{operation.nomPrenom|raw }} </td>
+                                                                                                        <td class="titreList"> {{operation.numeroCompte|raw }} </td> 
+                                                                                                        <td class="titreList"> {{operation.libTypeCompte|raw }} </td> 
+                                                                                                        <td class="titreList"> {{operation.libOperation|raw }} </td> 
+                                                                                                        <td class="titreList"> {{operation.montant|raw }} </td>
+                                                                                                        <td class="titreList"> {{operation.dateValeur|date("d/m/Y") }} </td> 
+                                                                                                        <td class="titreList"> {{operation.dateOperation|date("d/m/Y") }} </td>
+                                                                                                                      
+												</tr>
+											{% else %}
+												 <tr>
+												   <td colspan="4">{{ 'chargement.operation.none'|trans({}, 'chargement') }} </td>       
+												 </tr>       
+											{% endfor %}                                                                                                       
+									   </table>
+									   <div class="MarginBottomBox"></div>
+								</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+
+						</div>            
+						
+						<div class="MarginBottomBox"></div>
+						<div class="MarginBottomBox"></div>
+						
+						<div class="colorCadreArrondi coinsArrondis bgGris">
+								<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+								  <div class="MarginBottomBox"></div> 
+									   <h3> {{'chargement.liste.statistique'|trans({}, 'chargement')}} </h3>
+									   <table class="listMenusCateg listArticlesRub">
+											<tr>
+												<th><input type="checkbox" class="checkall" name="checkall" /></th>
+												<th>{{'chargement.nomprenom'|trans({}, 'chargement')}} </th>
+												<th>{{'chargement.nomprenom'|trans({}, 'chargement')}} </th>
+												<th>{{'chargement.nomprenom'|trans({}, 'chargement')}} </th>
+											</tr>	
+
+											{#% for stat in chargementsStat %} 
+												<tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+													<td class="statutArtList"> <input type="checkbox" name="objet[]"  rel="objet_c" value="{{objet.id}}" /> </td>
+													<td class="titreList"> {{stat.TypeDescription|raw }} </td>                                                         
+                                                                                                        <td class="titreList"> {{stat.TypeDescription|raw }} </td>
+                                                                                                        <td class="titreList"> {{stat.TypeDescription|raw }} </td>
+													<td class="statutArtList">              
+														<a href="{{path('utb_admin_texteinfos', {'locale': locale,'type':objet.paramType})}}">
+																  <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.edit'|trans({}, 'messages') }}" title="{{ 'admin.edit'|trans({}, 'messages') }}" />
+														</a> 
+													</td>                                                                                                                        
+												</tr>
+											{% else %}
+												 <tr>
+												   <td colspan="4">{{ 'objets.none'|trans({}, 'objets') }} </td>       
+												 </tr>       
+											{% endfor %#}                                                                                                       
+									   </table>
+									   <div class="MarginBottomBox"></div>
+								</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+
+						</div>                                                    
+                                                
+								<!-- Ecart entre les listes -->
+								<div class="MarginBottomBox"></div> 
+								  
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+
+			</div>				<!--  FIN SPAN - 25 -->
+                                            
+ <script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getObjetsID(){
+           
+            var objet_id = "";
+            
+            $(":input[rel=objet_c]:checked").each(function(){
+		objet_id = objet_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return objet_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "Voulez vous  changer le  supprimer ce objet ?"; 
+       
+    function gererEtatAll(objetId,etat){
+          if( objetId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+              
+            if( etat == 0 ){    
+            var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesactiver').html())};
+            }
+            
+            if( etat == 1 ){    
+            var args = {modal: true, autoOpen: false, title: ($('#titreconfirmactiver').html())};
+            }
+          
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          if( etat == 1 ){ 
+            $('#process_tpl').html( $('#msgconfirmactiver').html());
+          }
+          
+          if( etat == 0 ){ 
+            $('#process_tpl').html( $('#msgconfirmdesactiver').html());
+          }          
+          
+
+          if( etat == 0 ){    
+            var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesactiver').html())};
+          }
+
+          if( etat == 1 ){    
+            var args = {modal: true, autoOpen: false, title: ($('#titreconfirmactiver').html())};
+          }
+
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gererParametres')}}",
+                                data: {objetIds:objetId,etat:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    
+                                    if( answer.result=="erreurstatut"){                                        
+
+                                        if( etat == 1 ){ 
+                                          $('#process_tpl').html($('#impossibleactiver').html());
+                                        }
+
+                                        if( etat == 0 ){ 
+                                          $('#process_tpl').html($('#impossibledesactiver').html());
+                                        }  
+                                    }
+                                    
+                                    if( answer.result=="accessdenied"){ 
+                                        $('#process_tpl').html($('#accessdenied').html());
+                                    }   
+                                    
+                                    if( answer.result=="success"){ 
+
+                                        if( etat == 1 ){ 
+                                          $('#process_tpl').html($('#reussiteactiver').html());
+                                        }
+
+                                        if( etat == 0 ){ 
+                                          $('#process_tpl').html($('#reussitedesactiver').html());
+                                        }  
+
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }       
+       
+</script>                                            
+     <div id="process_tpl" style="display:none;"></div>   
+     
+  {# dépublier d'articles #}
+  <div id="msgconfirmactiver" style="display:none;">
+    {{ 'confirmation.activer'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmactiver" style="display:none;">
+    {{ 'confirmation.titreactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibleactiver" style="display:none;"> 
+    {{ 'confirmation.impossibleactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussiteactiver" style="display:none;"> 
+    {{ 'confirmation.succesactive'|trans({}, 'messages') }} 
+  </div>      
+  
+  <div id="msgconfirmdesactiver" style="display:none;">
+    {{ 'confirmation.desactiver'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmdesactiver" style="display:none;">
+    {{ 'confirmation.titredesactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibledesactiver" style="display:none;"> 
+    {{ 'confirmation.impossibledesactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussitedesactiver" style="display:none;"> 
+    {{ 'confirmation.succesdesactive'|trans({}, 'messages') }} 
+  </div>  
+     
+  <div id="sivide" style="display:none;"> 
+    {{ 'confirmation.sivide'|trans({}, 'messages') }} 
+  </div> 
+   
+   <div id="accessdenied" style="display:none;"> 
+    {{ 'confirmation.accessdenied'|trans({}, 'messages') }} 
+  </div>     
+     
+  {{ information.decochetoutbox() }}     
+     
+  {% endblock %}
+
+                                            

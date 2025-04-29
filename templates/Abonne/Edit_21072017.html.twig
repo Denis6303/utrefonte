@@ -1,0 +1,714 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'users.ajout.grandtitrepg'|trans({}, 'users') }}
+{% endblock %}
+
+  {% block client_centre_body %}
+ 
+    <ul class="filariane bleuLink">
+		<li><a href=""><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li><a href="">{{'abonnes.gestion.titre'|trans({},'abonnes') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'abonnes.ajout'|trans({},'abonnes') }}</li>
+    </ul>                            
+
+                             
+	  {% for contenu in app.session.flashbag.get('notice') %}            
+		{% if contenu == "emailerror" %}
+			<div class="error rightSpace leftSpace center">                        
+					{{ 'users.emailerror'|trans({}, 'users') }}
+			</div>  
+		{% endif %}
+  
+		{% if contenu == "compteerror" %}
+			<div class="error rightSpace leftSpace center">                        
+					{{ 'compte.compteerror'|trans({}, 'compte') }}
+			</div>  
+		{% endif %}
+
+		{% if contenu == "loginerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'users.loginerror'|trans({}, 'users') }}
+			</div>    
+		{% endif %}
+  
+		{% if contenu == "categorieerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'abonnes.categorieerror'|trans({}, 'abonnes') }}
+			</div>    
+		{% endif %}
+  
+		{% if contenu == "emailformaterror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'users.emailformaterror'|trans({}, 'users') }}
+			</div>    
+		{% endif %}
+		{% if contenu == "passworderror" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'users.passworderror'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+		{% if contenu == "smallpassworderror" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'users.smallpassworderror'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+	
+	   {% if contenu == "errorsmalllogin" %}
+		   <div class="error rightSpace leftSpace center">                        
+				{{ 'users.errorsmalllogin'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+                
+		{% if contenu == "errorlogincaracint" %}
+			   <div class="error rightSpace leftSpace center">                        
+					   {{ 'utilisateur.error.login.carcteresinterdits'|trans({}, 'utilisateurs') }}
+			   </div>    
+		{% endif %} 
+	
+	{% endfor %}
+			
+			
+	{#% set dot = "<span> *</span>" %#}		
+  <style>
+      .AjoutDUnAbonne label{width: 150px;}
+      .AjoutDUnAbonne input{width: 200px;}
+      .label2ligne label{width: 155px;}
+      .label2ligne input{width: 195px;}
+  </style>
+  <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'abonnes.ajout'|trans({},'abonnes') }}</h2>
+	<div class="marginBottom20p paddingBottom20p">
+            <h4 style="font-weight:normal;font-style: italic;text-align: right;"><span style="color: blue;"> * </span>{{'client.obligatoire'|trans({}, 'messages')}}</h4>
+	<form class="form_search"  action="{{ path('utb_client_ajout_abonne',{'locale':locale}) }}" {{ form_enctype(form) }} method="post" id="ajoutUser">
+									
+	 <div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.nomPrenom) }}
+                {{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom3'|trans({}, 'abonnes')|raw) }}
+		{{ form_widget(form.nomPrenom) }}
+		<div class="clr"></div>
+	</div>
+
+	<div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.email) }}
+		{{ form_label(form.email, 'abonnes.form.email3'|trans({}, 'abonnes'))}}
+		{{ form_widget(form.email) }}
+		<div class="clr"></div>
+	</div>								
+
+												
+	<div class="FrmAbonne champsGrp AjoutDUnAbonne">
+		{{ form_errors(form.telAbonne) }}
+		{{ form_errors(form.celAbonne) }}
+		{{ form_label(form.telAbonne, 'abonnes.form.tel'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.telAbonne) }}
+		{{ form_label(form.celAbonne, 'abonnes.form.cel3'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.celAbonne) }}
+		<div class="clr"></div>
+	</div>
+
+	<div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.adresseAbonne) }}
+		{{ form_label(form.adresseAbonne, 'abonnes.form.adresse3'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.adresseAbonne) }}
+		<div class="clr"></div>
+	</div>
+
+	<div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.username) }}
+		{{ form_label(form.username, 'abonnes.form.username3'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.username) }}
+		<div class="clr"></div>
+		<span class="gris-comment"><em>{{'users.form.nbcaract2'|trans({},'users')}}</em></span>
+	</div>
+
+	<div class="FrmAbonne champsGrp AjoutDUnAbonne">
+		{{ form_errors(form.password) }}
+		{{ form_errors(form.cpassword) }}
+		{{ form_label(form.password, 'abonnes.form.password3'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.password) }}
+		<span class="label2lign">{{ form_label(form.cpassword, 'abonnes.form.cpassword3'|trans({}, 'abonnes')) }}</span>
+		{{ form_widget(form.cpassword) }}
+		<div class="clr"></div>
+                <span class="gris-comment"><em>{{'users.form.nbcaract3'|trans({},'users')}} </em></span>
+	</div>
+           
+ 
+	<div class="FrmAbonne inputMin AjoutDUnAbonne">
+		{{ form_errors(form.radicalAbonne) }}
+		{{ form_label(form.radicalAbonne, 'abonnes.form.radical'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.radicalAbonne) }}
+		<div class="clr"></div>
+                <div id="errorRadical" style="display: none"><i> Le radical doit comporter  6 chiffres</i> </div>
+                	<input type="hidden"  name="comptes_1_fonds" id="comptes_1_fonds" >
+			<input type="hidden"  name="comptes_2_fonds" id="comptes_2_fonds" >
+			<input type="hidden"  name="comptes_3_fonds" id="comptes_3_fonds" >
+			<input type="hidden"  name="comptes_4_fonds" id="comptes_4_fonds" >
+			<input type="hidden"  name="comptes_5_fonds" id="comptes_5_fonds" >
+                        <input type="hidden"  name="comptes_6_fonds" id="comptes_6_fonds" >
+                        
+			<input type="hidden"  name="comptes_1_typecompte" id="comptes_1_typecompte" >
+			<input type="hidden"  name="comptes_2_typecompte" id="comptes_2_typecompte" >
+			<input type="hidden"  name="comptes_3_typecompte" id="comptes_3_typecompte" >
+			<input type="hidden"  name="comptes_4_typecompte" id="comptes_4_typecompte" >
+			<input type="hidden"  name="comptes_5_typecompte" id="comptes_5_typecompte" >
+                        <input type="hidden"  name="comptes_6_typecompte" id="comptes_6_typecompte" >
+	</div> 
+	<div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.profil) }}
+		{{ form_label(form.profil, 'abonnes.form.profil'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.profil) }}
+		<div class="clr"></div>
+	</div>                                                         
+            <style>
+            ul.comptes select{margin-left: 30px;}    
+            ul.comptes .compteini{margin-left: 155px;}    
+            ul.comptes div.legendeCpt{margin-left: 155px;}    
+            </style>
+            
+	<div class="FrmAbonne AjoutDUnAbonne">
+		{{ form_errors(form.adresseAbonne) }}
+		{{ form_label(form.adresseAbonne, 'fond.nomimp'|trans({}, 'fond')) }}
+            <select name="idfonds" required="required">
+                    <option value="">- Choisissez un Gestionnaire / Choose a manager -</option>
+                    {% for unfonds in listefonds %}
+                    <option value="{{unfonds.id}}">{{unfonds.libFonds}}</option>
+                    {% endfor %}
+                </select>
+		<div class="clr"></div>
+	</div> 
+            
+	<ul class="comptes" data-prototype="{{form_widget(form.comptes.vars.prototype)|e}}"> </ul>
+	<div class="clr marginBottom20p"></div>
+        
+	<input class="boutonSubmit" type="submit" value="{{'client.valider'|trans({},'messages') }}"/>
+        <a  href="{{ path('utb_client_liste_abonne',{'locale':locale}) }}"><input type="button" class="annulerBut back" value="{{'client.annuler'|trans({},'messages') }}" name="" id="" > </a>
+	</form>
+
+	</div>
+  
+    <script language="javascript" >                         
+                                // Récupère le div qui contient la collection de tags
+      var collectionHolder = $('ul.comptes');
+      // ajoute un lien « add a tag »
+      //var $addTagLink = $('<a href="#" class="add_tag_link">Ajouter un Numéro de Compte </a> ');
+      var $addTagLink = $('<a href="#" class="add_tag_link">Ajouter un Numéro de Compte </a>');
+      var $newLinkLi = $('<li></li>').append($addTagLink);
+
+      jQuery(document).ready(function() {
+          			/*inTab = new Array('0','1','2','3','4','5','6','7','8','9');
+			console.log(inTab);
+			//on ecrit le jquery qu'on appel pour chaque changement de ton input
+			$(".petitinput").blur(function(){
+				var valeur_input = $(this).val();
+				
+				if ($.inArray(valeur_input, inTab) === -1) {
+					alert("entier seulement...!");
+				}
+			})*/
+         // $("#Champ1").numeric();
+          // ajoute l'ancre « ajouter un tag » et li à la balise ul
+          //collectionHolder.append($newLinkLi);
+
+          //$addTagLink.on('click', function(e) {
+              // empêche le lien de créer un « # » dans l'URL
+              
+             // e.preventDefault();
+
+              // ajoute un nouveau formulaire tag (voir le prochain bloc de code)
+              //addCompteForm(collectionHolder, $newLinkLi);
+         // });
+            collectionHolder.append($newLinkLi); 
+            addCompteForm(collectionHolder, $newLinkLi);
+            $('.petitinput').focus(function() {
+                 addRadical();
+             });
+            $('.Champ1').focus(function() {
+                   $('.Champ1').css( "background-color", "#EEE" );
+                    });                   
+            $('#utb_clientbundle_abonnetype_radicalAbonne').blur(function() {
+                if(($('#utb_clientbundle_abonnetype_radicalAbonne').val()).length<6){
+                      $('#errorRadical').show();
+                      $('#utb_clientbundle_abonnetype_radicalAbonne').css("border-color","#F00");
+                }else{
+                     $('#utb_clientbundle_abonnetype_radicalAbonne').css("border-color","#CCC");
+                }
+                addRadical();
+          });
+
+            $('#utb_clientbundle_abonnetype_username').blur(function() {
+                if(($('#utb_clientbundle_abonnetype_username').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_username').css("border-color","#F00");
+                      alert("Le nom d'utilisateur doit contenir au moins 5 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_username').css("border-color","#CCC");
+                }               
+          });     
+
+            $('#utb_clientbundle_abonnetype_password').blur(function() {
+                if(($('#utb_clientbundle_abonnetype_password').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_password').css("border-color","#F00");
+                      alert("Le mot de passe doit contenir au moins 6 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_password').css("border-color","#CCC");
+                }               
+          });
+          
+            $('#utb_clientbundle_abonnetype_cpassword').blur(function() {
+                if($('#utb_clientbundle_abonnetype_cpassword').val()!= $('#utb_clientbundle_abonnetype_password').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_password').css("border-color","#F00");
+                      $('#utb_clientbundle_abonnetype_cpassword').css("border-color","#F00");
+                      alert("Les mots de passe  doivent être identiques !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_cpassword').css("border-color","#CCC");
+                    $('#utb_clientbundle_abonnetype_password').css("border-color","#CCC");
+                }               
+          });
+           //alert("TEst");
+         
+          
+          $('.boutonSubmit').click(function() { 
+              
+             //alert($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")+""+$('#utb_clientbundle_abonnetype_comptes_2_fonds').children('option:selected').attr("value"));
+            
+            //Pour vérifier si les fonds choisi sont identiques
+                    if($('#utb_clientbundle_abonnetype_comptes_2_fonds').children('option:selected').attr("value")!=null){
+                        if($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")!= $('#utb_clientbundle_abonnetype_comptes_2_fonds').children('option:selected').attr("value")){
+                               //$('#errorUtil').show();
+                               $('#utb_clientbundle_abonnetype_comptes_2_fonds').css("border-color","#F00");
+                               alert("Les fonds doivent être identiques !");
+                               return false;
+                         } 
+                     }
+
+                      if($('#utb_clientbundle_abonnetype_comptes_3_fonds').children('option:selected').attr("value")!=null){
+                        if($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")!= $('#utb_clientbundle_abonnetype_comptes_3_fonds').children('option:selected').attr("value")){
+                               //$('#errorUtil').show();
+                               $('#utb_clientbundle_abonnetype_comptes_3_fonds').css("border-color","#F00");
+                               alert("Les fonds doivent être identiques !");
+                               return false;
+                         } 
+                     }
+
+                     if($('#utb_clientbundle_abonnetype_comptes_4_fonds').children('option:selected').attr("value")!=null){
+                        if($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")!= $('#utb_clientbundle_abonnetype_comptes_4_fonds').children('option:selected').attr("value")){
+                               //$('#errorUtil').show();
+                               $('#utb_clientbundle_abonnetype_comptes_4_fonds').css("border-color","#F00");
+                               alert("Les fonds doivent être identiques !");
+                               return false;
+                         } 
+                     }
+
+                     if($('#utb_clientbundle_abonnetype_comptes_5_fonds').children('option:selected').attr("value")!=null){            
+                        if($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")!= $('#utb_clientbundle_abonnetype_comptes_5_fonds').children('option:selected').attr("value")){
+                               //$('#errorUtil').show();
+                               $('#utb_clientbundle_abonnetype_comptes_5_fonds').css("border-color","#F00");
+                               alert("Les fonds doivent être identiques !");
+                               return false;
+                         }
+                     }
+                     if($('#utb_clientbundle_abonnetype_comptes_6_fonds').children('option:selected').attr("value")!=null){            
+                        if($('#utb_clientbundle_abonnetype_comptes_1_fonds').children('option:selected').attr("value")!= $('#utb_clientbundle_abonnetype_comptes_6_fonds').children('option:selected').attr("value")){
+                               //$('#errorUtil').show();
+                               $('#utb_clientbundle_abonnetype_comptes_6_fonds').css("border-color","#F00");
+                               alert("Les fonds doivent être identiques !");
+                               return false;
+                         }  
+                     }
+                     
+                   //return false;
+                   /*  if($('#utb_clientbundle_abonnecomptetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnecomptetype_comptes_4_fonds').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnecomptetype_comptes_4_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;
+                    }   
+                    
+                    if($('#utb_clientbundle_abonnecomptetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnecomptetype_comptes_3_fonds').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnecomptetype_comptes_3_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;
+                    }   
+                    if($('#utb_clientbundle_abonnecomptetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnecomptetype_comptes_2_fonds').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnecomptetype_comptes_2_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;
+                    } */         
+        
+                     // Permet de gerer l'ajout de fond et type compte
+                    $('#comptes_1_fonds').val($('#utb_clientbundle_abonnetype_comptes_1_fonds').val());
+                    $('#comptes_1_typecompte').val($('#utb_clientbundle_abonnetype_comptes_1_Typecompte').val());
+                    
+                    $('#comptes_2_fonds').val($('#utb_clientbundle_abonnetype_comptes_2_fonds').val());  
+                    $('#comptes_2_typecompte').val($('#utb_clientbundle_abonnetype_comptes_2_Typecompte').val());
+                    
+                    $('#comptes_3_fonds').val($('#utb_clientbundle_abonnetype_comptes_3_fonds').val());
+                    $('#comptes_3_typecompte').val($('#utb_clientbundle_abonnetype_comptes_3_Typecompte').val());
+                    
+                    $('#comptes_4_fonds').val($('#utb_clientbundle_abonnetype_comptes_4_fonds').val()); 
+                    $('#comptes_4_typecompte').val($('#utb_clientbundle_abonnetype_comptes_4_Typecompte').val());
+                    
+                    $('#comptes_5_fonds').val($('#utb_clientbundle_abonnetype_comptes_5_fonds').val()); 
+                    $('#comptes_5_typecompte').val($('#utb_clientbundle_abonnetype_comptes_5_Typecompte').val());
+                    $('#comptes_6_fonds').val($('#utb_clientbundle_abonnetype_comptes_6_fonds').val()); 
+                    $('#comptes_6_typecompte').val($('#utb_clientbundle_abonnetype_comptes_6_Typecompte').val());
+                    
+                      
+         }); 
+
+
+          
+            
+          //Ancien fonction de controle de la validite du numero de compte 
+ 	  /*	$('.petitinput').keypress(function (e){
+				if(e.which == 9) return false;//Ne rien faire quand c'est une tabulation
+				if(e.which == 8){
+					if($(this).attr("name")!= "")
+						$(this).val(null);
+					else
+						return false;
+				}
+				else if((e.which < 48 || e.which > 57)){ 
+					return false;//$(this).val(null);
+				}
+				else{
+					$(this).next().focus();
+                                        $(this).next().css( "background-color", "#EEE" )
+				}
+		});  */
+
+                // controle des types de compte
+		$('.myselect').change(function (){
+			var	i =$(this).children('option:selected').attr("value");
+			if(i!=3){
+					$('.Champ1').attr("disabled","disabled").css("background","#cccccc");
+					$('.Champ2').attr("disabled","disabled").css("background","#cccccc");
+					$('.Champ9').attr("disabled","disabled").css("background","#cccccc");
+					$('.Champ15').attr("disabled","disabled").css("background","#cccccc");
+					$('.Champ1').attr("disabled","disabled").val("");
+					$('.Champ2').attr("disabled","disabled").val("");
+					$('.Champ9').attr("disabled","disabled").val("");
+					$('.Champ15').attr("disabled","disabled").val("");                                        
+					$(this).parent().children("input").eq(0).removeClass('required');
+					$(this).parent().children("input").eq(1).removeClass('required');
+					$(this).parent().children("input").eq(8).removeClass('required');
+					$(this).parent().children("input").eq(14).removeClass('required');
+                                        $('.Champ10').focus();
+                                        
+			}
+			else{
+					$('.Champ1').removeAttr("disabled");
+                                        $('.Champ1').css("background","#fff");
+                                        $('.Champ2').removeAttr("disabled");
+                                        $('.Champ2').css("background","#fff");
+                                        $('.Champ9').removeAttr("disabled");
+                                        $('.Champ9').css("background","#fff");
+                                        $('.Champ15').removeAttr("disabled");
+                                        $('.Champ15').css("background","#fff");
+                                        $('.Champ1').focus();
+			}	
+		});
+                
+           $('#utb_clientbundle_abonnetype_comptes_2_fonds').change(function() {                             
+                if($('#utb_clientbundle_abonnetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnetype_comptes_2_fonds').val()){
+                      //$('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_comptes_2_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;
+                }               
+           });
+           
+          $('#utb_clientbundle_abonnetype_comptes_3_fonds').change(function() {
+                if($('#utb_clientbundle_abonnetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnetype_comptes_3_fonds').val()){
+                      //$('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_comptes_3_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;
+                }               
+          });
+
+          $('#utb_clientbundle_abonnecomptetype_comptes_4_fonds').change(function() {              
+                if($('#utb_clientbundle_abonnetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnetype_comptes_4_fonds').val()){
+                    
+                      //$('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_comptes_4_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques !");
+                      return false;                      
+                } 
+                
+          });  
+          $('#utb_clientbundle_abonnecomptetype_comptes_5_fonds').change(function() {              
+                if($('#utb_clientbundle_abonnetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnetype_comptes_5_fonds').val()){
+                    
+                      //$('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_comptes_5_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques ! ");
+                      return false;                      
+                } 
+                
+          });
+          $('#utb_clientbundle_abonnecomptetype_comptes_6_fonds').change(function() {              
+                if($('#utb_clientbundle_abonnetype_comptes_1_fonds').val()!= $('#utb_clientbundle_abonnetype_comptes_6_fonds').val()){
+                    
+                      //$('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_comptes_6_fonds').css("border-color","#F00");
+                      alert("Les fonds doivent être identiques ! ");
+                      return false;                      
+                } 
+                
+          });
+      });
+
+          $addTagLink.on('click', function(e) {
+              // empêche le lien de créer un « # » dans l'URL   
+              e.preventDefault();
+              //alert('Test');
+                          
+              // ajoute un nouveau formulaire tag (voir le prochain bloc de code)
+              addCompteForm(collectionHolder, $newLinkLi);
+          });
+          
+        function supprCompte(enCours) { 
+              // alert("OK");
+              //enCours.preventDefault();
+               $("."+enCours).parents('li:eq(1)').remove(); 
+               //$(this).parents('li:eq(0)').remove();
+               // $("."+enCours).prev('li').remove();
+       };    
+      function addCompteForm(collectionHolder, $newLinkLi) {
+            // Récupère l'élément ayant l'attribut data-prototype comme expliqué plus tôt
+            var prototype = collectionHolder.attr('data-prototype');
+
+            // Remplace '__name__' dans le HTML du prototype par un nombre basé sur
+            // la longueur de la collection courante
+            var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+            // Affiche le formulaire dans la page dans un li, avant le lien "ajouter un tag"
+           
+            var $newFormLi = $("<li>\n\
+                                        <div id=\"touscompte\">\n\
+                                                      <span class=\"typescompt\">\n\{{'compte.type'|trans({},'compte') }}</span>\n\
+                                                      <select name=\"type_compte[]\" class=\"myselect\">\n\
+                                                                        <option value=\"3\"  class=\"choix\" >\n\
+                                                                                uweb\n\
+                                                                       </option>\n\
+                                                                       <option value=\"2\"  class=\"choix\" >\n\
+                                                                                afwb\n\
+                                                                       </option>\n\
+                                                                       <option value=\"1\"  class=\"choix\" >\n\
+                                                                                afwb2\n\
+                                                                       </option>\n\
+                                                        </select>\n\
+                                                        <div class=\"compteini\">\n\
+                                                            <input id =\"Champ1\" class=\"petitinput required Champ1\" type=\"text\" name=\"Champ1[]\" maxlength=\"1\"  width=\"2\" size=\"1\" onkeyup=\"javascript:suivant('Champ1','Champ2',1);\">\n\
+                                                            <input id =\"Champ2\" class=\"petitinput required Champ2\" type=\"text\" name=\"Champ2[]\" maxlength=\"1\"  width=\"2\" size=\"1\" onkeyup=\"javascript:suivant('Champ2','Champ3',1);\">&nbsp;&nbsp;\n\
+                                                            <input class=\"petitinput required Champ3\" type=\"text\" name=\"Champ3[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ3','Champ4',1);\" size=\"1\" required>\n\
+                                                            <input size=\"1\" class=\"petitinput required Champ4\" type=\"text\" name=\"Champ4[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ4','Champ5',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ5\" type=\"text\" name=\"Champ5[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ5','Champ6',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ6\" type=\"text\" name=\"Champ6[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ6','Champ7',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ7\" type=\"text\" name=\"Champ7[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ7','Champ8',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ8\" type=\"text\" name=\"Champ8[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ8','Champ9',1);\" size=\"1\" required>&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ9\" class=\"petitinput Champ9 required\" type=\"text\" name=\"Champ9[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ9','Champ10',1);\" size=\"1\" >&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ10\" class=\"petitinput required Champ10\" onblur=\"javascript:if(this.value != 0 ){this.focus()};\" type=\"text\" name=\"Champ10[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ10','Champ11',1);\" required>\n\
+                                                            <input id=\"Champ11\" onfocus=\"javascript:if(Champ10.value != 0 ){Champ10.focus()};\" onblur=\"javascript:if( this.value > 2){this.focus()};\" class=\"petitinput Champ11 required\" type=\"text\" name=\"Champ11[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ11','Champ12',1);\" required>\n\
+                                                            <input id=\"Champ12\"  onfocus=\"javascript:if( Champ11.value > 2){Champ11.focus()};\" onblur=\"javascript:if((Champ11.value >= 2) && (this.value > 7)){this.focus()};\" class=\"petitinput required Champ12\" type=\"text\" name=\"Champ12[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ12','Champ13',1);\" required>&nbsp;&nbsp;\n\
+                                                            <input  id=\"Champ13\" onfocus=\"javascript:if(( Champ11.value >= 2 ) && (Champ12.value > 7)  ){Champ12.focus()};\"  class=\"petitinput Champ13 required\" type=\"text\" name=\"Champ13[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ13','Champ14',1);\" required>&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ14\" class=\"petitinput Champ14 required\" type=\"text\" name=\"Champ14[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ14','Champ15',1);\" required>\n\
+                                                            <input id=\"Champ15\" class=\"petitinput Champ15 required\" type=\"text\" name=\"Champ15[]\" maxlength=\"1\">\n\
+                                                        </div>\n\
+                                            </div>\n\
+                                            <div class=\"legendeCpt\">\n\
+                                                    <span class=\"spn1\">\n\
+                                                            Code agence\n\
+                                                    </span>\n\
+                                                    <span class=\"spn2\">\n\
+                                                            Radical\n\
+                                                    </span>\n\
+                                                    <span class=\"spn3\">\n\
+                                                          Digit Contrôle\n\
+                                                    </span>\n\
+                                                    <span class=\"spn4\">\n\
+                                                                Type de Compte\n\
+                                                    </span>\n\
+                                                    <span class=\"spn5\">\n\
+                                                            N° Ordre\n\
+                                                    </span>\n\
+                                                    <span class=\"spn6\">\n\
+                                                            Code devise\n\
+                                                    </span>\n\
+                                            </div>\n\
+                        </li>").append(newForm);
+    
+            
+           
+            $newLinkLi.before($newFormLi);
+            addRadical();
+           // ajouterLienSuppression(prototype);
+        }
+     function addRadical(){
+            $('.Champ3').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(0,1)); 
+            $('.Champ4').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(1,1));
+            $('.Champ5').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(2,1));
+            $('.Champ6').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(3,1));
+            $('.Champ7').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(4,1));
+            $('.Champ8').val($('#utb_clientbundle_abonnetype_radicalAbonne').val().substr(5,1));          
+     }
+// La fonction qui ajoute un lien de suppression d'une catégorie
+        // La fonction qui ajoute un lien de suppression d'une catégorie
+            function ajouterLienSuppression(collectionHolder) {
+              // Création du lien
+             // $lienSuppression = $('<a href="#" class="btn btn-suppr">Supprimer</a>');
+                var prototype = collectionHolder.attr('data-prototype');
+                var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+                            // Remplace '__name__' dans le HTML du prototype par un nombre basé sur
+                // la longueur de la collection courante
+                var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+                // Affiche le formulaire dans la page dans un li, avant le lien "ajouter un tag"
+                var $newFormLi = $("<li>\n\
+                                        <div id=\"touscompte\">\n\
+                                                      <span class=\"typescompt\">\n\{{'compte.type'|trans({},'compte') }}</span>\n\
+                                                      <select name=\"type_compte[]\" class=\"myselect\">\n\
+                                                                        <option value=\"1\"  class=\"choix\" >\n\
+                                                                                uweb\n\
+                                                                       </option>\n\
+                                                                       <option value=\"2\"  class=\"choix\" >\n\
+                                                                                afwb\n\
+                                                                       </option>\n\
+                                                                       <option value=\"3\"  class=\"choix\" >\n\
+                                                                                afwb2\n\
+                                                                       </option>\n\
+                                                        </select>\n\
+                                                        <div class=\"compteini\">\n\
+                                                            <input id =\"Champ1\" class=\"petitinput required Champ1\" type=\"text\" name=\"Champ1[]\" maxlength=\"1\"  width=\"2\" size=\"1\" onkeyup=\"javascript:suivant('Champ1','Champ2',1);\">\n\
+                                                            <input id =\"Champ2\" class=\"petitinput required Champ2\" type=\"text\" name=\"Champ2[]\" maxlength=\"1\"  width=\"2\" size=\"1\" onkeyup=\"javascript:suivant('Champ2','Champ3',1);\">&nbsp;&nbsp;\n\
+                                                            <input class=\"petitinput required Champ3\" type=\"text\" name=\"Champ3[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ3','Champ4',1);\" size=\"1\" required>\n\
+                                                            <input size=\"1\" class=\"petitinput required Champ4\" type=\"text\" name=\"Champ4[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ4','Champ5',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ5\" type=\"text\" name=\"Champ5[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ5','Champ6',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ6\" type=\"text\" name=\"Champ6[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ6','Champ7',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ7\" type=\"text\" name=\"Champ7[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ7','Champ8',1);\" required>\n\
+                                                            <input class=\"petitinput required Champ8\" type=\"text\" name=\"Champ8[]\" maxlength=\"1\" readonly=\"readonly\" onkeyup=\"javascript:suivant('Champ8','Champ9',1);\" size=\"1\" required>&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ9\" class=\"petitinput Champ9 required\" type=\"text\" name=\"Champ9[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ9','Champ10',1);\" size=\"1\" >&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ10\" class=\"petitinput required Champ10\" onblur=\"javascript:if(this.value != 0 ){this.focus()};\" type=\"text\" name=\"Champ10[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ10','Champ11',1);\" required>\n\
+                                                            <input id=\"Champ11\" onfocus=\"javascript:if(Champ10.value != 0 ){Champ10.focus()};\" onblur=\"javascript:if( this.value > 2){this.focus()};\" class=\"petitinput Champ11 required\" type=\"text\" name=\"Champ11[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ11','Champ12',1);\" required>\n\
+                                                            <input id=\"Champ12\"  onfocus=\"javascript:if( Champ11.value > 2){Champ11.focus()};\" onblur=\"javascript:if((Champ11.value >= 2) && (this.value > 7)){this.focus()};\" class=\"petitinput required Champ12\" type=\"text\" name=\"Champ12[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ12','Champ13',1);\" required>&nbsp;&nbsp;\n\
+                                                            <input  id=\"Champ13\" onfocus=\"javascript:if(( Champ11.value >= 2 ) && (Champ12.value > 7)  ){Champ12.focus()};\"  class=\"petitinput Champ13 required\" type=\"text\" name=\"Champ13[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ13','Champ14',1);\" required>&nbsp;&nbsp;\n\
+                                                            <input id=\"Champ14\" class=\"petitinput Champ14 required\" type=\"text\" name=\"Champ14[]\" maxlength=\"1\" onkeyup=\"javascript:suivant('Champ14','Champ15',1);\" required>\n\
+                                                            <input id=\"Champ15\" class=\"petitinput Champ15 required\" type=\"text\" name=\"Champ15[]\" maxlength=\"1\">\n\
+                                                        </div>\n\
+                                            </div>\n\
+                                            <div class=\"legendeCpt\">\n\
+                                                    <span class=\"spn1\">\n\
+                                                            Code agence\n\
+                                                    </span>\n\
+                                                    <span class=\"spn2\">\n\
+                                                            Radical\n\
+                                                    </span>\n\
+                                                    <span class=\"spn3\">\n\
+                                                          Digit Contrôle\n\
+                                                    </span>\n\
+                                                    <span class=\"spn4\">\n\
+                                                                Type de Compte\n\
+                                                    </span>\n\
+                                                    <span class=\"spn5\">\n\
+                                                            N° Ordre\n\
+                                                    </span>\n\
+                                                    <span class=\"spn6\">\n\
+                                                            Code devise\n\
+                                                    </span>\n\
+                                            </div>\n\
+                        </li>").append(newForm);
+
+              // Ajout du lien
+              //$prototype.append($lienSuppression);
+
+              // Ajout du listener sur le clic du lien
+
+                $newFormLi.remove();
+                //alert($newFormLi);
+               // e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+                return false;
+            }      
+{#function suivant(enCours, suivant, limite)
+{
+       
+      // var inTab = new array(0,1,2,3,4,5,6,7,8,9);
+        if ( ($("."+enCours).val()).length ===1){
+            $("."+suivant).focus();
+
+            $("."+suivant).css( "background-color", "#EEE" );
+       }
+}#}
+	
+         $("#utb_clientbundle_abonnetype_radicalAbonne").numeric(); 
+function suivant(enCours, suivant, limite){
+    //alert($(this).val());
+    if ( ($("."+enCours).val()).length > limite-1)
+     inTab = new Array('0','1','2','3','4','5','6','7','8','9');
+     console.log(inTab);
+     //alert(enCours+" _ "+$("."+enCours).val());
+     if(enCours == "Champ2"){
+         $(".Champ9").focus();     
+         $(".Champ9").css( "background-color", "#EEE" );
+         return false;
+     } if(enCours == "Champ10"){
+       
+        if($("."+enCours).val()!=0){
+            alert('VOTRE NATURE DE COMPTE DOIT ETRE COMPRISE ENTRE 005 ET 027  !!!');
+            $("."+enCours).css( "border-color","#F00" );
+            return false;
+        }
+    }else if(enCours == "Champ11"){
+        if($("."+enCours).val()>2){
+            alert('VOTRE NATURE DE COMPTE DOIT ETRE COMPRISE ENTRE 005 ET 027  !!! ');
+            $("."+enCours).css( "border-color","#F00" );
+            return false;
+        }
+    }else if(enCours == "Champ12"){
+        // controle des champs 
+        if($("."+enCours).val()>7 && $(".Champ11").val()==2){
+            alert('VOTRE NATURE DE COMPTE DOIT ETRE COMPRISE ENTRE 005 ET 027  !!! ');
+            $("."+enCours).css( "border-color","#F00" );
+            return false;
+        }
+        
+        // les numero de commpte de nature 25
+        if($("."+enCours).val()==5 && $(".Champ11").val()==2){
+            alert('NATURE DE COMPTE  025 N\'EST PAS ACCEPTEE !!! ');
+            $("."+enCours).css( "border-color","#F00" );
+            return false;
+        }
+        // les natures de compte qui sont < 005
+        if($("."+enCours).val()<4 && $(".Champ11").val()==0){
+		    //alert('FC ');
+            alert('LES NATURES DE COMPTE INFERIEURS A 004 NE SONT PAS ACCEPTEES !!! ');
+            $("."+enCours).css( "border-color","#F00" );
+			//$(".Champ12").html('') ;
+			//$(".Champ12").focus(); 
+            //return false;
+        }   
+    }    
+    
+    if ($.inArray($("."+enCours).val(), inTab) === -1) {
+         
+       $("."+enCours).css( "border-color","#F00" ); 
+       //return false;                     
+     }else{
+         $("."+suivant).focus();
+         $("."+suivant).css( "background-color", "#EEE" ); 
+         $("."+enCours).css( "border-color","#356FC8" );
+     } 
+}
+	 
+
+</script>                          
+  {% endblock %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

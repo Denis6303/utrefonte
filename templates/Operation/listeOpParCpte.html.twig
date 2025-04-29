@@ -1,0 +1,214 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'abonnes.liste.grandtitrepg'|trans({},'abonnes') }}
+{% endblock %}
+
+  {% block client_centre_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+   {# <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_abonneProfilListe', {'locale': locale})}}">{{ 'admin.layout.menu.abonnes'|trans }}</a> > {#<a href="{{path('liste_utilisateur')}}">Utilisateurs</a>#}{#{ 'admin.layout.sousmenu.listeabonne'|trans }#}{#</a>#}
+</div>
+
+{% for contenu in app.session.flashbag.get('notice') %}
+    {% if contenu == "success" %}
+        
+            <div class="success leftSpace rightSpace center">                        
+                    {{ 'abonnes.addsuccess'|trans({}, 'abonnes') }}
+            </div>    
+         
+    {% endif %}
+    {% if contenu == "modifsuccess" %}
+        
+            <div class="success leftSpace rightSpace center">                        
+                    {{ 'abonnes.modifsuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenu == "failure" %}
+        
+            <div class="error leftSpace rightSpace center">                        
+                    {{ 'abonnes.addfailure'|trans({}, 'abonnes') }}
+            </div>    
+         
+    {% endif %}
+    {% if contenu == "emailerror" %}
+        
+            <div class="error leftSpace rightSpace center">                        
+                    {{ 'abonnes.emailerror'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenu == "activesuccess" %}
+        <div class="span-25">
+                                  
+                    {{ 'abonnes.activesuccess'|trans({}, 'abonnes') }}
+              
+        </div> 
+    {% endif %}
+    {% if contenu == "desactivesuccess" %}
+       
+            <div class="success leftSpace rightSpace center">                        
+                    {{ 'abonnes.desactivesuccess'|trans({}, 'abonnes') }}
+            </div>    
+       
+    {% endif %}
+{% endfor %}
+{% for contenus in app.session.flashbag.get('message') %}    
+    {% if contenus == "modifsuccess" %}
+        
+            <div class="success leftSpace rightSpace center">                        
+                    {{ 'abonnes.modifsuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenus == "modiffailure" %}
+        
+            <div class="error leftSpace rightSpace center">                        
+                    {{ 'abonnes.modiffailure'|trans({}, 'abonnes') }}
+            </div>    
+         
+    {% endif %}
+{% endfor %}
+
+			<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    
+                                        
+                                        {# BOX INFOS #}    
+                                        {#{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                      
+                                    
+                                    
+                                        {{ information.statsdynamique(listestat) }#} 
+                                        
+                                    
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                
+                                                <!-- Filtres - Recherche-->
+                                                <div>
+                                                    {{ render(controller('utbClientBundle:Recherche:rechercheAbonne', {'locale':locale})) }}
+                                                </div>
+                                                
+                                                <a href="{{ path("utb_client_exportcsv") }}">Télécharger</a>
+
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                        <th>{{'abonnes.liste.nom'|trans({}, 'abonnes') }}</th>
+                                                        <th>{{'abonnes.form.username'|trans({}, 'abonnes') }}</th>
+                                                        <th>{{'abonnes.form.email'|trans({}, 'abonnes') }}</th>
+                                                        <th>{{'abonnes.form.profil'|trans({}, 'abonnes') }}</th>
+                                                        <th>{{'abonnes.liste.statut'|trans({}, 'abonnes') }}</th>
+                                                        <th colspan="2">{{'abonnes.liste.action'|trans({}, 'abonnes') }}</th>
+                                                    </tr>
+                                                   
+                                                  {% for abonne in listeAbonne %}
+                                                    
+                                                    <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="abonne[]" value="{{abonne.id}}" rel="abonne_c"/></td>
+                                                        <td class="titreArtList"><a href="{{ path('utb_client_detail_abonne',{'id':abonne.id,'locale':locale})}}"> {{abonne.nomPrenom}}</a></td>									
+                                                        <td class="rubArtList"><a href="{{ path('utb_client_detail_abonne',{'id':abonne.id,'locale':locale})}}"> {{abonne.username}}</a></td>
+                                                        <td class="rubArtList">{{abonne.email}}</td>
+                                                        {#<td class="rubArtList">{{abonne.libProfil}}</td>#}
+                                                        
+                                                        <td class="statutArtList">
+                                                            {% if abonne.etatAbonne == 0 %}
+                                                               {# <a onclick="return confirm('Voulez vous vraiment activer cet utilisateur?')" href="{{path('utb_client_activer_abonne', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/validerSmall.png')}}" alt="{{'admin.activer'|trans({}, 'messages') }}" title="{{'admin.activer'|trans({}, 'messages') }}" /></a>#}		{{'admin.desactive'|trans({}, 'messages') }}                                                            
+                                                            {% endif %} 
+                                                            {% if abonne.etatAbonne == 1 %}
+                                                                     {#<a onclick="return confirm('Voulez vous vraiment désactiver cet utilisateur?')" href="{{path('utb_client_desactiver_abonne', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/depublierSmall.png')}}" alt="{{'admin.desactiver'|trans({}, 'messages') }}" title="{{'admin.desactiver'|trans({}, 'messages') }}" /></a>	#}{{'admin.active'|trans({}, 'messages') }}
+                                                            {% endif %}
+                                                        </td>
+                                                        
+                                                        {#% if ( abonneid == abonne.id ) or (abonne.idprofil != 1) %#} 
+							{% if ( abonneid == abonne.id ) %}                                                                 
+                                                            <td class="statutArtList"><a class="updateLink" href="#" onClick="modifierPhoto(); return false;">{#<a href="{{path('modifier_utilisateur', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans({}, 'messages') }}" title="{{'admin.modifier'|trans({}, 'messages') }}" />#}</a></td>                                                                                                          
+                                                        {% endif %}
+                                                        
+                                                        {#% if ( abonneid == abonne.id ) or (abonne.idprofil != 1) %#} 
+														{% if ( abonneid == abonne.id ) %} 
+                                                        <td class="statutArtList" >
+                                                            {% if abonneid == abonne.id %}
+                                                                <a href="#" onClick="modifierPwd({{abonne.id}}); return false;">
+                                                                    <img src="{{ asset('img/admin-img/icon-22-init.png')}}" alt="{{ 'abonnes.Bouton.reinit'|trans({}, 'abonnes')}}" title="{{ 'abonnes.Bouton.reinit'|trans({}, 'abonnes')}}" /> 
+                                                                </a>
+                                                            {% else %}   
+                                                                <a href="#">
+                                                                    <img src="{{ asset('img/admin-img/icon-22-init.png')}}" alt="{{ 'abonnes.Bouton.reinit'|trans({}, 'abonnes')}}" title="{{ 'abonnes.Bouton.reinit'|trans({}, 'abonnes')}}" /> 
+                                                                </a>                
+                                                            {% endif %}     
+                                                        </td>
+                                                        
+                                                        {% endif  %}
+                                                    </tr>
+                                                    {% else %}
+                                                            <tr class="bgBlanc">
+                                                                <td colspan="5" class="titreArtList" align:center<a href=""> {{ 'abonnes.none'|trans({}, 'abonnes') }} </a></td>	
+                                                            </tr>
+                                                    {% endfor %}
+
+                                                </table>
+
+                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                    </div>		<!--  FIN COL RIGHT -->
+                                </div>			<!--  FIN  SPAN - 19 -->
+
+                            </div>
+                        
+<script language="javascript" >
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+      
+       function getAbonnesID(){
+           
+            var abonnes_id = "";
+            
+            $(":input[rel=abonne_c]:checked").each(function(){
+		abonnes_id = abonnes_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return abonnes_id;
+       }
+</script>
+
+<div id="process_tpl" style="display:none;"></div> 
+<div id="sivide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div>  
+
+<div id="activationimpossible" style="display:none;"> {{ 'abonnes.confirmation.activationimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="activationreussie" style="display:none;"> {{ 'abonnes.confirmation.activationreussie'|trans({}, 'abonnes') }} </div>
+<div id="titreactivation" style="display:none;">{{ 'abonnes.confirmation.activation'|trans({}, 'abonnes') }} </div> 
+<div id="msgconfirmactivation" style="display:none;">   {{ 'abonnes.confirmation.activation'|trans({}, 'abonnes') }}</div> 
+
+<div id="desactivationimpossible" style="display:none;"> {{ 'abonnes.confirmation.desactivationimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="desactivationreussie" style="display:none;"> {{ 'abonnes.confirmation.desactivationreussie'|trans({}, 'abonnes') }} </div>                     
+<div id="titredesactivation" style="display:none;">{{ 'abonnes.confirmation.titredesactivation'|trans({}, 'abonnes') }}</div> 
+<div id="msgconfirmdesactivation" style="display:none;"> {{ 'abonnes.confirmation.desactivation'|trans({}, 'abonnes') }}</div>      
+
+<div id="suppressionimpossible" style="display:none;"> {{ 'abonnes.confirmation.supimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="suppressionreussie" style="display:none;"> {{ 'abonnes.confirmation.supreussie'|trans({}, 'abonnes') }} </div>
+<div id="titresuppression" style="display:none;">{{ 'abonnes.confirmation.titresup'|trans({}, 'abonnes') }}</div> 
+<div id="msgconfirmsuppression" style="display:none;"> {{ 'abonnes.confirmation.suppression'|trans({}, 'abonnes') }}</div>      
+
+<div id="operationexiste" style="display:none;"> {{ 'abonnes.confirmation.operationexiste'|trans({}, 'abonnes') }} </div> 
+
+{% endblock %}
+
+

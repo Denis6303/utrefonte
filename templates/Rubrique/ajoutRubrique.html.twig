@@ -1,0 +1,202 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'rubriques.ajout.grandtitrepg'|trans({}, 'rubriques') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }}</a>   
+                {%  if (infosparent|length >0)  and ( (infosparent[0] !='') or (infosparent[1]!='Aucun') ) %}    
+                   > 
+                  <a href="{{path('utb_admin_detailrubrique',{'id':infosparent[1],'locale': locale})}}">{{infosparent[0]}}</a> 
+                {% endif %}
+                   >
+                   {#{dump( infosparent)}#}
+				   
+				    {%  if infosparent is not null and infosparent|length >0 %}   
+                    {%  if infosparent[1] is not null and infosparent[1] != '' %}
+
+                       {%  if infosparent[1] == infosparent[2] and infosparent[1] != 0 %}
+
+                           {{ 'rubriques.creercateg'|trans({}, 'rubriques')}} 
+
+                       {% endif %} 
+
+                    {% elseif (infosparent[1] == infosparent[2]) and (infosparent[1] == 0) %}   
+
+                       {{ 'rubriques.creersousrub'|trans({}, 'rubriques')}}
+
+                    {% endif %} 
+                {% else %} 
+                   {{ 'rubriques.ajout.grandtitrepg'|trans({}, 'rubriques')}}
+                {% endif %}   
+            </div>
+                   
+				    {% for contenu in app.session.flashbag.get('notice') %}             
+                    {% if contenu == "errortypficart" %}
+                            <div class="span-25">
+                                 <div class="notices noticesMsg">
+                                {{ 'notification.errortype'|trans({}, 'articles') }}
+                                 </div>
+                            </div>
+                    {% elseif contenu == "errorajtrubexist" %}
+            
+                            <div class="span-25">
+                                <div class="error errorMsg">
+                                    {{  'notification.ajoutexistrubbad'|trans({}, 'articles') }}                    
+                                </div>
+                            </div>
+                                
+                    {% elseif contenu == "errorFaqexist" %}
+            
+                            <div class="span-25">
+                                <div class="error errorMsg">
+                                    {{  'notification.faqexistrubbad'|trans({}, 'rubriques') }}                    
+                                </div>
+                            </div>                                
+                                
+                    {% elseif contenu == "errornombrecaratere" %}
+            
+                            <div class="span-25">
+                                <div class="error errorMsg">
+                                    {{  'notification.errornombrecaratere'|trans({}, 'articles') }}                    
+                                </div>
+                            </div>
+                 {% endif %}
+                   
+               {% endfor %} 
+                   
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+                           <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-newcategory.png')}}" alt="{{ 'rubriques.liste.titrepg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.liste.grandtitrepgs'|trans({}, 'rubriques') }}" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }} <span>: {{ 'rubriques.ajout.titre2'|trans({}, 'rubriques') }}<h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                      
+                          <div class="span-25">	
+                              <form action=" {{ path("utb_admin_ajoutrubrique",{'locale': locale,'id':id}) }} " method="post" {{ form_enctype(form) }} id="ajoutRubrique">   
+                              <!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->                      
+                                      
+                                      {% if infos|length>0 and infos is not null %} 
+                                        {{ information.boxinfos(infos, infos.paramDescription,infos.actif) }}
+                                      {% endif %}
+                                      
+                                      {# STATISTIQUES macrosinfos.html.twig #}    
+                                      {{ information.stats(listestat) }}                                       
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+								  <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+									  <div class="colRightContentPadding">
+										  
+										<div class="FrmAjoutArt">     
+										<span class="">
+										{{ form_errors(form.nomRubrique) }}</span>
+										{{ form_label(form.nomRubrique, 'rubriques.ajout.librub'|trans({}, 'rubriques'))}} 
+										{{ form_widget(form.nomRubrique) }}
+										<div class="clr"></div>
+										<span class="gris-comment"><em>{{ 'rubriques.ajout.nbcaract'|trans({},'rubriques')}}</em></span>
+										</div>
+										
+										<div class="FrmAjoutArt">     
+										{{ form_errors(form.idparent) }}
+										{{ form_label(form.idparent, 'rubriques.form.idp'|trans({}, 'rubriques')) }}
+										{{ form_widget(form.idparent) }}
+										<div class="clr"></div>
+										</div>
+                                                                              
+                                                                                {% if isfaq == 1 %}
+                                                                                    <div class="FrmAjoutArt">     
+                                                                                        {{ form_errors(form.isFaq) }}
+                                                                                        {{ form_label(form.isFaq, 'rubriques.ajout.relfaq'|trans({}, 'rubriques')) }}
+                                                                                        {{ form_widget(form.isFaq) }}
+                                                                                        <div class="clr"></div>
+                                                                                    </div> 
+                                                                                {% endif %}
+										
+										<div class="FrmAjoutArt">     
+										{{ form_errors(form.descriptionRubrique) }}
+										<span class="labelNoFloat labelLong">
+										{{ form_label(form.descriptionRubrique, 'rubriques.ajout.descrub'|trans({}, 'rubriques')) }}
+										</span> 
+										{{ form_widget(form.descriptionRubrique) }}
+										</div>
+										
+                                                                                {% if isfaq == 0 %}
+                                                                                    <div class="FrmAjoutArt">     
+                                                                                    {{ form_errors(form.icone) }}
+                                                                                    {{ form_label(form.icone,'rubriques.ajout.icone'|trans({}, 'rubriques')) }}
+                                                                                    {{ form_widget(form.icone)}}
+                                                                                    <div class="clr"></div>
+                                                                                {% endif %}
+                                                                                    
+										</div> 
+															
+											<input type="submit" value="{{ 'admin.ajouter'|trans}}" name="op" id="j_bouton" style="display: none"><a href=""></a>
+									  
+									  </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+									  <div class="bottomButAction coinsArrondisMin colorCadreArrondi bgGris">
+									<div class="ecartBoutonsForBottom">&nbsp;</div>
+									  <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+							  
+							  	  </div>      <!-- div.bottomButAction-->
+							  
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>
+                            <!--  FIN  SPAN - 19 -->
+                            </form>
+
+                          </div>				<!--  FIN SPAN - 25 -->
+                      
+  {{ information.popupaddarticle(listeRubrique) }} 
+
+  {% endblock %}

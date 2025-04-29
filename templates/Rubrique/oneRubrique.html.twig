@@ -1,0 +1,1630 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+{% for rubrique in larubrique %} 
+  
+<!-- Pour la gestion des erreur ddddd -->  
+  
+    				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }}</a>{% if rubrique.nomRubrique !='' %} > {{rubrique.nomRubrique}}{% endif%}
+            </div>
+                                
+
+            {% for contenu in app.session.flashbag.get('notice') %}
+            
+                {% if contenu == "successajtart" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                            {{  'notification.ajoutbn'|trans({}, 'articles') }}                    
+                        </div>
+                    </div>
+                    {% elseif contenu == "errortypficart" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+                        {{ 'notification.errortype'|trans({}, 'articles') }}
+                                         </div>
+                                    </div>
+                        
+                    {% elseif contenu == "successupimg" %}
+                                    <div class="span-25">
+                                         <div class="success successMsg">
+                        {{ 'confirmation.successupimg'|trans({}, 'articles') }}
+                                         </div>
+                                    </div>            
+                {% elseif contenu == "successajtrub" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%} 
+                             {{  'notification.ajoutbn'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                            {{  'notification.ajoutsousrubbn'|trans({}, 'rubriques') }}
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}                            
+                            {{  'notification.ajoutcategbn'|trans({}, 'rubriques') }}                   
+                        {% endif %}                        
+                        </div>
+                    </div>
+            
+                {% elseif contenu == "errorajtrub" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.ajoutsousrubbad'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.ajoutcategbad'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.ajoutbad'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>            
+            
+            
+                {% elseif contenu == "successsuprub" %}
+
+                    <div class="span-25">
+                        <div class="success successMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supsousrubbn'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.supcategbn'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.supbn'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>            
+            
+                {% elseif contenu == "errorsuprub" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supbad'|trans({}, 'rubriques') }}                   
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.supsousrubbad'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.supcategbad'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>         
+                        
+                {% elseif contenu == "successmodrub" %}
+             
+                    <div class="span-25">
+                        <div class="success successMsg">
+                                
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%} 
+                            {{  'notification.modifbn'|trans({}, 'rubriques') }}                     
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                            {{  'notification.modifsousrubbn'|trans({}, 'rubriques') }}
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}                            
+                             {{  'notification.modifcategbn'|trans({}, 'rubriques') }}                 
+                        {% endif %}                                 
+                                
+                                
+                        </div>
+                            
+                            
+                    </div>             
+            
+                {% elseif contenu == "errormodrub" %}
+           
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.modifsourubbad'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.modifcategbad'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.modifbad'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div> 
+            
+                    {% elseif contenu == "errorsuprubbase" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                            
+                            
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supbadsysteme'|trans({}, 'rubriques') }}                     
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.supsousrubbadsysteme'|trans({}, 'rubriques') }}
+                            
+                        {% else %}
+                            {{  'notification.supcategbadsysteme'|trans({}, 'rubriques') }}                   
+                        {% endif %} 
+                        </div>
+                    </div>       
+                    
+             {% elseif contenu == "reussitesupprdesc" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                            {{  'notification.reussitesupprdesc'|trans({}, 'rubriques') }}
+                        </div>
+                    </div>
+            
+            {% elseif contenu == "echecsupprdesc" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                            {{  'notification.echecsupprdesc'|trans({}, 'rubriques') }}
+                        </div>
+                    </div>
+            
+                    {% elseif contenu == "errorsuprubcontenu" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">            
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supbadcontenu'|trans({}, 'rubriques') }}     
+                               
+                                
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+        
+                            {{  'notification.supsousrubbadcontenu'|trans({}, 'rubriques') }}    
+                                
+                        {% else %}
+                            {{  'notification.supcategbadcontenu'|trans({}, 'rubriques') }}   
+                                
+                        {% endif %}             
+                         </div>
+                    </div> 
+            
+                {% endif %}
+            {% endfor %}                                
+                                
+            <div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-11">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-category.png')}}"  alt="{{ 'rubriques.liste.titrepg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.liste.grandtitrepgs'|trans({}, 'rubriques') }}" /></div>
+							<div class="titreModule colorBleu">
+							<h1 style="padding-bottom: 5px;">
+							{% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+							{{ 'rubriques.rubrique'|trans({}, 'rubriques') }} N°{{rubrique.id}}
+							
+							{% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+							{{ 'rubriques.sousrub'|trans({}, 'rubriques') }} N°{{rubrique.id}}
+							
+							{% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+							{{ 'rubriques.categorie'|trans({}, 'rubriques') }} N°{{rubrique.id}}
+							
+							{% endif  %} 
+
+							<span>: {{ 'admin.visu'|trans({}, 'messages') }}</span></h1>
+							  {% if locale=='fr' %}
+								 {% set lelocale="en" %}
+							  {% elseif  locale=='en' %}
+								 {% set lelocale="fr" %}
+							   {% endif %}
+							</div>	
+						<div class="clr"></div>
+					</div>
+					
+					<div class="span-13 last">
+						
+                                                
+                                                 <div class="boutonGestion btGestLong">
+                                                          
+                                                         {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+                                                        
+                                                          <div><a href="{{ path('utb_admin_ajoutarticle', {'locale': locale,'type':id}) }}"><img src="{{ asset('img/admin-img/ajouter.png')}}"  alt="{{ 'rubriques.ajoutarticlerub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.ajoutarticlerub'|trans({}, 'rubriques') }}" /></div>
+							{{ 'rubriques.ajoutarticlerub'|trans({}, 'rubriques') }}
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                                                       
+                                                          <div><a href="{{ path('utb_admin_ajoutarticle', {'locale': locale,'type':id}) }}"><img src="{{ asset('img/admin-img/ajouter.png')}}"  alt="{{ 'rubriques.ajoutarticlesousrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.ajoutarticlesousrub'|trans({}, 'rubriques') }}" /></div>
+							{{ 'rubriques.ajoutarticlerub'|trans({}, 'rubriques') }}                                                      
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+                                                      
+                                                          <div><a href="{{ path('utb_admin_ajoutarticle', {'locale': locale,'type':id}) }}"><img src="{{ asset('img/admin-img/ajouter.png')}}"  alt="{{ 'rubriques.ajoutarticlecateg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.ajoutarticlecateg'|trans({}, 'rubriques') }}" /></div>
+							{{ 'rubriques.ajoutarticlerub'|trans({}, 'rubriques') }}                                                        
+
+                                                           {% endif  %}                                                                              
+                                                                       
+							</a> 
+						</div>
+                                                
+						<div class="boutonGestion btGestLong">
+
+                                                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+  							<div><a href="{{ path('utb_admin_ajoutrubrique', {'locale': locale,'id':id}) }}"><img src="{{ asset('img/admin-img/icon-48-newcategory.png')}}"  alt="{{ 'rubriques.creersousrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.creersousrub'|trans({}, 'rubriques') }}" /></div>
+							
+                                                            {{ 'rubriques.creersousrub'|trans({}, 'rubriques') }}
+                                                                
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+							<div><a href="{{ path('utb_admin_ajoutrubrique', {'locale': locale,'id':id}) }}"><img src="{{ asset('img/admin-img/icon-48-newcategory.png')}}"  alt="{{ 'rubriques.creercateg'|trans({}, 'rubriques') }}" /></div>
+							
+                                                            {{ 'rubriques.creercateg'|trans({}, 'rubriques') }}
+                                                                
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+                                                        
+                                                        {% endif  %}                                                    
+                                                        
+                                                        
+                                                        </a>
+						</div>
+                                                
+						<div class="boutonGestion btGestLong">
+
+                                                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+                                                    
+                                                            {% if locale=='en' %}
+                                                                    <div><a href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': 'en'}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" /></div>
+
+                                                                   {{ 'rubriques.modifrub'|trans({}, 'rubriques') }}
+                                                            {% else %}
+                                                                    <div><a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': rubrique.nomRubrique}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" /></div>
+                                                                   {{ 'rubriques.modifrub'|trans({}, 'rubriques') }}
+                                                            {% endif %}
+
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+    							
+                                                                   {% if locale =='en'%}
+                                                                    <div><a href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': 'en'}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" /></div>
+                                                                        {{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}
+                                                                   {% else %}                                                            
+                                                                        {% if(rubrique.nomRubrique != "") %}
+                                                                             <div><a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': rubrique.nomRubrique}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" /></div>
+                                                                              {{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }} 
+                                                                        {%else%}
+                                                                             <div><a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': 'vide'}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" /></div>
+                                                                              {{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}                                                                   
+                                                                        {%endif%}
+                                                                  {% endif %}
+                                                                   
+                                                            
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+                                                                   {% if locale =='en'%}
+                                                                    <div><a href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': 'en'}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifrub'|trans({}, 'rubriques') }}" /></div>
+                                                                    {{ 'rubriques.modifcateg'|trans({}, 'rubriques') }}
+                                                                   {% else %}
+                                                                           {% if(rubrique.nomRubrique!="") %}
+                                                                            <div><a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': rubrique.nomRubrique}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifcateg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifcateg'|trans({}, 'rubriques') }}" /></div>
+                                                                            {{ 'rubriques.modifcateg'|trans({}, 'rubriques') }}   
+                                                                           {%else%}
+                                                                                <div><a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': 'vide'}) }}"><img src="{{ asset('img/admin-img/modifier.png')}}"  alt="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" title="{{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}" /></div>
+                                                                                 {{ 'rubriques.modifsousrub'|trans({}, 'rubriques') }}                                                                   
+                                                                           {%endif%}                                                                    
+                                                                    {% endif %}
+
+                                                        
+                                                        {% endif  %} 
+                                                        </a>
+						</div>
+						
+						<div class="boutonGestion btGestLong">
+
+                                                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+							<div>
+                                                                {% if locale =='fr' %}
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('ÃŠtes-vous sÃ»r de supprimer cette Rubrique ?'));"> 
+                                                                {% elseif locale =='en' %}  
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('Are you-sure to remove this rubric?'));">       
+                                                                {% endif %}
+                                                                <img src="{{ asset('img/admin-img/icon-48-deny.png')}}" 
+                                                                     alt="{{ 'rubriques.delrub'|trans({}, 'rubriques') }}" 
+                                                                     title="{{ 'rubriques.delrub'|trans({}, 'rubriques') }}" />    
+                                                                    
+                                                        </div>
+
+                                                             {{ 'rubriques.delrub'|trans({}, 'rubriques') }}
+                                                        
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+							<div>
+                                                                {% if locale =='fr' %}
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('ÃŠtes-vous sÃ»r de supprimer cette Sous-rubrique ?'));"> 
+                                                                {% elseif locale =='en' %}  
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('Are you-sure to remove this sub-rubric?'));">       
+                                                                {% endif %}
+                                                            <img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'rubriques.delcateg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.delcateg'|trans({}, 'rubriques') }}" />    
+                                                        </div>
+
+                                                             {{ 'rubriques.delsousrub'|trans({}, 'rubriques') }}
+                                                        
+                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+ 							<div>
+                                                            {#
+                                                                <a href="javascript:void(0);" onclick="corbeilleAll( getArticlesID(),'Etes-vous sur de supprimer cet article?' ); return false;" >
+                                                            #}
+                                                                {% if locale =='fr' %}
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('ÃŠtes-vous sÃ»r de supprimer cette CatÃ©gorie ?'));"> 
+                                                                {% elseif locale =='en' %}  
+                                                                  <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale': locale}) }}"   onClick="return(confirm('Are you-sure to remove this category ?'));">       
+                                                                {% endif %}  
+                                                            <img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'rubriques.delcateg'|trans({}, 'rubriques') }}" title="{{ 'rubriques.delcateg'|trans({}, 'rubriques') }}" />    
+                                                        </div>
+							
+                                                            {{ 'rubriques.delcateg'|trans({}, 'rubriques') }}
+                                                        
+                                                        {% endif  %}                                                          
+                                                        </a>
+						</div>
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+					{% for uneimage in image %}	
+					<div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						<h3 class="colorBleu titreImgIllustr"> {{ 'rubriques.imgrub'|trans({}, 'rubriques') }} </h3>
+						<div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox">
+							<div class="cntImgIllustr"><img src="{{ asset('upload/rubriques/'~uneimage.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative"  width="200" height="200"/></div>
+						</div>
+						</div>
+						<p class="dimImgIllustr"><!-- 630 * 300px - --> <a class="updateLink" href="#" onClick="modifImage(); return false;"> {{ 'rubriques.modifimgrub'|trans({}, 'rubriques') }} </a>  {% if uneimage.urlMedia %} | <a href="javascript:void(0);" onclick="corbeilleAllBanniere( {{uneimage.idMedia}} ); return false;"> {{ 'admin.supprimgul'|trans({}, 'messages') }} </a>{% endif %}</p>
+                          
+						<div class="FrmInColLeft" id="modifMedia_container" style="display:none;">                        
+							<div class="" >
+							{{ render(controller('utbAdminBundle:Rubrique:modifMediaRubrique', {'id': rubrique.id,'locale':locale,'idmedia': uneimage.idMedia})) }}  
+							</div>
+						</div> 
+					</div>
+				 {% endfor %} 
+				 
+					
+				{# STATISTIQUES #}   
+				{{ information.stats(listestat) }}    
+					
+					{# -- Box Autres Information contenant les liens Corbeille et Archive
+					<div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						  <h3 class="colorBleu titreInfos"> {{ 'rubriques.autres'|trans({}, 'rubriques') }}  </h3>
+						  <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox autreInfoLinks">                                                         
+										   <a href="{{path('utb_admin_detailcorbeillerubrique',{'locale': locale, 'id': id})}}" title="">{{ 'admin.corbeille'|trans}} {% if rubrique.nomRubrique !='' %} {{rubrique.nomRubrique}}{% endif%} </a>
+										   <a href="{{path('utb_admin_detailarchiverubrique',{'locale': locale, 'id': id})}}" title="">{{ 'admin.archive'|trans}} {% if rubrique.nomRubrique !='' %} {{rubrique.nomRubrique}}{% endif%} </a> 
+							</div>
+						</div>
+					</div>
+					#}
+                      {% if (rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent) or (rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent) %}                                          
+                        <form id="my_radio_box"> 
+                           <table>
+                               <tr>
+                                   <td>
+                                    <input type="radio" name="type" id="1" value="5" {% if rubrique.typePresentation == 5 %}checked="true"{% endif%}  />
+                                   </td>
+                                   <td>                                       
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_1.png')}}" data-lightbox="Image_1">{{ 'menus.presentation'|trans({}, 'menus')}} 1</a></div>                                       
+                                        {#<img src="{{ asset('img/admin-img/pres1.png')}}" alt="{{ 'menus.presentation'|trans({}, 'menus')}} 1" title="{{ 'menus.presentation'|trans({}, 'menus')}} 1"  width="50"/>#}
+                                   </td>                                                                                             
+                               </tr>
+                               <tr>
+                                   <td>
+                                    <input type="radio" name="type" id="2" value="2" {% if rubrique.typePresentation == 2 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>                                                                            
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_2.png')}}" data-lightbox="Image_2">{{ 'menus.presentation'|trans({}, 'menus')}} 2</a></div>                                       
+ 
+                                   </td>                                                                                             
+                               </tr> 
+                               <tr>
+                                   <td>
+                                    <input type="radio" name="type" id="3" value="7" {% if rubrique.typePresentation == 7 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_3.jpg')}}" data-lightbox="Image_3">{{ 'menus.presentation'|trans({}, 'menus')}} 3</a></div>   
+                                   </td>                                                                                              
+                               </tr>  
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="4" value="6" {% if rubrique.typePresentation == 6 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_4.jpg')}}" data-lightbox="Image_4">{{ 'menus.presentation'|trans({}, 'menus')}} 4</a></div> 
+                                   </td>                                                                                             
+                               </tr> 
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="5" value="16" {% if rubrique.typePresentation == 16 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_5.jpg')}}" data-lightbox="Image_5">{{ 'menus.presentation'|trans({}, 'menus')}} 5</a></div>
+                                   </td>                                                
+                                               
+                               </tr>  
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="6" value="3" {% if rubrique.typePresentation == 3 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_6.jpg')}}" data-lightbox="Image_6">{{ 'menus.presentation'|trans({}, 'menus')}} 6</a></div>
+                                   </td>                                                
+                                               
+                               </tr>  
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="7" value="17" {% if rubrique.typePresentation == 17 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_7.jpg')}}" data-lightbox="Image_7">{{ 'menus.presentation'|trans({}, 'menus')}} 7</a></div>
+                                   </td>                                                
+                                               
+                               </tr> 
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="8" value="18" {% if rubrique.typePresentation == 18 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_18.jpg')}}" data-lightbox="Image_8">{{ 'menus.presentation'|trans({}, 'menus')}} 8</a></div>
+                                   </td>                                                
+                                               
+                               </tr>   
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="9" value="19" {% if rubrique.typePresentation == 19 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class="">
+                                             <a href="{{ asset('img/admin-img/Presentation_19.jpg')}}" data-lightbox="Image_9">{{ 'menus.presentation'|trans({}, 'menus')}} 9</a>
+                                        </div>
+                                   </td>                                                
+                                               
+                               </tr> 
+                               
+                               <tr>
+                                   <td>
+                                        <input type="radio" name="type" id="10" value="20" {% if rubrique.typePresentation == 20 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class="">
+                                             <a href="{{ asset('img/admin-img/Presentation_10.jpg')}}" data-lightbox="Image_10">{{ 'menus.presentation'|trans({}, 'menus')}} 10</a>
+                                        </div>
+                                   </td>                                                
+                                               
+                               </tr>
+                               <tr>
+                                    <td>
+                                        <input type="radio" name="type" id="11" value="21" {% if rubrique.typePresentation == 21 %}checked="true"{% endif%} />
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <a href="{{ asset('img/admin-img/Presentation_11.jpg')}}" data-lightbox="Image_11">{{ 'menus.presentation'|trans({}, 'menus')}} 11</a>
+                                        </div>
+                                    </td>	  
+                                </tr> 
+                               
+                               <tr>
+                                   <td colspan="2">
+                                       <img src="{{asset('img/wait.gif')}}"  style="display:none;margin:auto;" class="imgload1"/> 
+                                   </td>                                                                                            
+                               </tr> 
+                               {#<tr>
+                                   <td>
+                                        <input type="radio" name="type" id="6" value="10" {% if rubrique.typePresentation == 6 %}checked="true"{% endif%} />
+                                   </td>
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_6.jpg')}}" data-lightbox="Image_6">{{ 'menus.presentation'|trans({}, 'menus')}} 6</a></div>
+                                   </td>                                                
+                                             
+                               </tr> #}
+                                
+                            </table>
+                                    <input type="hidden" value="{{rubrique.id}}" id="idrubrique" />
+                       </form> 
+                    {% endif%}                                             
+					
+                    </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+						<div class="butTraitementArticle">
+							<div class="apTraduire">
+							<a href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': lelocale}) }}">{{ 'admin.traduarticle'|trans({}, 'messages') }}
+                                                                {% if tauxTraduction|length >0 %}
+                                                                    ( Taux {{tauxTraduction[0]['prcent']}}                                                            
+                                                                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+                                                                            {{ 'rubriques.sousrub'|trans({}, 'rubriques') }} {{'admin.infoTraduit'|trans({}, 'messages')}}
+                                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                                                                            {{'rubriques.categorie'|trans({}, 'rubriques')}} {{'admin.infoTraduit'|trans({}, 'messages')}}
+                                                                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+
+                                                                        {% endif  %}
+                                                                    )
+                                                                {% endif %}
+                                                        </a> 
+							{#--LibellÃ© : GÃ©rer la traduction {{ 'rubriques.traduction'|trans({}, 'rubriques') }} #}
+							</div>
+                                                        
+							{# <div class="apCadre">
+								  <a class="" href="{{ path('utb_admin_listecadrerubrique', {'id': rubrique.id,'locale': locale}) }}">{{'admin.gescadre'|trans({}, 'messages')}}</a>
+							</div> #}
+
+							{% for uneimage in image %}    
+							{% else %}
+							<div class="apBanniere" style="border-right:none;">
+							<a class="updateLink" href="#" onClick="ajoutImage(); return false;">	{{'rubriques.addimgillustr'|trans({}, 'rubriques')}}</a>
+							</div>   
+							{% endfor %} 
+                                                        
+							                                                       
+
+						</div>		<!-- div.butTraitementArticle-->
+							              
+							<div class="clr"></div>
+						
+						<div class="FrmAjoutArt FrmTopDetailArt FrmInRubriqTop" id="ajoutMedia_container" style="display:none;">
+							<div style="float:left;">
+							{{ render(controller('utbAdminBundle:Rubrique:ajoutMediaRubrique', {'id': rubrique.id,'locale':locale,'type':0})) }}  
+							</div>
+							<a href="#" class="noSoulignHover" onClick="AnnulerAjout( ); return false;">{{'admin.annuler'|trans}}</a>
+							<div class="clr"></div>
+						</div>  
+                                                        
+						                                                 
+						
+	                                                      
+                                                        
+						<h2 class="titleRubrique colorBleu">
+                                                    {% set i=0 %}
+                                                    {% for unnom in nom %}
+                                                        {%set i=i+1 %}
+                                                        {% set fin =  unnom|length %}   
+                                                                {% if i>1 %}
+                                                                   &nbsp;<img src="{{ asset('img/admin-img/icon-position.png')}}" alt="" title="" />&nbsp;
+                                                                {% endif %}                                                        
+                                                            {% if unnom[1]=="" %}
+
+                                                            {% else %}
+                                                               <a href="{{ path('utb_admin_detailrubrique', {'id': unnom[0],'locale':locale}) }}">    {{unnom[1]}}</a>
+                                                            {% endif %}
+                                                    {% endfor %}    														
+						</h2>					
+                                              {% if rubrique.idGrandParent ==9 %}
+                                                    <a href="javascript:void(0);" onclick="definirAccueil(getArticlesID(),1); return false;"  >
+                                                        {{ 'rubriques.affichaccueil'|trans({}, 'rubriques')}}
+                                                    </a> |
+                                                    <a href="javascript:void(0);" onclick="definirAccueil(getArticlesID(),0); return false;"  >
+                                                       {{ 'rubriques.cachaccueil'|trans({}, 'rubriques')}}
+                                                    </a> 
+                                              {% endif %}
+					
+						<div id="accordion">
+                                                    {% if  listesousrub is empty %} 
+                                                    {% else %}    
+							<h3>{{ 'rubriques.sousrub'|trans({}, 'rubriques') }}</h3>
+							<div>			<!-- DIV accordeon OBLIGATOIRE-->
+							<div class="allBoxSousRubriq">
+                                                            {% for sousrubrique in listesousrub %} 
+								<div class="boxSousRubriq">									
+                                                                        <div class="logoSousRub"><img src="{{ asset('img/admin-img/icon-24-content.png')}}" alt="{{sousrubrique.nomRubrique}}" title="{{sousrubrique.nomRubrique}}" /></div>
+									<div class="titreSousRub"><h3><a class="defaultColor hoverBleu noSoulignHover" href="{{ path('utb_admin_detailrubrique',{'id': sousrubrique.id,'locale':locale}) }}">{{sousrubrique.nomRubrique}}</a></h3></div>	
+									<div class="clr"></div>
+								</div>
+                                                        {% else %}
+                                                        <div>
+                                                          <h2 class="titleArticle colorBleu">                                                              
+                                                            {{ 'rubriques.nosubrub'|trans({}, 'rubriques') }}
+                                                          </h2>  
+                                                        </div>                                       
+                                                       {% endfor %}      
+        						<div class="clr"></div>
+							</div>
+							</div>		<!-- DIV accordeon OBLIGATOIRE-->
+                                                    {% endif %}
+						    {% if  rubrique.descriptionRubrique =="" or rubrique.descriptionRubrique =="- default text -" %}
+                                                    {% else %} 
+							<h3><strong>{{ 'rubriques.description'|trans({}, 'rubriques') }}</strong></h3>
+							<div>			<!-- DIV accordeon OBLIGATOIRE-->
+								<div class="conteuTextJustify">
+                                     {{rubrique.descriptionRubrique|raw}}
+                                </div>
+				                                
+				                                {% if locale =='fr' %}
+                                                                        
+                                                                        <div class="butonAccord butAccUpdate"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'nomrubrique': rubrique.nomRubrique,'typeaction': 1}) }}"> {{ 'rubriques.modifdescription'|trans({}, 'rubriques') }}</a></h4></div>&nbsp;&nbsp;
+                                                                
+                                                                {% elseif locale =='en' %}  
+                                                                        
+                                                                        <div class="butonAccord butAccUpdate"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': locale,'typeaction': 1}) }}"> {{ 'rubriques.modifdescription'|trans({}, 'rubriques') }}</a></h4></div>&nbsp;&nbsp;
+                                                                     
+                                                                {% endif %} 
+                                                                     
+
+                                                                {% if locale =='fr' %}
+                                                                         <div class="butonAccord butAccDelete"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'typeaction': 2}) }}" onclick="return(confirm('Etes-vous sûr de vouloir supprimer cette description ?'));">{{ 'rubriques.deldescription'|trans({}, 'rubriques') }}</a></h4></div>&nbsp;&nbsp;
+                                                                
+                                                                {% elseif locale =='en' %}  
+                                                                     <div class="butonAccord butAccDelete"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': locale,'typeaction': 2}) }}" onclick="return(confirm('Are you-sure to remove this description ?'));">{{ 'rubriques.deldescription'|trans({}, 'rubriques') }}</a></h4></div>&nbsp;&nbsp;
+                                                                     
+                                                                {% endif %} 			        
+                                                                
+                                                               <div class="clr"></div><br/>
+							</div>			<!-- FIN DIV accordeon OBLIGATOIRE--> 
+                                                  {% endif %}
+						</div>		<!-- FIN des accordÃ©ons -->
+				
+					<div class="MarginBottomBox"></div>
+					
+                                        {% if ((listestat1[0].valeur>0) or  (listestat1[1].valeur>0)) and (listestat1 is not null)%}
+					<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">
+                                                        
+                                                       {#{ dump(listestat1)}#} 
+                                                      {{ information.stat_alerte(listestat1,'[24,23]') }}
+                                                         
+                                                                                                           
+                                                  {# ALERTE STATISTIQUES #}                                                            
+							<div class="clr"></div>
+						</div>			<!-- FIN colRightContentPadding-->
+					</div>                                       
+					{% endif %}
+                                        <h2 class="titleRubrique colorBleu">
+                                               {{ 'articles.liste.liste'|trans({}, 'articles') }}
+                                                                                                                    														
+						</h2>
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+					<div class="colRightContentPadding">		
+					
+					  {# <div class="filtersArticles">
+						<input type="text"> <input type="submit" value="OK">
+                                              <select class="filterStatus">
+                                                        <option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+                                                        <option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+                                                        <option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+                                                        <option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+                                                        <option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+                                                        <option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+
+                                                </select>
+						<select class="filterRubrique">
+						<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+						{#	<option>RÃ©seau UTB</option>
+							<option>RÃ©seau GAB</option>
+							<option> --- GAB LomÃ©</option>
+							<option> --- GAB IntÃ©rieur</option>
+							<option>RÃ©seau TPE</option>
+							<option> --- TPE CommerÃ§ant</option>
+							<option> --- TPE Agence</option>
+							<option>RÃ©seau Agence</option> 
+						</select>
+						<select class="filterAutor">
+							<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+							<option>Armand K.</option>
+							<option>Benoit G.</option>
+							<option>Serges A.</option>
+						</select> 
+                                                        
+                                                <select class="filterLanguage">
+                                                        <option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+                                                        <option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+                                                        <option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+                                                </select>
+						<div class="clr"></div>
+					</div>     #}  <!-- FIN filtersArticles-->
+					
+					<table class="listMenusCateg listArticlesRub">
+						
+							{#<th><input type="checkbox" class="checkall" name="checkall"/></th>
+							<th>Titre</th>
+							<th>Statut</th>
+							
+							<th>Auteur</th>
+							<th>Date</th>
+							<th>Langue</th>
+							<th>NÂ°</th>#}
+                                                        
+                                                        <tr>
+                                                                <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                                <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                                <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                                
+                                                                <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                                <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                                <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                                                <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                                                                <th colspan="5">{{ 'articles.liste.actions'|trans({}, 'articles') }}</th>
+                                                        </tr>                                                        
+                                                        
+                                                        {#<th colspan="4"> Actions </th>#}
+						
+                                                {% for article in listearticle %} 
+                                                    {% if article.titreArticle is not null %}
+                                                        <tr id="recordsArray_{{article.id}}" {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                                                            <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                            <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idRubrique}) }}" >{{article.titreArticle}} {% if article.afficheAccueil==1 %} - <b>[Accueil]</b>{% endif %}</a></td>
+                                                                <td class="statutArtList">
+                                                                                    {% if article.statutArticle ==1  %}
+                                                                                        <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'admin.state.redact'|trans({}, 'messages') }}" title="{{ 'admin.state.redact'|trans({}, 'messages') }} " />
+                                                                                    {% elseif article.statutArticle ==2 %}
+                                                                                        <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{{ 'admin.state.sub'|trans({}, 'messages') }}" title="{{ 'admin.state.sub'|trans({}, 'messages') }}" />
+                                                                                    {% elseif article.statutArticle ==3 %}
+                                                                                        <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{{ 'admin.state.val'|trans({}, 'messages') }}" title="{{ 'admin.state.val'|trans({}, 'messages') }}" />
+                                                                                    {% elseif article.statutArticle ==6 %}    
+                                                                                        <img src="{{ asset('img/admin-img/bloquerSmall.png')}}"  alt="{{ 'admin.state.rejected'|trans({}, 'messages') }}" title="{{ 'admin.state.rejected'|trans({}, 'messages') }}" />                                                                                        
+                                                                                    {% elseif article.statutArticle ==4  %}
+                                                                                        <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'admin.state.pub'|trans({}, 'messages') }}" title="{{ 'admin.state.pub'|trans({}, 'messages') }}" />
+                                                                                    {% elseif article.statutArticle ==5 %}
+                                                                                        <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'admin.state.unpub'|trans({}, 'messages') }}" title="{{ 'admin.state.unpub'|trans({}, 'messages') }}" />
+                                                                                    {% endif %}
+                                                                </td>
+
+                                                                <td class="autorArtList">
+                                                                    {% for user in listeuser %}
+                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                             {{user.NameUser}}
+                                                                        {% endif %}
+                                                                    {% endfor %}                                                                                    
+                                                                </td>
+                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                <td class="langArtList"> {{locale}}</td>
+                                                                <td class="numArtList"> {{'N°'~article.id}}</td>                                                           
+                                                                      <td class="actionArtList">                                                                      
+                                                                        {% if article.statutArticle in [1,2,5] %} 
+                                                                              
+                                                                                         {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':id})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}                                                                               
+                                                                            <a href="{{path('utb_admin_modifarticle', {'id': article.id,'locale': locale, 'type':id})}}">
+                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" />  
+                                                                            </a>    
+                                                                                        {% endif%}
+                                                                        {% elseif article.statutArticle == 3 %}
+                                                                              
+                                                                                         {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':id})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}                                                                              
+                                                                            <a href="{{path('utb_admin_modifarticlevalide', {'id': article.id,'locale': locale, 'type':id})}}"> 
+                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" />  
+                                                                            </a>
+                                                                                        {% endif %}
+                                                                        {% elseif article.statutArticle == 4 %}
+                                                                              
+                                                                                         {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':id})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}                                                                              
+                                                                            <a href="{{path('utb_admin_modifarticlepublie', {'id': article.id,'locale': locale, 'type':id})}}"> 
+                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" />
+                                                                            </a> 
+                                                                                        {% endif %}
+                                                                        {% endif %}                 
+                                                                      </td>            
+                                                                <td class="actionArtList">
+                                                                    {% if article.statutArticle in [1,6] %}
+                                                                        <a href="javascript:void(0);" onclick="gererAll({{article.id}},2); return false;"  >
+                                                                            <img src="{{ asset('img/admin-img/soumettreSmall.png')}}" alt="{{ 'admin.soumettre'|trans({}, 'messages') }}" title="{{ 'admin.soumettre'|trans({}, 'messages') }}"/>
+                                                                        </a>    
+                                                                    {% elseif (article.statutArticle ==2) %}
+                                                                        <a href="javascript:void(0);" onclick="gererAll({{article.id}},3); return false;"  >
+                                                                            <img src="{{ asset('img/admin-img/validerSmall.png')}}" alt="{{ 'admin.btnvalider'|trans({}, 'messages') }}" title="{{ 'admin.btnvalider'|trans({}, 'messages') }}"/>
+                                                                        </a>  
+                                                                        <a href="javascript:void(0);" onclick="gererAll({{article.id}},6); return false;"  >
+                                                                            <img src="{{ asset('img/admin-img/bloquerSmall.png')}}" alt="{{ 'admin.state.rejected'|trans({}, 'messages') }}" title="{{ 'admin.state.rejected'|trans({}, 'messages') }}"/>
+                                                                        </a>                                                                                                                                            
+                                                                       
+                                                                    {% elseif article.statutArticle ==3 %}
+                                                                        <a href="javascript:void(0);" onclick="gererAll( {{article.id}},4); return false;"  >
+                                                                            <img src="{{ asset('img/admin-img/publierSmall.png')}}" alt="{{ 'admin.publier'|trans({}, 'messages') }}" title="{{ 'admin.publier'|trans({}, 'messages') }}"/>
+                                                                        </a> 
+                                                                    {% elseif article.statutArticle ==4 %}
+                                                                        <a href="javascript:void(0);" onclick="gererAll( {{article.id}},5); return false;"  > 
+                                                                            <img src="{{ asset('img/admin-img/depublierSmall.png')}}" alt="{{ 'admin.depublier'|trans({}, 'messages') }}" title="{{ 'admin.depublier'|trans({}, 'messages') }}"/>
+                                                                        </a> 
+                                                                    {% elseif article.statutArticle ==5 %}
+                                                                        <a href="javascript:void(0);" onclick="gererAll( {{article.id}},3); return false;"  > 
+                                                                            <img src="{{ asset('img/admin-img/validerSmall.png')}}" alt="{{ 'admin.btnvalider'|trans({}, 'messages') }}" title="{{ 'admin.btnvalider'|trans({}, 'messages') }}"/>    
+                                                                        </a> 
+                                                                    {% endif %}
+                                                                </td>
+                                                                {% if article.statutArticle !=4 %}
+                                                                <td class="actionArtList"> <a href="javascript:void(0);" onclick="corbeilleAll( {{article.id}}); return false;" > <img src="{{ asset('img/admin-img/icon-16-trash.png')}}" id="{{article.id}}"  alt="{{ 'admin.supprimer'|trans}}" title="{{ 'admin.supprimer'|trans}}" /></a></td>                                                  
+                                                                <td class="actionArtList"> <a href="javascript:void(0);" onclick="archiveAll( {{article.id}}); return false;"  > <img src="{{ asset('img/admin-img/archiverSmall.png')}}" id="{{article.id}}"  alt="{{'admin.archiver'|trans}}" title="{{'admin.archiver'|trans}}" /></a></td>
+                                                                {% else %} 
+                                                                     <td class="actionArtList">&nbsp; </td>                                                  
+                                                                     <td class="actionArtList">&nbsp; </td>
+                                                                        
+                                                                {% endif %} 
+                                                        </tr> 
+                                                        {% endif %}
+                                                {% else %} 
+                                                        <tr class="bgGris">
+
+                                                            <td colspan="8">{{ 'rubriques.noarticle'|trans({}, 'rubriques') }}</td>
+                                                     </tr>                                                        
+                                                {% endfor %}
+					 </table>
+                                        
+                                       <br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{{ path('utb_admin_detailrubrique', { 'id':rubrique.id,'page': 1,'locale':locale }) }}"> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_detailrubrique', { 'id':rubrique.id,'page': previous_page,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_detailrubrique', { 'id':rubrique.id ,'page': page,'locale':locale }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_detailrubrique', {'id':rubrique.id ,'page': next_page,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_detailrubrique', { 'id':rubrique.id,'page': last_page,'locale':locale }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> {{ 'articles.finpage'|trans({}, 'articles')}} 
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+                                                         
+                                        
+                                        </div> 	<!-- FIN colRightContentPadding-->
+					</div>		<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+				
+					
+					</div>		<!--  FIN COL RIGHT -->
+                                        
+                                <div class="allBannieres">
+                                    <h2 class="titleRubrique colorBleu addBanner-title">{{ 'rubriques.gestbanniere'|trans({}, 'rubriques') }} 					
+									{% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%}
+									{{ 'rubriques.rubrique'|trans({}, 'rubriques') }}
+									
+									{% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+									{{ 'rubriques.sousrub'|trans({}, 'rubriques') }}
+									
+									{% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}
+									{{ 'rubriques.categorie'|trans({}, 'rubriques') }}
+									
+									{% endif  %} 
+									
+									</h2>
+									<div class="addBanner-but">
+										<a class="addBanner" href="#" onClick="ajoutBanniere(); return false;">	{{'rubriques.addbanniere'|trans({}, 'rubriques')}}</a>
+									</div>  
+									<div class="clr"></div>
+									
+									<div class="FrmAjoutArt FrmTopDetailArt FrmInRubriqTop" id="ajoutBanniere_container" style="display:none;">
+										<div>
+										{{ render(controller('utbAdminBundle:Rubrique:ajoutMediaRubrique', {'id': rubrique.id,'locale':locale,'type':1})) }}  
+										</div>
+										
+										<a href="#" class="noSoulignHover" onClick="AnnulerAjoutBanniere( ); return false;">{{'admin.annuler'|trans}}</a>
+										<div class="clr"></div>
+									</div>  
+                                        {% for unimage in banniere %}
+                                              {% if unimage.urlMedia != "" %}
+                                                                        
+                                                <div class="onePic onePic2 colorCadreNonArrondi">
+                                                                <div class="picMini"><img src="{{  asset('upload/rubriques/'~unimage.urlMedia)}}" alt="" title="" width="220" height="70"/></div>
+                                                                <div class="namePicMini">{{unimage.nomMedia|raw}}</div>
+                                                                <div class="actionPicMini"><a href="javascript:void(0);" onclick="corbeilleAllBanniere( {{unimage.idMedia}} ); return false;"><img src="{{ asset('img/admin-img/icon-16-delete.png')}}" alt="{{ 'admin.supprimer'|trans}}" title="{{ 'admin.supprimer'|trans}}" /></a></div>
+                                                                 <div class="clr"></div>
+                                                </div>
+                                                                        
+                                              {% endif %} 
+                                         {% endfor %} 
+                                         <div class="clr"></div>							 
+
+                                </div>                                         
+				</div>			<!--  FIN  SPAN - 19 -->
+                                
+                               
+				
+			</div>				<!--  FIN SPAN - 25 -->
+{% endfor %} 
+     
+  {{ information.popupaddarticle(listeRubrique) }} 
+                                             
+ <script language="javascript" >
+     
+// gerer la presentation de la page de rubrique
+
+            $( document ).ready(function() {
+                    $('#my_radio_box').change(function(){
+                   $(".imgload1").css("display","block");       
+                   var type= $("input[name='type']:checked").val();
+                   var rubriqueId= $("#idrubrique").val();
+                   
+
+                        $.ajax({
+                           type: "POST",
+                            url: "{{ path('utb_admin_presentationrubrique')}}",
+                            data: {typeId:type, rubriqueIds:rubriqueId},
+                            cache: false,
+                            success: function(data){
+                                  var resJson = jQuery.parseJSON(data);
+                                  if( resJson.result == "success"){
+                                      alert("{{ 'notification.sousrubpresent'|trans({}, 'rubriques')}}");
+                                      
+                                       window.location.reload(); 
+                                       
+                                  }      
+                                   else
+                                       alert("Non");
+         
+                                        //console.log(data);
+                            }
+                      });            
+
+                    });
+          });
+          
+          
+// fin presentation
+       
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.effectuer'|trans}}";
+       var htmldefault3 = "{{ 'admin.effectuer'|trans}}";
+       
+       
+       function gererAll( articlesId,etat){
+         
+           if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+              
+            if (etat == 2) {   
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsub').html())};
+            }else if (etat == 3){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmval').html())};
+            }else if (etat == 4){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+            }else if (etat == 5){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdepub').html())};
+            }                          
+         
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+           $("#process_tpl").dialog('open'); 
+              return false;
+          }     
+          
+          
+          if (etat == 2) {   
+                $('#process_tpl').html($('#msgconfirmsub').html());
+          }else if (etat == 3){
+                $('#process_tpl').html($('#msgconfirmval').html());
+          }else if (etat == 4){
+                $('#process_tpl').html($('#msgconfirmpub').html());
+          }else if (etat == 5){
+                $('#process_tpl').html($('#msgconfirmdepub').html());
+          }
+      
+          if (etat == 2) {   
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsub').html())};
+          }else if (etat == 3){
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmval').html())};
+          }else if (etat == 4){
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          }else if (etat == 5){
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdepub').html())};
+          }        
+          
+          if (etat == 2) {   
+                $('#process_tpl').html($('#msgconfirmsub').html());
+          } 
+
+          if (etat == 3){
+                $('#process_tpl').html($('#msgconfirmval').html());
+          }
+
+          if (etat == 4){
+                $('#process_tpl').html($('#msgconfirmpub').html());
+          }
+
+          if (etat == 5){
+                $('#process_tpl').html($('#msgconfirmdepub').html());
+          }
+          //var args = {modal: true, autoOpen: false, title: ('Changer le statut des articles')};
+         
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                 
+
+        
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gererAllarticles')}}",
+                                data: {articlesIds:articlesId,etat:etat},
+                                cache: false,
+                                success: function(data){ 
+                            
+                                    var answer = jQuery.parseJSON(data);
+                                    if(answer.result == "erreurstatut"){
+                                        
+                                        if (etat == 2) {   
+                                              $('#process_tpl').html($('#impossiblesub').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 3){
+                                              $('#process_tpl').html($('#impossibleval').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 4){
+                                              $('#process_tpl').html($('#impossiblepub').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 5){
+                                              $('#process_tpl').html($('#impossibledepub').html());
+                                              window.location.reload();
+                                        }  
+                                         
+                               
+                                    }
+                                    else if (answer.result == "success"){
+                                                                                
+                                        if (etat == 2) {   
+                                              $('#process_tpl').html($('#reussitesub').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 3){
+                                              $('#process_tpl').html($('#reussiteval').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 4){
+                                              $('#process_tpl').html($('#reussitepub').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 5){
+                                              $('#process_tpl').html($('#reussitedepub').html());
+                                              window.location.reload();
+                                        }     
+                                         //window.location.reload();
+                                        
+                                        
+                                    }else{
+                                        $('#process_tpl').html($('#accessdenied').html()); 
+                                        window.location.reload();
+                                    }                       
+                            
+                            
+                                  
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+       
+       
+       //function pour supprimer plusieurs elements a la fois
+       function deleteAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsup').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html($('#msgconfirmsup').html());
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }    
+       
+       
+       function definirAccueil( articlesId, etat ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdef').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmdef').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdef').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html($('#msgconfirmdef').html());
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_definirAccueil')}}",
+                                data: {articlesIds:articlesId,etat:etat},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }       
+       
+       function corbeilleAll( articlesId ){
+    
+          if( articlesId.length == 0 ){              
+          $('#process_tpl').html($('#titreconfirmcorb').html());//$('#sivide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmcorb').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmcorb').html());//
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmcorb').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html($('#msgconfirmcorb').html());
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeilleAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblecorb').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitecorb').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       }       
+       
+  
+       function archiveAll( articlesId ){
+       
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())}; 
+   
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmarch').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html($('#msgconfirmarch').html());
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_archiveAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblearch').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitearch').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+
+                  
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( actionsId ){
+         //To do
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function adesactiveAll( actionsId ){
+         //To do
+       }           
+   
+       
+       function deleteOne( articlesId ){          
+          
+          $('#process_tpl').html($('#msgconfirmsuprub').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsuprub').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                           $('#process_tpl').html($('#titreconfirmsuprub').html());
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_supprrubrique')}}",
+                                data: articlesId,
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblesuprub').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitesuprub').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }      
+       
+       function ajoutImage(){
+       
+             $("#ajoutMedia_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerAjout( ); return false;">{{ 'admin.annulermodif'|trans}}</a>';
+            $(".apBanniere").html(html);
+       }
+       
+       function ajoutBanniere(){
+       
+             $("#ajoutBanniere_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerAjoutBanniere( ); return false;">{{ 'admin.annuler'|trans}}</a>';
+            $(".apBanniereB").html(html);
+       }       
+       
+       function AnnulerAjout(){
+           
+           $("#ajoutMedia_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="ajoutImage(); return false;">	{{'rubriques.addimgillustr'|trans({}, 'rubriques')}}</a>';
+
+
+            $(".apBanniere").html(html);
+            
+       } 
+       function AnnulerAjoutBanniere(){
+           
+           $("#ajoutBanniere_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="ajoutBanniere(); return false;">	{{'rubriques.addbanniere'|trans({}, 'rubriques')}}</a>';
+
+
+            $(".apBanniereB").html(html);
+            
+       }       
+       
+       function modifImage(){
+       
+             $("#modifMedia_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerModif( ); return false;">{{ 'admin.annulermodif'|trans}}</a>';
+            $(".dimImgIllustr").html(html);
+       }
+       
+       function AnnulerModif(){
+           
+           $("#modifMedia_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="modifImage(); return false;"> {{ 'rubriques.modifimgrub'|trans({}, 'rubriques') }} </a>';
+
+
+            $(".dimImgIllustr").html(html);
+            
+       }
+       
+       function getBannieresID(){
+           
+            var banniere_id = "";
+            
+            $(":input[rel=banniere_c]:checked").each(function(){
+		banniere_id = banniere_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return banniere_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'articles.onearticle.supprimg'|trans({}, 'articles')}}"; //image illustrative
+       var htmldefault2 = "{{ 'banniere.statut.confirmation'|trans}}"; 
+ 
+    
+       function corbeilleAllBanniere( banniereId ){
+          if( banniereId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'banniere.supprimer.titre'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'articles.onearticle.supprimgtitre'|trans({}, 'articles')}}')};// image illustrative
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeillebanniere')}}",
+                                data: {banniereIds:banniereId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'banniere.supprimer.impossible'|trans}}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'banniere.supprimer.reussie'|trans}}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }        
+       
+  	$(function() {
+		$(".listArticlesRub tbody").sortable({ opacity: 0.6, cursor: 'move', update:
+                    function() {
+                	var order = $(this).sortable("serialize"); 
+                        $.ajax({
+                            type: "POST",
+                            url: "{{path('utb_admin_updateOrdreArticle',{ 'locale': locale, 'page':current_page})}}",
+                            data: {formdata:order},
+                            cache: false,
+                            success: function(data){
+                                var resJson = jQuery.parseJSON(data);
+                                 //console.log(resJson);
+                            }
+                        });	                
+                    }								  
+		});
+	});        
+       
+       
+</script>
+ 
+  
+  <div id="process_tpl" style="display:none;"></div> 
+  
+    {# suppression de rubriques #}
+  {#<div id="msgconfirmsuprub" style="display:none;">{{ 'confirmation.suppressionrub'|trans({}, 'rubriques') }}</div>   
+
+  <div id="titreconfirmsuprub" style="display:none;">{{ 'confirmation.titresuprub'|trans({}, 'rubriques') }}</div> 
+
+  <div id="impossiblesuprub" style="display:none;"> {{ 'confirmation.impossiblesuprub'|trans({}, 'rubriques') }}</div> 
+
+  <div id="reussitesuprub" style="display:none;"> {{ 'confirmation.successuprub'|trans({}, 'rubriques') }} </div> #}
+
+  <div id="sivide," style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+  
+  
+  {# suppression de articles #}
+  <div id="msgconfirmsup" style="display:none;">{{ 'confirmation.suppressionone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmsup" style="display:none;">{{ 'confirmation.titresupone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesup" style="display:none;"> {{ 'confirmation.impossiblesupone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesup" style="display:none;"> {{ 'confirmation.successupone'|trans({}, 'articles') }} </div> <div id="sivide," style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+  {# definir comme correspondant  #}
+  <div id="msgconfirmdef" style="display:none;">{{ 'confirmation.definirone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmdef" style="display:none;">{{ 'confirmation.titredefone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossibledef" style="display:none;"> {{ 'confirmation.impossibledefone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitedef" style="display:none;"> {{ 'confirmation.succesdefone'|trans({}, 'articles') }} </div> <div id="sivide," style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+ 
+  
+  {# corbeille de articles #}
+  <div id="msgconfirmcorb" style="display:none;">{{ 'confirmation.corbeilleone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmcorb" style="display:none;">{{ 'confirmation.titrecorbone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblecorb" style="display:none;"> {{ 'confirmation.impossiblecorbone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitecorb" style="display:none;"> {{ 'confirmation.succescorbone'|trans({}, 'articles') }} </div> 
+
+  {# validation des articles #}
+  <div id="msgconfirmval" style="display:none;">{{ 'confirmation.validerone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmval" style="display:none;">{{ 'confirmation.titrevalone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossibleval" style="display:none;"> {{ 'confirmation.impossiblevalone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussiteval" style="display:none;"> {{ 'confirmation.succesvalone'|trans({}, 'articles') }} </div> 
+
+  {# archivage d'articles #}
+  <div id="msgconfirmarch" style="display:none;">{{ 'confirmation.archiverone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmarch" style="display:none;">{{ 'confirmation.titrearchone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblearch" style="display:none;"> {{ 'confirmation.impossiblearchone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitearch" style="display:none;"> {{ 'confirmation.succesarchone'|trans({}, 'articles') }} </div> 
+
+  {# publier d'articles #}
+  <div id="msgconfirmpub" style="display:none;">{{ 'confirmation.publierone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmpub" style="display:none;">{{ 'confirmation.titrepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblepub" style="display:none;"> {{ 'confirmation.impossiblepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitepub" style="display:none;"> {{ 'confirmation.succespubone'|trans({}, 'articles') }} </div> 
+    
+
+  {# dÃ©publier d'articles #}
+  <div id="msgconfirmdepub" style="display:none;">{{ 'confirmation.depublierone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmdepub" style="display:none;">{{ 'confirmation.titredepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossibledepub" style="display:none;"> {{ 'confirmation.impossibledepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitedepub" style="display:none;"> {{ 'confirmation.succesdepubone'|trans({}, 'articles') }} </div> 
+  
+   {# soumission d'articles #}
+  <div id="msgconfirmsub" style="display:none;">{{ 'confirmation.soumettreone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmsub" style="display:none;">{{ 'confirmation.titresubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesub" style="display:none;"> {{ 'confirmation.impossiblesubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesub" style="display:none;"> {{ 'confirmation.successubone'|trans({}, 'articles') }} </div> 
+  
+  <div id="accessdenied" style="display:none;"> 
+    {{ 'confirmation.accessdenied'|trans({}, 'articles') }} 
+  </div>   
+  
+{% endblock %}

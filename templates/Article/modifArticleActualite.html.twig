@@ -1,0 +1,159 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'articles.ajout.grandtitrepg'|trans({}, 'articles') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }}</a> > {% for rubrique in larubrique%} <a href="{{path('utb_admin_detailrubrique',{'locale': locale,'id':rubrique.id})}}">{{rubrique.nomRubrique}}</a>{% endfor %} > {{ 'articles.modif.grandtitrepg'|trans({}, 'articles') }}
+            </div>
+                                
+                {% for contenu in app.session.flashbag.get('notice') %}             
+                    {% if contenu == "errortypficart" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+                                        {{ 'notification.errortype'|trans({}, 'articles') }}
+                                         </div>
+                                    </div>
+                   {% elseif contenu == "errorajtartexist" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+                        {{ 'notification.ajoutexistart'|trans({}, 'articles') }}
+                                         </div>
+                                    </div>                                 
+                   {% elseif contenu == "errorajtartdescvide" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+                        {{ 'notification.ajoutartdescvide'|trans({}, 'articles') }}
+                                         </div>
+                                    </div>   
+                   {% endif %}
+              {% endfor %}                                 
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="{{ 'articles.ajout.titre1'|trans({}, 'articles')}}" title="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'articles.liste.titrepg.ajoutactualite'|trans({}, 'articles') }} <span>: {{ 'articles.modif.titre2'|trans({}, 'articles')}} </span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans({}, 'messages')}}" title="{{ 'admin.btnvalider'|trans({}, 'messages')}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans({}, 'messages')}}" title="{{ 'admin.annuler'|trans({}, 'messages')}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                      {# STATISTIQUES #}    
+                                      {{ information.stats(listestat) }}   
+                                      
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+									<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+									<div class="colRightContentPadding">
+									
+										<form action=" {{ path("utb_admin_modifarticle",{'locale': locale,'type': type,'id':id,'nomarticle':nomarticle}) }} " method="post" {{ form_enctype(form) }} id="ajout">
+									  
+											<div class="FrmAjoutArt">
+											{{ form_errors(form.titreArticle) }}
+											<span class="labelCourt">
+											{{ form_label(form.titreArticle, 'articles.form.titre'|trans({}, 'articles')) }}</span> 
+											{{ form_widget(form.titreArticle) }}
+											<div class="clr"></div>
+											</div>
+												
+											<div class="FrmAjoutArt">
+											{{ form_errors(form.introTexteArticle) }}
+											<span class="labelNoFloat">
+											{{ form_label(form.introTexteArticle, 'articles.form.intro'|trans({}, 'articles'))}}</span> 
+											{{ form_widget(form.introTexteArticle) }}
+											</div>
+											
+											<div class="FrmAjoutArt">
+											{{ form_errors(form.descriptionArticle) }}
+											<span class="labelNoFloat">
+											{{ form_label(form.descriptionArticle, 'articles.form.desc'|trans({}, 'articles')) }}</span> 
+											{{ form_widget(form.descriptionArticle) }}
+											</div>
+											 
+											<div class="FrmAjoutArt cadreInForm colorCadreArrondi bgBlanc">
+											{{ form_errors(form.referenceArticle) }}
+											{{ form_label(form.referenceArticle, 'articles.form.reference'|trans({}, 'articles')) }}
+											{{ form_widget(form.referenceArticle) }}
+											<div class="clr" style="">&nbsp;</div>
+											{{ form_errors(form.urlArticle) }}
+											{{ form_label(form.urlArticle, 'articles.form.url'|trans({}, 'articles')) }}</span> 
+											{{ form_widget(form.urlArticle) }}
+											<div class="clr"></div>
+											</div>
+																											
+										{#	{{ form_errors(form.medias.vars.value.nomMedia) }}
+											{{ form_label(form.medias.vars.nomMedia) }}
+											{{ form_widget(form.medias.vars.nomMedia) }}
+											
+											{{ form_widget(form.medias.urlMedia) }}
+											{{ form_label(form.medias.urlMedia) }}
+											{{ form_widget(form.medias.urlMedia) }
+										#}
+                                                  
+                                            <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none"><a href=""></a>
+                                       </form>
+                                      
+									  </div>			<!-- FIN colRightContentPadding-->
+								  </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+								  <div class="bottomButAction coinsArrondisMin colorCadreArrondi bgGris">
+										<div class="ecartBoutonsForBottom">&nbsp;</div>
+									<div class="boutonGestion">
+									  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans({}, 'messages')}}" title="{{ 'admin.btnvalider'|trans({}, 'messages')}}" /></div>
+									  {{ 'admin.btnvalider'|trans}}</a>
+								  </div>
+
+								  <div class="ecartBoutons">&nbsp;</div>
+
+								  <div class="boutonGestion">
+									  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans({}, 'messages')}}" title="{{ 'admin.annuler'|trans({}, 'messages')}}" /></div>
+									  {{ 'admin.annuler'|trans}}</a>
+								  </div>
+								  <div class="clr"></div>
+									</div>    	<!-- div.bottomButAction--> 
+							  </div>		<!--  FIN COL RIGHT -->
+						  </div>			<!--  FIN  SPAN - 19 -->
+
+                       </div>				<!--  FIN SPAN - 25 -->
+  
+                        {{ information.popupaddarticle(listeRubrique) }}                        
+ 
+
+  {% endblock %}

@@ -1,0 +1,229 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+       					<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+                {% if type == 0  %}
+                  {{ 'admin.allarttrad'|trans}}                                                                                                                     
+                {% elseif type == 1 %}  
+                  {{ 'admin.allrubtrad'|trans}}                                                        
+                {% endif %}
+            </div>
+
+                        <div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="">
+						<div class=" span-9 logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" title="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" /></div>
+						<div class=" span-16 titreModule colorBleu">
+                                                    <h1>
+                                                        {#{ 'admin.gestTraduction'|trans }#}
+                                                          {% if type == 0  %}
+                                                            {{ 'admin.allarttrad'|trans}}                                                                                                                     
+                                                          {% elseif type == 1 %}  
+                                                            {{ 'admin.allrubtrad'|trans}}                                                        
+                                                          {% endif %}
+                                                    <h1>
+                                                </div>	
+						<div class="clr"></div>
+					</div>					
+
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                           
+                                            {# STATISTIQUES  #}
+                                          
+                                            <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                                                    <h3 class="colorBleu titreStats">{{ 'admin.stats'|trans({}, 'messages') }} </h3>
+                                                    <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                                    <table class="tableStats">
+                                                        {% for letaux in taux %}                                                                                                                                                                                       
+                                                                <tr{% if loop.index is odd %}  class="bgBlanc" {% else %} class="bgGris"  {% endif %} >
+                                                                    <td> {{ letaux.Lg }} </td>
+                                                                    <td class="" colspan="3">{{ letaux.prcent }}</td>                                                                      
+                                                                </tr>                                                    
+                                                        {% endfor %}    
+                                                    </table>
+                                                    </div>
+                                            </div>                                              
+                                                
+                                            
+                                        </div>	                               
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+                                    <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                            <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                              
+                                                
+                                               {#******* STYLE AJOUTE POUR AJUSTER LE TABLEAU DE MAINTENANCE #TAUX ***********#} 
+                                                <style>
+                                                    .ajustTableau tr th:nth-child(4){width: 200px;}
+                                                    .ajustTableau1 tr th:nth-child(3){width: 150px;}
+                                                    .filtrerOuiNon{text-align: right;padding:0px 2px 5px 0px;font-style: italic;}
+                                                    #roui,#rnon{border:1px solid #ccc;background: #ccc;color: #555}
+                                                </style>  
+                                                <div class="filtrerOuiNon">    
+                                                    {{'reseau.filtrer'|trans({}, 'site')}}
+                                                    <span><input id="roui" type="button" value="{{'admin.oui'|trans}}">  </span>
+                                                    <span><input id="rnon" type="button" value="{{'admin.non'|trans}}">  </span> 
+                                                </div>
+                                                <table {% if type == 0 %} class="listMenusCateg listArticlesRub ajustTableau" {%else%} class="listMenusCateg listArticlesRub ajustTableau1" {%endif%} >
+                                                     <tr>
+
+                                                        {% for k0, d0 in listetraduction|first %}
+                                                           {% if (loop.index != 5)  %} 
+                                                               {% set t0 = k0|split('|') %}	
+
+                                                                    {% if t0|length == 3 %}
+                                                                       <th>{{ t0[2] }}</th>
+                                                                    {% else  %}
+                                                                       {% if (type == 1) and (loop.index==3)  %} 
+                                                                       {% else  %}    
+                                                                          <th>{{ k0 }}</th>                                                                         
+                                                                       {% endif %} 
+                                                                    {% endif %}
+                                                           {% endif %}
+                                                        {% endfor %}
+
+                                                      </tr>
+                                                         {% for key, data in listetraduction %}
+                                                           {% if data is not null %}  														  
+
+                                                             <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+
+                                                                 {% for value in data %} 
+                                                                    {% if loop.index == 2 %}  
+                                                                        <td class="titreArtList">
+                                                                            {% if type == 0 %}  
+
+                                                                                <a href="{{ path('utb_admin_detailarticle', {'id': data['N°'],'type': data['NRub'],'locale': locale,'genre':0}) }}">    
+                                                                                        {{ value }}
+                                                                                </a>        
+
+                                                                            {% elseif type == 1 %}    
+                                                                                <a href="{{ path('utb_admin_detailrubrique', {'id': data['N°'],'page': 1,'locale': locale}) }}">    
+                                                                                        {{ value }}
+                                                                                </a> 
+                                                                            {% endif %}
+                                                                        </td>        
+                                                                    {% elseif loop.index == 3 %}  
+                                                                      {% if type == 0 %}  
+                                                                        {{ information.statutliste(data['Stat.']) }}
+                                                                      {% endif %}  
+                                                                    {% elseif loop.index == 5 %}  
+                                                                        
+                                                                    {% elseif loop.index>5 %}    
+                                                                        <td class="statutArtList">
+                                                                            {% if value == 1 %}
+                                                                            <div class="oui">
+                                                                                <b>{{'admin.oui'|trans}}</b> 
+                                                                            </div>
+                                                                            {% else %}
+                                                                            <div class="non">  
+                                                                                {{'admin.non'|trans}} 
+                                                                            </div> 
+                                                                            {% endif %}    
+                                                                        </td>
+                                                                    {% else  %}      
+                                                                        <td class="statutArtList">{{ value }}</td>
+                                                                    {% endif %}
+                                                                 {% endfor %}
+
+                                                              </tr>  
+                                                             
+                                                           {% endif %} 
+                                                         {% endfor %}
+
+                                                </table>
+                                                
+                                            <br/>
+                                                <!-- pagination (edem)-->
+                                            {% if last_page > 1 %}
+                                                 <div class="paginationTry">
+
+                                                     <a href="{{path('utb_admin_traduction', {'id':0, 'locale': locale,'type':type,'page':1})}}"> <span> << </span> </a> 
+                                                     <a href="{{ path('utb_admin_traduction', {'id':0, 'locale': locale,'type':type,'page': previous_page }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                     {% for page in 1..last_page %}
+                                                           {% if page == current_page %}
+                                                           <span>{{ page }}</span>
+                                                           {% else %}
+                                                           <span><a href="{{ path('utb_admin_traduction', {'id':0, 'locale': locale,'type':type, 'page': page }) }}">{{ page }}</a></span>
+                                                           {% endif %}
+                                                     {% endfor %}
+                                                     <a href="{{ path('utb_admin_traduction', {'id':0, 'locale': locale,'type':type,'page': next_page }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                     <a href="{{ path('utb_admin_traduction', {'id':0, 'locale': locale,'type':type,'page': last_page }) }}"> <span> >> </span></a>
+
+                                                 </div>
+                                            {% endif %}
+                                             <br/>    
+                                            <div class="pagination_desc">
+                                               <center>
+                                                   <strong>{{ total }}</strong> 
+                                                          {% if type == 0  %}
+                                                            {{ 'admin.allarttrad'|trans}}                                                                                                                     
+                                                          {% elseif type == 1 %}  
+                                                            {{ 'admin.allrubtrad'|trans}}                                                        
+                                                          {% endif %}
+                                                   {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                               </center>
+                                            </div>                                            
+                                            <br/>                        
+                                            
+                                       </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                       
+                                    </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+                                    
+                                </div>		<!--  FIN COL RIGHT -->
+                                
+                            </div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>            
+
+<div id="process_tpl" style="display:none;"></div>  
+
+<script>
+    
+    $("#roui").click(function() {
+        surbrillance(1);
+    });
+    
+    $("#rnon").click(function() {
+        surbrillance(0);
+    });
+    
+    function surbrillance(numcl){            
+
+        if (numcl ===0){
+            $(".non").css({backgroundColor:"transparent", color:"#555" , border:"none"});
+            $(".oui").css({backgroundColor:"transparent", color:"#555" , border:"none"});
+            $(".non").css({backgroundColor:"red", color:"#fff" , border:"1px solid #A3D246"});
+        } 
+        if (numcl ===1){
+            $(".non").css({backgroundColor:"transparent", color:"#555" , border:"none"});
+            $(".oui").css({backgroundColor:"transparent", color:"#555" , border:"none"});
+            $(".oui").css({backgroundColor:"#EBF8A4", color:"#264409" , border:"2px solid #A3D246"});
+        } 
+
+    };       
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Informations d'un Abonné
+{% endblock %}
+  
+	{% block client_centre_body %}
+	{% for contenu in app.session.flashbag.get('notice') %}
+	{% if contenu == "errancienpwd" %}
+		<div class="error leftSpace rightSpace center">                        
+		{{ 'abonnes.errancienpwd'|trans({}, 'abonnes') }}
+		</div>    
+	{% endif %}                         
+
+	{% if contenu == "passworderror" %}
+		<div class="error leftSpace rightSpace center">                        
+		  {{ 'abonnes.passworderror'|trans({}, 'abonnes') }}
+		</div>    
+	{% endif %}
+
+	{% endfor %}    
+
+	<ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li><a href="{{ path("utb_client_detail_abonne",{'locale':locale}) }}">{{'abonnes.perso'|trans({},'abonnes') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'abonnes.modifPwd'|trans({},'abonnes') }}</li>
+    </ul>
+    
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'abonnes.code2'|trans({},'abonnes') }}</h2>
+	
+	<form action="{{ path('utb_client_change_infosabonne',{'id':unabonne.id , 'type' : 1, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutAbonne" class="leftPartIn">
+	
+                <div class="FrmAbonne">
+                    {{ form_errors(form.username) }}
+                    <span class="labelLong">{{ form_label(form.username, 'abonnes.form.login'|trans({}, 'abonnes')) }}</span>
+                    {{ form_widget(form.username) }}
+                    <div class="clr"></div>
+                </div>
+
+                <div class="FrmAbonne">
+                    <span class="labelLong"><label> {{'abonnes.form.oldPass'|trans({},'abonnes') }} </label></span>
+                    <input type="password" name="vpassword" id="vpassword" >
+                    <div class="clr"></div>
+                </div>
+
+                <div class="FrmAbonne">
+                    {{ form_errors(form.password) }}
+                    <span class="labelLong">{{ form_label(form.password, 'abonnes.form.newPass'|trans({},'abonnes')) }}</span>
+                    {{ form_widget(form.password) }}
+                    <div class="clr"></div>
+                    <span class="gris-comment"><em>{{'abonnes.form.min'|trans({},'abonnes') }}</em></span>
+                </div>
+
+                <div class="FrmAbonne">
+                    {{ form_errors(form.cpassword) }}
+                    <span class="labelLong">{{ form_label(form.cpassword, 'abonnes.form.cpassword'|trans({},'abonnes')) }}</span>
+                    {{ form_widget(form.cpassword) }}
+                    <div class="clr"></div>
+                </div>
+				
+				<div class="boutonsAction">
+                    <input type="submit" class="boutonSubmit" value="{{'client.modifier'|trans({},'messages') }}" name="op" id="j_bouton" >
+                   
+                   <a class="back" href="#"><input type="submit" class="annulerBut back" value="{{'client.annuler'|trans({},'messages') }}" name="" id="" >   </a><div class="clr"></div>
+				</div>
+       </form>
+
+ {% endblock %}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title> {{ 'client.bienvenue'|trans({}, 'messages') }}</title>
+		<link rel="stylesheet" type="text/css" media="all" href="style.css"/>
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	</head><!-- Fin header -->
+	
+	<body style="width:750px;font-family:serif,Arial,sans-serif; font-size:11px; color:#555;">
+            <div id="entete">
+                    <div class="bande1" style="border-top: 1px solid #0049ba;border-bottom: 1px solid #0049ba;padding-top: 5px; padding-bottom: 5px;margin-top:10px;">
+                        <h1 style="padding: 0px; margin: 0px;font-family: 'Bauhaus 93';color: #0049ba;font-size: 28px;"><img src="{{asset('img/client-img/logo_utb_mini.png')}}" alt="" width="30px" /> <span style="position: relative;top:-5px;">Union togolaise de banque</span></h1>
+                    </div><!-- Fin bande 1 -->
+                    
+                    <div class="bande2" style="border-bottom: 1px solid #0049ba;padding-top: 5px; padding-bottom: 5px;margin-top:0px;text-align: center;">
+                        <p style="padding: 0px; margin: 0px;">{{ 'client.aptitresa2'|trans({}, 'messages') }} </p>
+                        <br><p style="padding: 0px; margin: 0px;">{{ 'client.aptitresa3'|trans({}, 'messages') }} </p>
+                    </div>
+                    <div>
+                        <h2>{{ 'operation.listeop'|trans({}, 'recherche') }}</h2>
+                    </div><!-- Fin bande 2 -->
+            </div><!-- Fin de l'entête || -->
+            
+            <div id="main" style="min-height: 900px;">
+                <table class="withTDborder" style="width: 750px; border-collapse: collapse;text-align: left;margin-right: 1px;margin-bottom: 50px;">
+                    <thead  style="text-align: left;background: #ccc;" class="titreTableau">
+                        <th style="text-align: left;border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 50px;">{{'compte.date'|trans({},'compte') }}</th>
+                        <th style="text-align: left;border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 260px;">{{'compte.operations.libelle'|trans({},'compte')|upper }}</th>
+                        <th style="text-align: left;border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 50px;">{{'compte.valeur'|trans({},'compte') }}</th>
+                        <th style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px;">{{'compte.debit'|trans({},'compte') }}</th>
+                        <th style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px;">{{'compte.credit'|trans({},'compte') }}</th>
+                       
+                        
+                        
+                        {#<th style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px; text-align: right;">{{'compte.debit'|trans({},'compte') }}</th>#}
+                        <th style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px; text-align: right;">{{'compte.nummouvement'|trans({},'compte')|upper }}</th>
+                        <th style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px; text-align: right;">{{'compte.releves.solde'|trans({},'compte')|upper }}</th>
+                    </thead>
+
+                    <tbody>
+
+                        {% if soldedeb|length >0  %}
+                                <tr class="soldes"> 
+                                                                
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> {{ soldedeb[0]['dateSolde']|date("d/m/Y") }} </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> SOLDE DEBUT PERIODE </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right;"> </td>
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right;"> </td> 
+                                    
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right">
+                                         {% if soldedeb[0]['sens']|lower == 'd' %} - {% endif %}                                                                  
+                                         {{soldedeb[0]['solde']|number_format(0, '', ' ')}}                                                                  
+                                    </td>
+                                    {#<td class="titreList" >
+
+                                       <div style='display:none'>
+                                            <img src='{{ asset('img/client-img/x.png')}}' alt='' />
+                                       </div>
+                                    </td>#}
+                                </tr>
+                        {% endif %}  
+                        {% for operation in listeOperation %} 
+                           {% if operation.codOperation =='01'   %}
+                           {% elseif operation.codOperation =='07' %}
+                           {% else %}                        
+                            <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> {{operation.dateOperation|date("d/m/Y") }} </td> 
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> {{operation.libOperation }} </td>
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> 
+                                    {% if operation.dateValeur|date("d/m/Y")|slice(6,1) != '-' %}
+                                        {{operation.dateValeur|date("d/m/Y") }} 
+                                    {% endif %}
+                                </td>
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; text-align: right;">
+                                 {% if operation.sensOperation == 'D' %}
+                                    {{(operation.montant)|number_format(0, '', ' ') }}
+                                 {% else %}
+                                 {% endif %}
+                                </td>
+				<td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; text-align: right;">
+                                 {% if operation.sensOperation == 'C' %}
+                                    {{(operation.montant)|number_format(0, '', ' ') }}
+                                 {% else %}
+                                 {% endif %}
+                                </td>    
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;"> {{operation.numeroMvt }} </td>
+                                
+                                <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; text-align: right;">
+                                 {% if operation.soldeEnLigne != 0 %}
+                                    {{(operation.soldeEnLigne)|number_format(0, '', ' ') }}
+                                 {% else %}
+                                 {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% else %}
+                            <tr>
+                              <td colspan="4">{{ 'operation.operation.none'|trans({}, 'recherche') }} </td>       
+                            </tr>       
+                        {% endfor %} 
+                             
+
+                        {% if soldefin|length >0  %}
+                                <tr class="soldes"> 
+                                                           
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 50px;"> {{ soldefin[0]['dateSolde']|date("d/m/Y") }} </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 260px;"> SOLDE FIN PERIODE </td>
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right;width: 100px;"> </td>
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px;"> </td> 
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 100px;"> </td>                                                                         
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right;width: 50px;"> </td>                                     
+                                    <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align:right;width: 100px;"> 
+                                        {% if soldefin[0]['sens']|lower == 'd' %} - {% endif %}
+                                        {{soldefin[0]['solde']|number_format(0, '', ' ')}} 
+                                    </td>
+                                                                
+                                </tr>
+                        {% endif %}         
+                                
+                        {#<tr>
+                            <td colspan="3" style="text-align: center;font-weight: bold;border: 1px solid #ccc;padding-left: 5px;padding:5px;">TOTAL DES MONTANTS</td>
+                            <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;">19471</td>
+                            <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;">19471</td>
+                        </tr>#}
+                        
+                    </tbody>
+                </table>
+                {#<div><img src="{{asset('img/client-img/imeubUtbBg.png')}}" alt="" style="position: absolute; bottom: 0px;"/></div>#}
+            </div>
+            
+            {#<h5 style="text-align: center;">
+                La Direction de votre agence est à votre disposition pour vous fournir tous renseignements sur ce document. Prière de nous adresser
+                vos éventuelles observations dans un délai de un mois en rappelant les références indiquées. Passé ce délai, nous considérons que
+                votre compte a été reconnu conforme.
+            </h5>#}
+            <div style="margin-bottom: 0px;padding-bottom: 0px;margin-top: 20px;">
+                <h5 style="text-align: center;">
+                    {{'compte.texte'|trans({},'compte') }}
+               </h5>
+                {#<img src="{{asset('img/client-img/authentif_backgrd2.png')}}" alt="" style="height: 200px;position: relative;opacity: 0.7; bottom: 0px;left: 0px;z-index: 255;"/>
+                <div style="margin: 0px; padding: 0px; clear:both;"></div>#}
+            </div>
+            <div style="border-top: 2px solid transparent; margin: 0px;">
+                    <img src="{{asset('img/client-img/pied_page_backgrd.jpeg')}}" alt="" style="z-index:1;"/>
+                    <p style="z-index:10;position: relative;top:-22px;color:#ddd;padding-left: 5px;font-size:8px;"> © 2006 - {{ "now"|date("Y") }} Union Togolaise de Banque . SWIFT : UNTBTGTG . Informations Légales </p>
+                    <p style="z-index:10;position: relative;top:-45px;color:#ddd;padding-right: 5px;text-align:right;font-size:9px;"> {{'compte.sauf'|trans({},'compte') }}</p>
+                <span style="clear:both;"></span>
+            </div>
+            {#<div id="pied_de_page" style="height: 60px; background:url({{asset('img/client-img/pied_page_backgrd.jpg')}}) no-repeat;">
+                <div style="position: relative; top: 19px;color:#fff;padding: 0px;padding-top: 5px;">
+                    <p style="margin: 0px; padding: 0px;"> ©2006 - 2009 Union Togolaise de Banque . SWIFT : UNTBTGTG . Informations Légales </p>
+                    <p class="saufErreur" style="text-align:right;font-weight: bold;padding-right:5px;"> SAUF ERREUR OU OMMISSION </p>
+                    <span class="clr" style="clear:both;"></span>
+                </div>
+            </div>#}
+	</body><!-- Fin body -->
+</html><!-- Fin page -->
+
+<script type="text/javascript">
+		window.print() ;
+</script>

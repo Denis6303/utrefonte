@@ -1,0 +1,19 @@
+{# empty Twig template #}
+<form action=" {{ path("utb_admin_modifmediasarticle", {'id': id,'idmedia': idmedia,'locale':locale,'type':type,'genre':1,'typemedia':1}) }} " method="post" {{ form_enctype(form) }}>
+
+	<div class="FrmAjoutArt">
+		<label>{{'admin.titreimg'|trans({}, 'messages')}}</label>
+		{{ form_widget(form.nomMedia) }}      
+		<div class="clr"></div>
+	</div>
+		  
+	<div class="FrmAjoutArt">
+		<label>{{'admin.imgtitre'|trans({}, 'messages')}}</label>
+		{{ form_widget(form.file) }}
+		<img src="{{ asset('img/wait.gif') }}" id="attendre_img" style="display:none;"/>
+	<div class="clr"></div>
+	</div>
+	
+	<input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" >
+	<div class="clr"></div>
+</form>   

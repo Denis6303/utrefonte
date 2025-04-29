@@ -1,0 +1,211 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+				
+{% block client_centre_body %} 
+<ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'fond.titre'|trans({},'fond')}}</li>
+</ul>
+<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'fond.titre'|trans({},'fond')}}</h2>
+<div class="toolBoutons marginBottom20p">
+    <div>    
+        <a href="{{path('utb_client_ajoutfonds',{'locale':locale})}}">
+            <img src="{{ asset('img/client-img/icon-25-add.png')}}" alt="{{'client.ajouter'|trans({},'messages') }}" title="" />
+            <span>{{'client.ajouter'|trans}}</span>
+        </a>
+    </div>
+
+    <div>    
+        <a href="javascript:void(0);" onclick="gererEtatAll( getFondssID(),0); return false;">
+            <img src="{{ asset('img/client-img/icon-25-lock.png')}}" alt="Dé-Publier" title="{{'utilisateur.horsLigne'|trans({},'utilisateurs') }}" />
+            <span>{{'client.desactiver'|trans}}</span>
+        </a>
+    </div>
+    <div>    
+        <a href="javascript:void(0);" onclick="gererEtatAll( getFondssID(),1); return false;">
+            <img src="{{ asset('img/client-img/icon-25-unlock.png')}}" alt="Publier" title="{{'utilisateur.enLigne'|trans({},'utilisateurs') }}" />
+            <span>{{'client.activer'|trans}}</span>
+        </a>
+    </div>
+    <div>    
+        <a href="javascript:void(0);" onclick="corbeilleAll( getFondssID()); return false;">
+            <img src="{{ asset('img/client-img/icon-25-bin.png')}}" alt="{{'client.supprimer'|trans({},'messages') }}" title="" />
+            <span>{{ 'client.supprimer'|trans}}</span>
+        </a>
+    </div>
+    <div class="clr"></div>
+</div>
+        
+<table class="infoCompte noLeftBorder noGras">
+
+    <tr>
+        <th class="" style="padding-left:10px"><input  type="checkbox" class="checkall" name="checkall" /></th>
+        <th class="">{{'fond.libelle'|trans({},'fond')}}</th>
+        <th class="">{{'fond.code'|trans({},'fond')}}</th>
+        <th class="">{{'fond.gest'|trans({},'fond')}}</th>
+        <th class="">{{'fond.statut'|trans({},'fond')}}</th>
+        <th class="" colspan='2'>{{'fond.action'|trans({},'fond')}}</th>
+
+    </tr>
+
+
+{% for unfonds in listeFonds %}
+    <tr>
+        <td class="w20"><input type="checkbox" name="fonds[]" value="{{unfonds.id}}" rel="fonds_c" /></td>
+
+        <td class="">{{  unfonds.libFonds }} </td>
+
+        <td class="">{{  unfonds.codeFonds }}</td>
+        <td class="">{{  unfonds.nomPrenom }}</td>
+        <td class="w100">
+            {% if unfonds.etatFonds == 1 %}{{'fond.active'|trans({},'fond')}}{% elseif unfonds.etatFonds == 0 %}{{'fond.desactive'|trans({},'fond')}}{% endif %}
+        </td>
+        <td class="w20"><a href="{{ path("utb_client_modiffonds",{'id':unfonds.id,'locale':locale}) }}"><img src="{{ asset('img/client-img/icon-16-pen.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></a></td>
+        <td class=""><a href="{{ path("utb_client_detailfonds",{'fonds':unfonds.id,'locale':locale}) }}">{{ 'fond.lienclientsfonds'|trans({}, 'fond') }}</a></td>
+     </tr>
+{% else %}
+    <tr>
+       <td colspan="3">{{ 'fond.none'|trans({}, 'fond') }} </td>       
+    </tr>       
+{% endfor %}                                                               
+
+
+</table> 
+ <script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getFondssID(){
+           
+            var fonds_id = "";
+            
+            $(":input[rel=fonds_c]:checked").each(function(){
+		fonds_id = fonds_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return fonds_id;
+       }
+       
+       var html = "<div style='text-align:;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{'fond.suppression.message'|trans({},'fond') }}"; 
+       var htmldefault2 = "{{'fond.changeStatut.message'|trans({},'fond') }}"; 
+ 
+    
+       function corbeilleAll( fondsId ){
+          if( fondsId.length == 0 ){              
+              $('#process_tpl').html("{{'fond.coche'|trans({},'fond') }}");
+          var args = {modal: true, autoOpen: false, title: ("{{'fond.suppression.title'|trans({},'fond') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ("{{'fond.suppression.title'|trans({},'fond') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_corbeillefonds')}}",
+                                data: {FondsIds:fondsId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{'fond.suppression.failure'|trans({},'fond') }}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{'fond.suppression.title'|trans({},'fond') }}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+       
+      function gererEtatAll(fondsId,etat){
+          if( fondsId.length == 0 ){              
+              $('#process_tpl').html("{{'fond.coche'|trans({},'fond') }}");
+          var args = {modal: true, autoOpen: false, title: ("{{'fond.changeStatut.title'|trans({},'fond') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault2);
+          var args = {modal: true, autoOpen: false, title: ("{{'fond.changeStatut.title'|trans({},'fond') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_gereretatfonds')}}",
+                                data: {idfonds:fondsId,etatfonds:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{'fond.changeStatut.failure'|trans({},'fond') }}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{'fond.changeStatut.success'|trans({},'fond') }}");
+                                    }
+                                    window.location.reload();
+                                    //console.log(answer);
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }       
+ 
+</script>                                            
+<div id="process_tpl" style="display:none;"></div> 
+
+{{ information.msgjquerytranslate() }}
+
+{{ information.decochetoutbox() }}
+
+{% endblock %}

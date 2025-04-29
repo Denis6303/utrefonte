@@ -1,0 +1,35 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Souscription
+{% endblock %}
+
+{% block public_body %} 
+
+<div class="borderBotStyle marginBottom20p paddingBottom20p bgBlanc span-24">
+    <div class="leftSpace rightSpace ">
+        <div class="marginBottom20p">
+            <h1 class="boxSection-titre bleuLogo" style="margin: 0px;margin-top: 10px;">{{ 'acceuil.accesrub'|trans({}, 'site')}}</h1>
+            <img src="{{asset('img/site-img/ombreHorizontalTitre.png')}}" alt="" style=""/>
+        </div>
+        <div class="rightSpace descrsouscr">
+            <div class="marginBottom20p">
+            <p>{{ 'acceuil.acces'|trans({}, 'site')}}</p>
+            </div>
+            <div class="center">
+            <a class="bleuLink souscription bleuLogo" href="{{ path('utb_site_rubrique',{'locale': locale,'id':12, 'type':6,'typecate': 0, 'date':0})}}" title="{{ 'acceuil.acceslien'|trans({}, 'site')}}">{{ 'acceuil.acceslien'|trans({}, 'site')}}</a>
+            </div>
+            
+        </div>
+        <div class="bocillustration positionRelative">
+            <img class="ombregauche"  src="{{ asset('img/site-img/ombrsousgauche.jpg')}}"  />
+            <img src="{{ asset('img/site-img/souscription.jpg')}}"  />
+            <img class="ombredroite" src="{{ asset('img/site-img/ombrsousdroit.jpg')}}"  />
+        </div>
+        <div class="clear"></div>
+    </div>
+
+</div>
+
+{% endblock %}

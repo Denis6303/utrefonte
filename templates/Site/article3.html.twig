@@ -1,0 +1,159 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+	{% for articleFrancais in larticleFrancais %} 
+  {{ parent() }} - {{articleFrancais.titreArticle}}
+  {% endfor %}
+{% endblock %}	
+  
+  {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" /> #}
+		
+{% block public_body %}
+ 
+        {#<div class="span-24 all-lookupCategorie marginBottom20p">
+                <div class="leftSpace">
+                                {% for sousrubrique in listecateg %}
+          
+                                        {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent)}}
+
+                                 {% endfor %}
+                </div>
+        </div>   #} 
+    {% set idrubrique = app.request.get('idparentrub') %}
+    {% if listecateg|length <= 5 %}
+          <div class="span-24 all-lookupCategorie marginBottom10p">
+                  <div class="leftSpace blocArPart">
+                                  {% for sousrubrique in listecateg %}
+                                          {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id,locale)}}
+                                          {% else %}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}                        
+                                          {% endif %}
+                                   {% endfor %}                        
+                  </div>
+          </div> 
+    {% endif %} 
+{% for articleFrancais in larticleFrancais %}   
+        <div class="span-24 borderBotStyle bgBlanc marginBottom10p positionRelative ">
+            <img src="{{ asset('img/site-img/ombreVertical1Gauche.png')}}" class="ombreGEtrprise" />
+                <div class="leftSpace rightSpace paddingTopBot20p">
+                    
+                    <div class="contDetailCarte">
+                        <div class="menu">
+                            <img src="{{ asset('img/site-img/ombremenucarte.png')}}" class="ombre" />
+                            <div class="image">
+                                {% if articleFrancais.urlMedia != "default_.png" %}
+                                    <img  style="" src="{{asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="" title="" />                              
+                                {% endif %}
+                            </div>
+                            
+                            <ul class="menu">
+                                         {% set i=0 %}
+                                  {% if listecategorie|length > 0  %} 
+                                       {% for categorie in listecategorie %} 
+                                        {% set i=i+1 %}
+                                                <li><span class="titre">{{categorie.nomRubrique}}</span>
+                                             {% if articlecategorie[categorie.id]|length > 0 %}                               
+                                                
+                                                    <ul class="sousmenu">
+                                                      {% for article in articlecategorie[categorie.id]  %} 
+                                                        {% if loop.index !=1%}
+                                                            <li {% if articleFrancais.id == article.id%} class="active"{%endif%}><a href="{{path('utb_site_article',{'id': article.id,'locale':locale,'type':article.typePre})}}">{{article.titreArticle|raw}}</a></li>
+                                                        {% endif %}
+                                                      {% endfor %} 
+                                                    </ul>
+                                             {% endif %}
+                                                </li>
+                                       {% endfor %}
+                                   {% endif %}
+                            </ul>
+                        </div><!-- Fin div.menu -->
+                        <div class="detailArticle positionRelative">
+                            <div class="bordgrisgros marginBottom20p"><h1 class="titre boxSection-titre bleuLogo">{{articleFrancais.titreArticle}}</h1></div>
+                            <div class="contenucarte">
+                                {% for unimage in image %}
+                                     {% if unimage.urlMedia == "default_.png" %}
+                                     {% elseif unimage.urlMedia ==null%}
+                                     {% else %} 
+                                       
+                                        <img src="{{  asset('upload/articles/images/'~unimage.urlMedia)}}" />
+                                     {% endif %}   
+                                {% endfor %}
+                                {{articleFrancais.descriptionArticle|raw}}
+                                
+                            </div>
+                        </div>
+                        <!-- Fin div.detailArticle -->
+                        <div class=" clear"></div>
+                        					
+                        {#<div class="leftSpace rightSpace">	<!-- -->
+                                <div class="otherCard">
+                                        <div class="otherCardHead"><h1 class="title2">Cartes de la même Gamme</h1></div>
+                                        <div class="otherCardCnt paddingTopBot20p">
+                                            {% for unarticle in memeRubrique %}
+                                                <div class="otherCardOne">
+                                                      
+                                                        <img src="{{asset('upload/articles/'~unarticle.urlMedia)}}" alt="{{unarticle.titreArticle}}" title="{{unarticle.titreArticle}}" />
+                                                </div>
+                                            {% endfor %}        
+                                                <div class="clr"></div>
+                                        </div>
+                                </div>
+                        </div>	#}
+                    </div><!-- Fin div.contDetailCarte -->
+               </div>	<!-- FIN SPAN 24 LES 2 CARTES -->
+               <img src="{{ asset('img/site-img/ombreVertical1Droit.png')}}" class="ombreDEtrprise" />
+        </div>	<!-- FIN SPAN 24 LES 2 CARTES --> 
+	<!-- Ligne Correspondants -->
+	<div class="span-24 marginBottom20p"> 
+		<div class="leftSpace rightSpace boxCorespdant">
+			<h1 class="boxSection-titre gris-text">{{ 'acceuil.cores'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+			<div class="slideCorespdant">
+                           {% for article in listecorrespondance%} 
+                                {% if article.urlMedia != "default_.png" %}
+                                       <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="{{article.titreArticle|raw}}" />
+
+                                {% endif %}                                
+				
+                           {% endfor %}     				
+			</div>
+			<div class="divButmoore rightPosition" >
+                               
+				<a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>{{ 'acceuil.voir'|trans({}, 'site') }}</span><span></span></a>
+			</div>			
+		</div>
+	</div>		<!-- FIN Correspondants-->
+{% endfor %}  
+        {#
+        {{articleFrancais.titreArticle}} nom de l'article
+                        {% if articleFrancais.urlMedia != "default_.png" %}
+                               <img  style="float:right; margin-top:25px;" src="{{asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="" title="" />
+                              {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" />
+                      {% endif %}                        
+                        
+                        {{articleFrancais.descriptionArticle|raw}}
+        #}
+        
+    <script>
+           $('.detailArticle p').each(function() {
+           // var $this = $(this);
+            if($(this).html().replace(/\s|&nbsp;/g, '').length === 0){ $(this).replaceWith('<div style="height: 17px;"></div>');}
+});
+           $(".detailArticle").each(function(){
+{#               alert("p trouvé");#}
+{#               $(this).css({backgroundColor: "#000"});#}
+{#                $("p:empty").each(function(){alert("p trouvé"); $(this).css({backgroundColor: "#000"});});#}
+           });
+           var hautbloc;
+           if($(".contDetailCarte div.menu").height()>$(".contDetailCarte .detailArticle").height()){
+               hautbloc = $(".contDetailCarte div.menu").height() - 32;
+               $(".contDetailCarte .detailArticle").height(hautbloc);
+           }
+                
+                //    if($(this).height()>hauteur){hauteur = $(this).height();}
+                
+                //    $(".lookupCategorie").each(function(){ $(this).height(hauteur); });
+            </script>     
+{% endblock %}
+		

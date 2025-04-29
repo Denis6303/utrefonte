@@ -1,0 +1,498 @@
+
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'users.liste.grandtitrepg'|trans({}, 'users') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_userProfilListe', {'locale': locale})}}">{{ 'admin.layout.menu.users'|trans }}</a> > {#<a href="{{path('liste_utilisateur')}}">Utilisateurs</a>#}{{ 'admin.layout.sousmenu.listeuser'|trans }}{#</a>#}
+</div>
+
+{% for contenu in app.session.flashbag.get('notice') %}
+    {% if contenu == "success" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                    {{ 'users.addsuccess'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "modifsuccess" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                    {{ 'users.modifsuccess'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "failure" %}
+        <div class="span-25">
+            <div class="error errorMsg">                        
+                    {{ 'users.addfailure'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "emailerror" %}
+        <div class="span-25">
+            <div class="error errorMsg">                        
+                    {{ 'users.emailerror'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "activesuccess" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                    {{ 'users.activesuccess'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "desactivesuccess" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                    {{ 'users.desactivesuccess'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+{% endfor %}
+{% for contenus in app.session.flashbag.get('message') %}    
+    {% if contenus == "modifsuccess" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                    {{ 'users.modifsuccess'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenus == "modiffailure" %}
+        <div class="span-25">
+            <div class="error errorMsg">                        
+                    {{ 'users.modiffailure'|trans({}, 'users') }}
+            </div>    
+        </div> 
+    {% endif %}
+{% endfor %}
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-14">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'users.liste.titrepg'|trans({}, 'users') }}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+                        <div class="span-10 last">                                        
+
+                            <div class="ecartBoutonsFirst for3ButonsLg">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="{{ path('ajouter_utilisateur',{'locale':locale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'users.ajout.grandtitrepg'|trans({}, 'users') }}" title="{{ 'users.ajout.grandtitrepg'|trans({}, 'users') }}" /></div>
+                                      {{ 'admin.ajouter'|trans}}</a>
+                            </div>
+                            
+							<div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="activeAll( getUsersID()); return false;"><img src="{{ asset('img/admin-img/valider.png')}}" alt="{{ 'admin.enligne'|trans({}, 'messages') }}" title="{{ 'admin.enligne'|trans({}, 'messages') }}" /></div>
+                                    {{ 'admin.activer'|trans({}, 'messages') }}</a>
+                            </div>
+
+                            <div class="boutonGestion btGestMoy">
+                                    <div><a href="javascript:void(0);" onclick="desactiveAll( getUsersID()); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.horsligne'|trans({}, 'messages') }}" title="{{ 'admin.horsligne'|trans({}, 'messages') }}" /></div>
+                                    {{ 'admin.desactiver'|trans({}, 'messages') }}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>
+							
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll( getUsersID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.supprimer'|trans({}, 'messages') }}" title="{{ 'admin.supprimer'|trans({}, 'messages') }}" /></div>
+                                      {{ 'admin.supprimer'|trans({}, 'messages') }}</a>
+                            </div>
+                            <div class="clr"></div>
+
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    
+                                        
+                                        {# BOX INFOS #}    
+                                        {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                      
+                                    
+                                    
+                                        {{ information.statsdynamique(listestat) }} 
+                                        
+                                    
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							{# <div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>Statut --- </option>
+									<option>Actif</option>
+									<option>Inactif</option>
+
+								
+								</select>
+								<select class="filterRubrique">
+									<option>Profils --- </option>
+									<option>Administrateur</option>
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>	#}					<!-- FIN filtersArticles-->
+
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                        <th>{{'users.liste.nom'|trans({}, 'users') }}</th>
+                                                        <th>{{'users.form.login'|trans({}, 'users') }}</th>
+                                                        <th>{{'users.form.email'|trans({}, 'users') }}</th>
+                                                        <th>{{'users.form.profil'|trans({}, 'users') }}</th>
+                                                        <th>{{'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                        <th colspan="2">{{'actions.ajout.titre1'|trans({}, 'actions') }}</th>
+                                                    </tr>	
+                                                  {% for user in listeUser %}
+
+												  
+                                                    <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="user[]" value="{{user.id}}" rel="user_c"/></td>
+                                                        <td class="titreArtList"><a href="{{ path('detail_utilisateur',{'id':user.id,'locale':locale})}}"> {{user.nameUser}}</a></td>									
+                                                        <td class="rubArtList"><a href="{{ path('detail_utilisateur',{'id':user.id,'locale':locale})}}"> {{user.username}}</a></td>
+                                                        <td class="rubArtList">{{user.email}}</td>
+                                                        <td class="rubArtList">
+                                                            {{user.libProfil}}
+                                                        </td>
+                                                        
+                                                        <td class="statutArtList">
+                                                            {% if user.enabled == 0 %}
+                                                               {# <a onclick="return confirm('Voulez vous vraiment activer cet utilisateur?')" href="{{path('activer_utilisateur', {'id': user.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/validerSmall.png')}}" alt="{{'admin.activer'|trans({}, 'messages') }}" title="{{'admin.activer'|trans({}, 'messages') }}" /></a>	#}	{{'admin.desactive'|trans({}, 'messages') }}
+                                                            
+                                                            {% endif %} 
+                                                            {% if user.enabled == 1 %}
+                                                                    {# <a onclick="return confirm('Voulez vous vraiment désactiver cet utilisateur?')" href="{{path('desactiver_utilisateur', {'id': user.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/depublierSmall.png')}}" alt="{{'admin.desactiver'|trans({}, 'messages') }}" title="{{'admin.desactiver'|trans({}, 'messages') }}" /></a>#}	{{'admin.active'|trans({}, 'messages') }}
+                                                            {% endif %}
+                                                        </td>
+                                                        
+                                                        {#% if ( userid == user.id ) or (user.idprofil != 1) %#} 
+							{% if ( userid == user.id ) or ( user.idprofil!=1 ) %} 
+                                                            <td class="statutArtList"><a class="updateLink" href="#" onClick="modifierPhoto({{user.id}}); return false;">{#<a href="{{path('modifier_utilisateur', {'id': user.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans({}, 'messages') }}" title="{{'admin.modifier'|trans({}, 'messages') }}" />#}</a></td>                                                   
+                                                        
+                                                        {% endif %}
+                                                        
+                                                        {% if ( userid == user.id ) or (user.idprofil != 1) %} 
+														
+                                                        <td class="statutArtList" >
+                                                            {% if (userid == user.id) or  (user.idprofil!=1) %}
+                                                                <a href="#" onClick="modifierPwd({{user.id}}); return false;">
+                                                                    <img src="{{ asset('img/admin-img/icon-22-init.png')}}" alt="{{ 'users.Bouton.reinit'|trans({}, 'users')}}" title="{{ 'users.Bouton.reinit'|trans({}, 'users')}}" /> 
+                                                                </a>
+                                                            {% else %}   
+                                                                <a href="#">
+                                                                    <img src="{{ asset('img/admin-img/icon-22-init.png')}}" alt="{{ 'users.Bouton.reinit'|trans({}, 'users')}}" title="{{ 'users.Bouton.reinit'|trans({}, 'users')}}" /> 
+                                                                </a>                
+                                                            {% endif %}     
+                                                        </td>
+                                                        
+                                                        <div class="FrmAjoutArt FrmTopDetailArt FrmUserIn" id="{{"modifPwd_container"~user.id}}"  style="display:none;">
+                                                            <div class="FrmUserIn2">
+                                                                {{ render(controller('utbUserBundle:User:modifSuivantType', {'id': user.id,'locale':locale,'type':1})) }}  
+                                                                <div class="clr"></div></div>
+                                                                <div class="noEffectBack"><a href="#" class="" onClick="AnnulerPwd({{user.id}}); return false;">{{'admin.annuler'|trans}}</a></div>
+                                                                <div class="clr"></div>
+                                                            </div> 
+                                                        
+						<div class="FrmAjoutArt FrmTopDetailArt FrmInArticleTop" id="{{"modifPhoto_container"~user.id}}" style="display:none;">
+							<div style="float:left;">
+								{{ render(controller('utbUserBundle:User:modifier', {'id': user.id,'locale':locale,'genre':4})) }}  
+							</div>
+							<a href="#" class="noSoulignHover" onClick="AnnulerPhoto({{user.id}}); return false;">{{'admin.annuler'|trans}}</a>
+							<div class="clr"></div>
+						</div>                                                         
+                                                       
+                                                        
+                                                        {% endif  %}
+                                                    </tr>
+                                                                {% else %}
+                                                    <tr class="bgBlanc">
+                                                        <td colspan="5" class="titreArtList" align:center<a href=""> {{ 'users.none'|trans({}, 'users') }} </a></td>	
+                                                    </tr>
+                                                                 {% endfor %}
+
+                                                </table>
+
+                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                    </div>		<!--  FIN COL RIGHT -->
+                                </div>			<!--  FIN  SPAN - 19 -->
+
+                            </div>
+                        
+<script language="javascript" >
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+
+    
+      function modifierPhoto(iduser){
+       
+             $("#modifPhoto_container"+iduser).show(); 
+             $("#modifFicheUser_container").hide();
+             $("#modifPwd_container").hide();             
+            var html = '<a class="updateLink" href="#" onClick="modifierPwd( ); return false;">{{ 'admin.modifimgul2'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+       }
+       
+      function AnnulerPhoto(iduser){
+           
+           $("#modifPhoto_container"+iduser).hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul2'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }    
+       
+       function getUsersID(){
+           
+            var users_id = "";
+            
+            $(":input[rel=user_c]:checked").each(function(){
+		users_id = users_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return users_id;
+       }
+       
+       
+       function modifierPwd(iduser){
+       
+             $("#modifPwd_container"+iduser).show(); 
+             $("#modifPhoto_container").hide();
+             $("#modifFicheUser_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerPwd( iduser); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerPwd(iduser){
+           
+           $("#modifPwd_container"+iduser).hide();   
+           /* var html = '<a class="updateLink" href="#" onClick="modifierPwd(+ iduser+); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }       
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "Voulez vous vraiment Supprimer ces utilisateurs ?";
+       var htmldefault2 = "Voulez vous vraiment Activer ces utilisateurs ?";
+       var htmldefault3 = "Voulez vous vraiment Désactiver ces utilisateurs ?";
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( usersId ){
+         //To do
+         if( usersId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          
+          $('#process_tpl').html($('#msgconfirmsuppression').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('delete_Allusers')}}",
+                                data: {usersIds:usersId},
+                                cache: false,
+                                success: function(data){ 
+                                   var answer = jQuery.parseJSON(data);
+                                   /*if( resJson.result == "success"){
+                                        window.location.reload();
+                                   }
+                                    else
+                                         alert("Erreur durant le traitement. Veuillez réessayer svp.");           
+                                   //console.log(data);*/
+        
+                                   if( answer.result=="error"){
+                                        $('#process_tpl').html($('#suppressionimpossible').html());
+                                    }
+                                    else if (answer.result=="operationerror") {
+                                        $('#process_tpl').html($('#operationexiste').html());
+                                    } 
+                                    else if (answer.result=="success") {
+                                        $('#process_tpl').html($('#suppressionreussie').html());
+                                    }          
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       } 
+       
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( usersId ){
+         //To do
+         if( usersId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmactivation').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('active_Allusers')}}",
+                                data: {usersIds:usersId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="profildesactive"){
+                                        $('#process_tpl').html($('#activationimpossible').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#activationreussie').html());
+                                    }
+                                      
+                                  window.location.reload();
+                                    
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function desactiveAll( usersId ){
+         //To do
+         if( usersId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmdesactivation').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('desactive_Allusers')}}",
+                                data: {usersIds:usersId},
+                                cache: false,
+                                success: function(data) {
+                                   
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }
+</script>
+
+<div id="process_tpl" style="display:none;"></div> 
+<div id="sivide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div>  
+
+<div id="activationimpossible" style="display:none;"> {{ 'users.confirmation.activationimpossible'|trans({}, 'users') }}</div> 
+<div id="activationreussie" style="display:none;"> {{ 'users.confirmation.activationreussie'|trans({}, 'users') }} </div>
+<div id="titreactivation" style="display:none;">{{ 'users.confirmation.activation'|trans({}, 'users') }} </div> 
+<div id="msgconfirmactivation" style="display:none;">   {{ 'users.confirmation.activation'|trans({}, 'users') }}</div> 
+
+<div id="desactivationimpossible" style="display:none;"> {{ 'users.confirmation.desactivationimpossible'|trans({}, 'users') }}</div> 
+<div id="desactivationreussie" style="display:none;"> {{ 'users.confirmation.desactivationreussie'|trans({}, 'users') }} </div>                     
+<div id="titredesactivation" style="display:none;">{{ 'users.confirmation.titredesactivation'|trans({}, 'users') }}</div> 
+<div id="msgconfirmdesactivation" style="display:none;"> {{ 'users.confirmation.desactivation'|trans({}, 'users') }}</div>      
+
+<div id="suppressionimpossible" style="display:none;"> {{ 'users.confirmation.supimpossible'|trans({}, 'users') }}</div> 
+<div id="suppressionreussie" style="display:none;"> {{ 'users.confirmation.supreussie'|trans({}, 'users') }} </div>
+<div id="titresuppression" style="display:none;">{{ 'users.confirmation.titresup'|trans({}, 'users') }}</div> 
+<div id="msgconfirmsuppression" style="display:none;"> {{ 'users.confirmation.suppression'|trans({}, 'users') }}</div>      
+
+<div id="operationexiste" style="display:none;"> {{ 'users.confirmation.operationexiste'|trans({}, 'users') }} </div> 
+
+{% endblock %}
+
+

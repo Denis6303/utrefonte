@@ -1,0 +1,755 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Espace Administration
+{% endblock %}
+
+  {% block administration_body %} 
+{% for rubrique in larubrique %} 
+  
+    				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+     
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> 
+                > 
+                <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }}</a> 
+                {% if rubrique.nomRubrique !='' %}
+                > 
+                <a href="{{path('utb_admin_detailrubrique',{'id': rubrique.id,'page': 1,'locale': locale})}}">
+                {{rubrique.nomRubrique}}
+                </a>
+                {% endif%}
+                >
+                {{'articles.state.redact'|trans({}, 'articles')}}                 
+                
+            </div>
+
+                                
+                {% for contenu in app.session.flashbag.get('notice') %}
+                    {% if contenu == "success" %}
+                        <div class="span-25">
+                            <div class="success successMsg">                        
+                               
+                            </div>    
+                        </div> 
+                    {% else %}
+                
+                
+                    {% endif %}
+                {% endfor %}                                
+                                
+<div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-16">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="Articles" title="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" /></div>
+						<div class="titreModule colorBleu"><h1>{{ 'admin.layout.menu.articles'|trans}} {{ 'articles.liste.spv'|trans({}, 'articles') }}</h1></div>	
+						<div class="clr"></div>
+					</div>
+					
+					<div class="span-8 last">
+                                                <div class="ecartBoutonsFirst for3ButonsLg">&nbsp;</div>                                                
+                                                <div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="publishAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans({}, 'messages') }}" title="" /></div>
+							{{ 'admin.publier'|trans({}, 'messages') }}</a>
+						</div>
+						<div class="ecartBoutons">&nbsp;</div>						
+                                                <div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="archiveAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/archiver.png')}}" alt="{{ 'admin.archiver'|trans({}, 'messages') }}" title="{{ 'admin.archiver'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.archiver'|trans({}, 'messages') }}</a>
+						</div>
+						<div class="ecartBoutons">&nbsp;</div>						
+						<div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="deleteAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.corbeille'|trans({}, 'messages') }}" title="{{ 'admin.corbeille'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.corbeille'|trans({}, 'messages') }}</a>
+						</div>
+						<div class="clr"></div>
+					</div>						<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+                                           {# STATISTIQUES #}    
+                                           {{ information.stats(listestat) }}                                           	
+				
+                                        </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+						<h2 class="titleArticle colorBleu">
+                                                    {%set i=0 %}
+                                                    {% for unnom in nom %}
+                                                        {%set i=i+1 %}
+                                                        {% set fin =  unnom|length %}   
+                                                                {% if i>1 %}
+                                                                   &nbsp;<img src="{{ asset('img/admin-img/icon-position1.png')}}" alt="" title="" />&nbsp;
+                                                                {% endif %}                                                        
+                                                            {% if unnom[1]=="" %}
+
+                                                            {% else %}
+                                                               <a href="{{ path('utb_admin_detailrubrique', {'id': unnom[0]}) }}">    {{unnom[1]}}</a>
+                                                            {% endif %}
+                                                    {% endfor %}  
+							
+							
+						</h2>					
+						
+					
+						{#<div id="accordion">
+                                                    {% if  listesousrub is empty %} 
+                                                    {% else %}    
+							<h3>Sous-Rubriques</h3>
+							<div>			<!-- DIV accordeon OBLIGATOIRE-->
+							<div class="allBoxSousRubriq">
+                                                            {% for sousrubrique in listesousrub %} 
+								<div class="boxSousRubriq">									
+                                                                        <div class="logoSousRub"><img src="{{ asset('img/admin-img/icon-24-content.png')}}" alt="{{sousrubrique.nomRubrique}}" title="{{sousrubrique.nomRubrique}}" /></div>
+									<div class="titreSousRub"><h3><a class="defaultColor hoverBleu noSoulignHover" href="{{ path('utb_admin_detailrubrique',{'id': sousrubrique.id,'locale':locale}) }}">{{sousrubrique.nomRubrique}}</a></h3></div>	
+									<div class="clr"></div>
+								</div>
+                                                        {% else %}
+                                                        <div>
+                                                          <h2 class="titleArticle colorBleu"> 
+                                                            Aucune sous rubrique disponible !      
+                                                          </h2>  
+                                                        </div>                                       
+                                                       {% endfor %}      
+        						<div class="clr"></div>
+							</div>
+							</div>		<!-- DIV accordeon OBLIGATOIRE-->
+                                                    {% endif %}
+						    {% if  rubrique.descriptionRubrique =="" or rubrique.descriptionRubrique =="- default text -" %}
+                                                    {% else %} 
+							<h3><strong>Description</strong></h3>
+							<div>			<!-- DIV accordeon OBLIGATOIRE-->
+								<div class="conteuTextJustify">
+                                                                    {{rubrique.descriptionRubrique}}
+                                                                </div>
+								<div class="butonAccord butAccUpdate"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'typeaction': 1}) }}">Modifier la description</a></h4></div>&nbsp;&nbsp;
+							        <div class="butonAccord butAccDelete"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a class="defaultColor noSoulignHover" href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale,'typeaction': 2}) }}" onclick="return(confirm('Etes-vous sûr de vouloir supprimer cette description ?'));">Suppr la description</a></h4></div>&nbsp;&nbsp;
+                                                                <div class="clr"></div><br/>
+							</div>			<!-- FIN DIV accordeon OBLIGATOIRE--> 
+                                                  {% endif %}
+						</div>	#}	<!-- FIN des accordéons -->
+				
+					<div class="MarginBottomBox"></div>
+					
+				
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+					<div class="colRightContentPadding">		
+					
+					{# <div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+									<option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+									<option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+									<option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+									<option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+									<option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+									<option>Présentation</option>
+									<option>Produits-Services</option>
+									<option>Actualités</option>
+									<option>FAQ</option>
+									<option>Brèves</option>
+								</select>
+								<select class="filterAutor">
+									<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+									<option>Armand K.</option>
+									<option>Benoit G.</option>
+									<option>Serges A.</option>
+								</select>
+								<select class="filterLanguage">
+									<option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+									<option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+									<option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+								</select>
+								<div class="clr"></div>
+							</div> #}
+					
+                                                            <table class="listMenusCateg listArticlesRub">
+                                                                    <tr>
+                                                                            <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                                            <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.actions'|trans({}, 'articles') }}</th>
+                                                                    </tr>
+                                                                    {% for article in listearticle %}
+                                                                      {% if article.titreArticle is not null %}                                                                      
+                                                                        <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+
+                                                                                <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                                                <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                               
+                                                                                <td class="statutArtList">
+                                                                                    {% if article.statutArticle ==1  %}
+                                                                                        <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'articles.liste.ecr'|trans({}, 'articles') }} " title="{{ 'articles.liste.ecr'|trans({}, 'articles') }} " />
+                                                                                    {% elseif article.statutArticle ==2 %}
+                                                                                        <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{{ 'articles.liste.spv'|trans({}, 'articles') }}" title="{{ 'articles.liste.spv'|trans({}, 'articles') }}" />
+                                                                                    {% elseif article.statutArticle ==3 %}
+                                                                                        <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{{ 'articles.liste.eap'|trans({}, 'articles') }}" title="{{ 'articles.liste.eap'|trans({}, 'articles') }}" />
+                                                                                    {% elseif article.statutArticle ==4  %}
+                                                                                        <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'articles.liste.publies'|trans({}, 'articles') }}" title="{{ 'articles.liste.publies'|trans({}, 'articles') }}" />
+                                                                                    {% elseif article.statutArticle ==5 %}
+                                                                                        <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'articles.liste.depublies'|trans({}, 'articles') }}" title="{{ 'articles.liste.depublies'|trans({}, 'articles') }}" />
+                                                                                    {% endif %}
+                                                                                </td>
+                                                                                
+                                                                                <td class="dateArtList"> {{article.nomRubrique}}</td>
+                                                                                <td class="autorArtList">
+                                                                                    {% for user in listeuser %}
+                                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                                             {{user.NameUser}}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}                                                                                    
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                <td class="langArtList"> {{locale}}</td>
+                                                                                <td class="numArtList"> {{'N°'~article.id}}</td>
+                                                                                
+                                                                                <td class="statutArtList">
+                                                                                    {% if article.statutArticle in [1,2,5] %}
+                                                                                            <a href="{{path('utb_admin_modifarticle', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}"/>
+                                                                                            </a>
+                                                                                    {% elseif article.statutArticle == 3 %} 
+                                                                                            <a href="{{path('utb_admin_modifarticlevalide', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}"/>
+                                                                                            </a>                                                                                        
+                                                                                    {% elseif article.statutArticle == 4 %}         
+                                                                                            <a href="{{path('utb_admin_modifarticlepublie', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}"/>
+                                                                                            </a>
+                                                                                    {% endif %} 
+                                                                                </td>        
+                                                                        </tr>  
+                                                                      {% endif %} 
+                                                                    {% endfor %}
+
+                                                             </table>
+                                        
+                                       <br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': 1 }) }}"> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': previous_page }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_listearticlecorbeille', { 'page': page }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': next_page }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': last_page }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> {{ 'articles.liste.corbeille'|trans({}, 'articles') }}
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+                                                         
+                                        
+                                        </div> 	<!-- FIN colRightContentPadding-->
+					</div>		<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+				
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>				<!--  FIN SPAN - 25 -->
+{% endfor %} 
+     
+                        
+                                         <div id="form_a_container" style="display:none;">
+                                  <form id="form_addArticle">
+                                    <div class="clr"></div>
+                                     <p id="form_rubrique_container">
+                                         <span class="colorBleu"><label>{{ 'articles.selectRubrique'|trans({}, 'articles')}}<label></span> 
+                                                     <select id="rubrique" name="rubrique">
+                                                         {% for rb in listeRubrique %}
+                                                             <option value="{{rb.getId}}">{{rb.getNomRubrique}}</option>
+                                                         {% endfor %}    
+                                                     </select>          
+                                     </p> 
+                                  </form>   
+                        </div>                       
+ <script language="javascript" >
+     
+       function ajouterArticle(){
+           var args = {modal: true, autoOpen: false, title: ('{{ 'articles.ajout.grandtitrepg'|trans({}, 'articles') }}'), width:400,height:200};
+           $('#form_a_container').dialog(args);
+           var rubrique;
+           rubrique  = $("#rubrique").val();
+
+               $('#form_a_container').dialog({
+                   
+                   buttons: {
+                           "OK": function() {
+                               
+                                $.ajax({
+                                   type: "POST",
+                                   url: "{{ path('utb_admin_addArticle')}}",
+                                   data: {formdata:$("#form_addArticle").serialize()},
+                                   cache: false,
+                                   success: function(data){
+                                        var resJson = jQuery.parseJSON(data);
+                                        window.location = resJson.url;
+                                   }
+                               });                             
+                           },                   
+                           "{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                               $(this).dialog("close");
+                           }
+                   }
+               })             
+              $('#form_a_container').dialog('open');          
+       }
+  
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+           
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'articles.onearticle.confirmation2'|trans({}, 'articles') }}";
+       var htmldefault2 = "{{ 'articles.onearticle.confirmation3'|trans({}, 'articles') }}";
+       var htmldefault3 = "{{ 'articles.onearticle.confirmation4'|trans({}, 'articles') }}";
+       
+       //function pour supprimer plusieurs elements a la fois
+       function publishAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmpub').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_publierAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblepub').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitepub').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+       //function pour archiver plusieurs articles a la fois(edem)
+       /*function archiveAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html("Vous devrez cochez au moins un élément");
+          var args = {modal: true, autoOpen: false, title: ('Archiver des articles')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('Archiver des articles')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{#{ path('utb_admin_archiveAllarticles')}#}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("Impossible d'archiver des articles publiés");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("Archivage réussie");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }*/
+            
+       function archiveAll( articlesId ){
+       
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())}; 
+   
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmarch').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_archiveAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblearch').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitearch').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }     
+            
+            
+            
+            
+     
+       //function pour  supprimer plusieurs elements a la fois 
+       /*function deleteAll( articlesId ){
+         //To do
+         if( articlesId.length == 0 ){              
+              $('#process_tpl').html("Vous devrez cochez au moins un élément");
+          var args = {modal: true, autoOpen: false, title: ('Supprimer des articles')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault2);
+          var args = {modal: true, autoOpen: false, title: ('Supprimer des articles')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{#{ path('utb_admin_delectAllarticles')}#}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       }*/
+       
+       function deleteAll( articlesId ){
+         //To do
+         if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsup').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblesup').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitesup').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       }           
+       
+</script>
+
+
+    {# suppression de rubriques #}
+  <div id="msgconfirmmodif" style="display:none;">{{ 'confirmation.modification'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmmodif" style="display:none;">{{ 'confirmation.titremodif'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesupmodif" style="display:none;"> {{ 'confirmation.impossiblemodif'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesupmodif" style="display:none;"> {{ 'confirmation.succesmodif'|trans({}, 'articles') }} </div> 
+
+  <div id="vide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+  
+  
+  {# suppression de articles #}
+  <div id="msgconfirmsup" style="display:none;">
+       {{ 'confirmation.suppression'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsup" style="display:none;">
+       {{ 'confirmation.titresup'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesup" style="display:none;"> 
+       {{ 'confirmation.impossiblesup'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesup" style="display:none;"> 
+     {{ 'confirmation.successup'|trans({}, 'articles') }} 
+  </div> 
+  
+  {# corbeille de articles #}
+  <div id="msgconfirmcorb" style="display:none;">
+     {{ 'confirmation.corbeille'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmcorb" style="display:none;">
+     {{ 'confirmation.titrecorb'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblecorb" style="display:none;"> 
+    {{ 'confirmation.impossiblecorb'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitecorb" style="display:none;"> 
+    {{ 'confirmation.succescorb'|trans({}, 'articles') }}
+  </div> 
+
+  {# validation des articles #}
+  <div id="msgconfirmval" style="display:none;">
+    {{ 'confirmation.valider'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmval" style="display:none;">
+    {{ 'confirmation.titreval'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossibleval" style="display:none;">
+    {{ 'confirmation.impossibleval'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussiteval" style="display:none;"> 
+    {{ 'confirmation.succesval'|trans({}, 'articles') }} 
+  </div> 
+
+  {# archivage d'articles #}
+  <div id="msgconfirmarch" style="display:none;">      
+    {{ 'confirmation.archiver'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmarch" style="display:none;">
+    {{ 'confirmation.titrearch'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="impossiblearch" style="display:none;"> 
+    {{ 'confirmation.impossiblearch'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitearch" style="display:none;"> 
+    {{ 'confirmation.succesarch'|trans({}, 'articles') }}
+      </div> 
+
+  {# publier d'articles #}
+  <div id="msgconfirmpub" style="display:none;">
+    {{ 'confirmation.publier'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmpub" style="display:none;">
+    {{ 'confirmation.titrepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblepub" style="display:none;"> 
+    {{ 'confirmation.impossiblepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitepub" style="display:none;">
+    {{ 'confirmation.succespub'|trans({}, 'articles') }} 
+      </div> 
+    
+
+  {# dépublier d'articles #}
+  <div id="msgconfirmdepub" style="display:none;">
+    {{ 'confirmation.depublier'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmdepub" style="display:none;">
+    {{ 'confirmation.titredepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossibledepub" style="display:none;"> 
+    {{ 'confirmation.impossibledepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitedepub" style="display:none;"> 
+    {{ 'confirmation.succesdepub'|trans({}, 'articles') }} 
+  </div> 
+  
+   {# soumission d'articles #}
+  <div id="msgconfirmsub" style="display:none;">
+    {{ 'confirmation.soumettre'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsub" style="display:none;">
+    {{ 'confirmation.titresub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesub" style="display:none;"> 
+    {{ 'confirmation.impossiblesub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesub" style="display:none;"> 
+    {{ 'confirmation.successub'|trans({}, 'articles') }} 
+  </div>
+
+
+<div id="process_tpl" style="display:none;"></div> 
+
+  {{ information.decochetoutbox() }}
+
+  {% endblock %}

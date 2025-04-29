@@ -1,0 +1,26 @@
+{# empty Twig template #}
+
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+  
+{% block public_body %}
+
+        {% for unsondage in sondage %}
+            {{ unsondage.question}}
+        {% endfor %}
+        {% set i = 0 %}
+       <form id="my_radio_box"> 
+        {% for uneopinion in listeopinion %}
+        
+            <br/>{{uneopinion.reponse}}({{uneopinion.nbReponse}})<div class="{{'couleur'~i}}" style="width:{{pourcentage[i]~'%'}}"></div>
+        
+            {% set i = i+1 %}  
+        {% endfor %}
+      </form>  
+  {% endblock %}
+  
+

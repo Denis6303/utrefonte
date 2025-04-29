@@ -1,0 +1,233 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+
+  {% block public_body %}
+  <script>
+      function changecolor(){
+          var lien1 = document.getElementById("lien1"), lien2 = document.getElementById("lien2"), form = document.getElementById("triangle");
+          lien2.style.background ="#5B89D3";
+          lien2.style.color = "#fff";
+          lien1.style.background ="#F0EEEE";
+          lien1.style.color = "#555";
+          form.src="{{asset('img/site-img/pucetriangle2.png')}}";
+      }
+      function changecolor2(){
+          var lien1 = document.getElementById("lien1"), lien2 = document.getElementById("lien2"), form = document.getElementById("triangle");
+          lien2.style.background ="#F0EEEE";
+          lien2.style.color = "#555";
+          lien1.style.background ="#5B89D3";
+          lien1.style.color = "#fff";
+          form.src="{{asset('img/site-img/pucetriangle1.png')}}";
+      }
+   </script>
+   <script type="text/javascript" src="{{ asset('js/site-js/tab.js') }}"></script>
+   <script>
+       $(document).ready(function($) {
+    
+
+    $('#tabs').tabulous({
+    	effect: 'scale'
+    });
+    $('#blocPrincipal').tabulous({
+    	effect: 'scale'
+    });
+});
+   </script>    
+
+<div class="span-24 marginBottom20p paddingBottom20p bgBlanc positionRelative borderBotStyle">
+    <img src="{{asset('img/site-img/ombreVertical1Gauche.png')}}" alt="" class=" ombreVertical1Gauche"/>
+    <div class="leftSpace rightSpace blocPrincipal" id="blocPrincipal" >
+        
+           
+                <a id="lien1" href="#bloc1" class=" capitaLetter center uno titre" onclick="javascript:changecolor2();" >cartes utb avec compte bancaire</a>
+                <a id="lien2" href="#bloc2" class="capitaLetter center duo titre" onclick="javascript:changecolor();"><img id="triangle" style="position: absolute;left: -41px; top: 0px;" src="{{asset('img/site-img/pucetriangle1.png')}}" />cartes utb sans compte bancaire</a>
+                
+            
+            <div  id="tabs_container">
+{#                <div class="contraint">#}
+                <!--<div class="wrapper">-->
+                    <div id="bloc1" class="blocus">
+                        <div class="bordBleu">
+                            
+                            Conçues pour vous suivre pas à pas et pour vous donner entière satisfaction à chaque étape de votre vie, avec vos cartes VISA, vous pouvez librement déployer vos ailes, vos privilèges s’envoleront aussitôt avec vous.
+                        </div><!-- Fin bordBleu -->
+                        <div class="marginBottom20p"></div>
+                        <div class="groupeProduit">
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="clr"></div>
+                        </div><!-- Fin groupe produits -->  
+
+
+                    </div>
+                    <div id="bloc2" class="blocus">
+                        <div class="bordBleu">
+                            La rapidité de service au gré de votre disponibilité. Le plaisir de donner forme à vos envies sans délai, sans limites.
+
+                            La liberté telle que vous l’avez toujours souhaitée, sans contraintes et sans frontières.
+                            Tout ça et bien plus encore avec vos cartes VISA GOLD et VISA ÉLECTRON.
+                            Conçues pour vous suivre pas à pas et pour vous donner entière satisfaction à chaque étape de votre vie, avec vos cartes VISA, vous pouvez librement déployer vos ailes, vos privilèges s’envoleront aussitôt avec vous.
+                        </div><!-- Fin bordBleu -->
+                        <div class="marginBottom20p"></div>
+                        <div class="groupeProduit">
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="produit">
+                                <div class="image"><img src="{{asset('img/site-img/carte1.jpg')}}" /></div>
+                                <div class="contenuProduit">
+                                    <h2>VISA GOLD</h2>
+                                    <div class="resume">Elle vous étonnera... 
+                                        Et puisqu'elle ne vous refusera rien, vous 
+                                        pourrez l'utiliser au gré de vos désirs avec 
+                                        un maximum de satisfaction et zéro tracas...
+                                    </div>
+                                    <div class=" rightPosition">
+                                        <a class="btmoore coinsArrondis " href="/utbtest/web/rubrique/40/13"><span>En savoir plus</span><span></span></a>
+                                    </div>
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                            <div class="clr"></div>
+                        </div><!-- Fin groupe produits -->
+
+
+                    </div>
+                    <div class="clr"></div>
+               <!-- </div><!-- Fin wrapper -->
+               <!-- </div> <!-- Fin contraint -->
+            </div><!-- Fin tabscontainer -->
+       
+    </div>
+    
+    
+    <img src="{{asset('img/site-img/ombreVertical1Droit.png')}}" alt="" class=" ombreVertical1Droit"/>
+</div> 
+<div class="span-24 marginBottom20p"> 
+    <div class="leftSpace rightSpace boxCorespdant">
+        <h1 class="boxSection-titre gris-text">Correspondants</h1><div class="mhr"><hr></div><div class="clr"></div>
+        <div class="slideCorespdant">
+                          {# {% for article in listecorrespondance%} 
+                                 {% if article.urlMedia != "default_.png" %}
+                                        <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="" />
+                                 {% endif %}                                				
+                            {% endfor %}  #}  
+            <span><img src="{{ asset('img/site-img/correspHomePage/societe-generale.png')}}" alt="" title="" /></span>
+            <span><img src="{{ asset('img/site-img/correspHomePage/credit-agricole.png')}}" alt="" title="" /></span>
+            <span><img src="{{ asset('img/site-img/correspHomePage/fortis-bank.png')}}" alt="" title="" /></span>
+            <span><img src="{{ asset('img/site-img/correspHomePage/citibank.png')}}" alt="" title="" /></span>
+            <span><img src="{{ asset('img/site-img/correspHomePage/abn-amro.png')}}" alt="" title="" /></span>
+            <span><img src="{{ asset('img/site-img/correspHomePage/natixis.png')}}" alt="" title="" /></span>				
+        </div>
+        <div class="divButmoore" style="text-align:right;">
+
+            <a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>Voir tous nos correspondants</span><span></span></a>
+        </div>			
+    </div>
+</div>		<!-- FIN Correspondants-->
+  {% endblock %}
+

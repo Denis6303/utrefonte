@@ -1,0 +1,49 @@
+<form  action="{{ path("utb_client_detail_compte", {'idCompte':idCompte,'idAbonne':idAbonne,'locale':locale}) }} " method="post"  id="ajoutImage">
+    <div class="filterPageBox coinsArrondis">
+        
+        Sélectionner le compte
+        <select name="idcompte"> 
+            {#<option value="0">Choisir un gestionnaire</option>#}
+            {% if listeCompteAbonne is defined %}    
+                {% for liste in listeCompteAbonne %}
+                    <option value={{liste.numeroCompte}}>{{liste.nomPrenom}}</option>
+                {% endfor %}
+            {% endif %}  
+        </select>
+        Du <input name="datedebut" type="text" /> - Au  <input name="datefin" type="text" /> 
+        <br/>
+        Montant min <input name="mttde" type="text" /> - 
+        Montant max  <input name="mtta" type="text" /> - 
+        Sens <select name="type_compte" class="myselect">
+                <option value="D"  class="choix" >débit</option>
+                <option value="C"  class="choix" >crédit</option>
+            </select>
+       
+        
+        
+        <input type="submit" value="{{'client.rechercher'|trans({},'messages') }}" />
+    </div>		<!-- FIN filterPageBox coinsArrondis -->
+</form> 
+
+{#<script language="javascript" >
+
+    function rechercher(){
+        /*document.getElementById('rechercher').submit();*/
+        javascript:document.getElementById('btn_rechercher').click()
+    }
+
+    
+    $("#form_recherche").submit(function(){
+    
+       var motcle = $("#motcle").val();
+       
+       if(motcle == "") {
+        alert("Aucune donnée saisie dans la recherche !");
+       }
+       else{
+            document.location.href = "{{ path('utb_admin_resultat',{'motcle': '%s','locale': locale}) | url_decode | format('"+motcle+"') | raw }}";
+       }   
+
+       return false;
+    });
+</script>#}

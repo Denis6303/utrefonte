@@ -1,0 +1,263 @@
+{#------------    src/utb/ClientBundle/Resources/views/layoutSite.html.twig   ------------#}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+	<ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre'|trans({},'compte')}}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'compte.releves.imprim'|trans({},'compte')}}</li>
+	</ul>
+    
+        {#% if  app.request.get('cpte')|trim == null   %}   
+                {% set cpte = '' %}       
+        {% else %}                       
+                {% set cpte = app.request.get('cpte') %} 
+        {% endif %}    
+                
+        {% if  app.request.get('per')|trim == null   %}   
+                {% set periode = '' %}              
+        {% else %}   
+               {% set periode = app.request.get('per') %}  
+        {% endif %#}   
+  
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'compte.releves.imprim'|trans({},'compte')}}</h2>
+	
+	<div class="marginBottom20p">
+        <form class="form-search-operation bgGrisatr1 paddingBottom10p" action="{{path("utb_client_imprimeReleveAbonne",{'locale':locale})}} " method="post"  id="ajoutImage" target="_blank">
+			<div>
+                            <label class="labelLong">{{'compte.num'|trans({},'compte')}}<span class="red-text">*</span></label>
+				<select name="numCompte" class="ncompte" id="compte" style="width: 323px;"> 
+					{% if listeCompte is defined %}    
+						<option value="0" selected>{{'operation.select'|trans({},'recherche')}}</option>
+						{% for liste in listeCompte %}
+							<option value={{liste.numeroCompte}}>{{liste.numeroCompte}} - {{liste.libCategorie}}</option>
+						{% endfor %}
+					{% endif %}  
+                </select>
+                                <span id="wait" style="display:none;position:relative;top:40px;" ><img src="{{asset('img/wait.gif')}}" alt="" /></span>
+                               {# <br /><span style="position:relative;top:-10px;">Ceci est un texte descriptif</span> #}
+			</div>
+			<div id="labelperiode">
+                {% if ( listeAnnee is defined ) and ( listeAnnee|length > 0) %} 
+                                
+				<label class="labelLong" >{{'compte.releves.periode'|trans({},'compte')}}<span class="red-text">*</span></label>
+				<select name="annee" class="releveCompte" id ="selannee" style="width:100px;display:none;"> 
+                                                <option value="0">Année/Year</option>
+						{% for annee in listeAnnee %}
+							<option value={{annee.annee}}>{{annee.annee}}</option>
+						{% endfor %}					 
+				</select>    
+                            
+                <select name="mois" class="releveCompte" id ="selmois" style="display:none;"> 
+
+				</select> 
+                            
+                {% else %} 
+                                {#<div class =" center FrmAbonne" style="border:1px solid red;display:block;"> {{'compte.releves.none'|trans({},'compte')}}</div>#}
+                                
+                {% endif %}
+                                
+						{% if ( listeAnnee is defined ) and ( listeAnnee|length > 0) %} 
+                                                    <span id="aucuneOperation" style="padding:5px;width:248px;display:none;margin:0px;">{{'compte.releves.none'|trans({},'compte')}}</span> 
+                                                    <div class ="val" style="display:none;float: none; margin-left: 0px;"> 
+                                                                <label class="labelLong" >{{'compte.releves.format'|trans({},'compte')}}<span class="red-text">*</span></label>
+                                                                    <select name="typefichier">
+                                                                            <option value="2" >EXCEL</option>
+                                                                            <option value="3" >CSV</option>
+
+                                                                            <option value="4" >TXT</option>
+                                                                            <option value="1" >PDF</option>
+                                                                    </select>                                                                                                                        
+                                                                    <input class="boutonSubmit"  type="submit" class="val1" value="{{'compte.telecharger'|trans({},'compte') }}" style="margin-right: 193px; width: 93px;"/>
+                                                    </div>
+                                                                    <div class="clr"></div>
+						{% endif %}
+            </div>                      
+                        
+		</form>
+	</div>
+        
+        
+        {% for contenu in app.session.flashbag.get('notice') %}             
+            {% if contenu == "errornoeoperation" %}                                    
+                    <div class="error rightSpace leftSpace center">
+                    {{ 'compte.releves.operationnone'|trans({}, 'compte') }}
+                    </div>                                      
+            {% endif %}
+        {% endfor %}        
+
+	<script type="text/javascript">
+ 
+        jQuery(document).ready(function() {  
+            
+        });
+		$("option[value = '0']").prop('selected', true);
+		$("#ajoutImage").css({"padding-bottom":"0px"});
+		$("#labelperiode").hide();
+
+        $("#compte").change(function() {
+             var annee = $("#selannee option:selected").val();
+             var compte = $("#compte option:selected").val();
+             var DATA = 'annee=' + annee+'&'+'compte='+compte;       
+             
+             if ( (annee != '0') && (compte != '') ){
+                $("#wait").show();
+             } else {
+                $("#wait").hide(); 
+             }
+             
+             if ((compte != '')) { 
+				$("#ajoutImage").css({"padding-bottom":"10px"});
+				$("#labelperiode").show();
+				
+                  doRechProcessAnnee(DATA);
+                  //doRechProcess(DATA);
+             }
+             
+        })
+
+
+
+      $("#selannee").change(function() {
+
+            var annee = $("#selannee option:selected").val();
+            var compte = $("#compte option:selected").val();
+            var DATA = 'annee=' + annee+'&'+'compte='+compte;
+            
+            if ( (annee != '0') && (compte != '') ){
+                $("#wait").show();
+            } else {
+                $("#wait").hide(); 
+            }
+           
+            if ( (annee !='0') && (compte != '')) {
+				
+                doRechProcess(DATA);
+               
+            }
+            
+      }); 
+
+      function doRechProcess( DATA ){
+	
+             $.ajax({
+                 type: "POST",
+                 dataType: 'json',
+                 url:  "{{ path('utb_client_remplirmois')}}",
+                 data: DATA,
+                 success: function(msg)
+                 {
+                      i=0; 
+                      
+                     $.each(msg, function(index, mois)
+                     {
+                             $('#selmois').empty();
+                             //$('#selmois').append('<option value="'+'0'+'" > '+ 'Mois/Month' +' </option>');
+                             var recup ='';
+                             if (mois.length != 0){
+                                $("#aucuneOperation").hide(); 
+                                
+                                $("#selmois").show();$(".val").show();$(".val1").show();
+                                for(var i =0;i < mois.length;i++){ 
+
+                                   if (mois[i].lemois == "01"){
+                                       recup =' {{'compte.releves.janv'|trans({},'compte')}}';
+                                   }
+                                   if (mois[i].lemois == "02"){
+                                       recup =' {{'compte.releves.fev'|trans({},'compte')}}';
+                                   } 
+                                   if (mois[i].lemois == "03"){
+                                       recup =' {{'compte.releves.mars'|trans({},'compte')}}';
+                                   }
+                                   if (mois[i].lemois == "04"){
+                                       recup =' {{'compte.releves.avril'|trans({},'compte')}}';
+                                   } 
+                                   if (mois[i].lemois == "05"){
+                                       recup =' {{'compte.releves.mai'|trans({},'compte')}}';
+                                   }
+                                   if (mois[i].lemois == "06"){
+                                       recup =' {{'compte.releves.juin'|trans({},'compte')}}';
+                                   } 
+                                   if (mois[i].lemois == "07"){
+                                       recup =' {{'compte.releves.juil'|trans({},'compte')}}';
+                                   }
+                                   if (mois[i].lemois == "08"){
+                                       recup =' {{'compte.releves.aout'|trans({},'compte')}}';
+                                   }         
+                                   if (mois[i].lemois == "09"){
+                                       recup =' {{'compte.releves.sept'|trans({},'compte')}}';
+                                   }
+                                   if (mois[i].lemois == "10"){
+                                       recup =' {{'compte.releves.oct'|trans({},'compte')}}';
+                                   }  
+                                   if (mois[i].lemois == "11"){
+                                       recup =' {{'compte.releves.nov'|trans({},'compte')}}';
+                                   } 
+                                   if (mois[i].lemois == "12"){
+                                       recup =' {{'compte.releves.dec'|trans({},'compte')}}';
+                                   } 
+                                   $('#selmois').append('<option value="'+ mois[i].lemois+'" > '+ recup +' </option>');                                    
+                                }  
+                               $("#wait").hide(); 
+                          }   else {
+                            $("#selmois").hide();
+                            $(".val").hide();$(".val1").hide();
+                            $("#aucuneOperation").show();
+                            $("#wait").hide();
+                          }
+                     });
+                 }
+             }); 
+       
+      }
+      
+    function doRechProcessAnnee( DATA ){
+	     $(".val").hide();$(".val1").hide();
+             $("#wait").show();
+             $.ajax({
+                 type: "POST",
+                 dataType: 'json',
+                 url:  "{{ path('utb_client_remplirannee')}}",
+                 data: DATA,
+                 success: function(msg)
+                 {
+                      i=0;  
+                     
+                     $.each(msg, function(index, annee)
+                     {
+                             $('#selannee').empty();
+                             $('#selannee').append('<option value="'+'0'+'" > '+ 'Année/Year' +' </option>');
+                             
+                             //var recup ='';
+                             if (annee.length != 0){
+                                $("#aucuneOperation").hide(); 
+                                
+                                $("#selannee").show();
+                                $(".val").hide();$(".val1").hide();
+                                for(var i =0;i < annee.length;i++){ 
+
+                                   $('#selannee').append('<option value="'+ annee[i].annee+'" > '+ annee[i].annee +' </option>');                                    
+                                }  
+                               $("#wait").hide(); 
+                          }   else {
+                            $("#selannee").hide();
+                            $(".val").hide();$(".val1").hide();
+                            $("#aucuneOperation").show();
+                            $("#wait").hide();
+                          }
+                     });
+                 }
+             }); 
+       
+      }
+      
+	</script>             
+            
+{% endblock %}
+		

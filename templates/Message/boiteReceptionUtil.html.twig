@@ -1,0 +1,236 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+				
+{% block client_centre_body %} 
+    <ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'messagerie.titre'|trans({},'messagerie') }}</li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'messagerie.reception'|trans({},'messagerie') }}</li>
+    </ul>
+    
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'messagerie.interne'|trans({},'messagerie') }}</h2>
+    {#		#}
+	
+    <div class="menu_messag">
+        <div class="onglets title3">
+			<span class="onglet_0 onglet read" id="onglet_read" onclick="javascript:change_onglet('read');"><a href="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}">{{'messagerie.reception'|trans({},'messagerie') }}</a></span>
+			<span class="onglet_0 onglet sent" id="onglet_sent" onclick="javascript:change_onglet('sent');"><a href="{{ path("utb_client_messageenvoyeutil",{'locale':locale}) }}">{{'messagerie.envoye'|trans({},'messagerie') }}</a></span>
+			<span class="onglet_0 onglet write" id="onglet_write" onclick="javascript:change_onglet('writeabonne');"><a href="{{ path("utb_client_envoimessageutilabonne",{'locale':locale}) }}">{{'messagerie.ecrire'|trans({},'messagerie') }}</a></span>
+			<span class="onglet_0 onglet write" id="onglet_write" onclick="javascript:change_onglet('write');"><a href="{{ path("utb_client_envoimessageutil",{'locale':locale}) }}">{{'messagerie.ecrireUtil'|trans({},'messagerie') }}</a></span>
+        </div>
+    </div> 
+    <form action="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}" method="post">
+        <div class="MsgSearch marginBottom10p">
+            <label class="labelLong">{{'operation.du'|trans({},'recherche') }} <span class="red-text"></span></label>
+            <input name="datedebut" type="text" class="montant" id="from"/>
+            <label class="labelLong expLabel">{{'operation.au'|trans({},'recherche') }} <span class="red-text"></span></label>
+            <input name="datefin" type="text" class="montant" id="to" />
+            <label class="labelLong expLabel">{{'operation.motcle'|trans({},'recherche') }} <span class="red-text"></span></label>
+            <input name="contenu" type="text" class="contenu"  id="contenu"/>
+             <input type="submit" value="OK" /> 
+             {#<em class="gris-comment ">{{'operation.libelle'|trans({},'recherche') }}</em>#}
+        </div>	
+    </form>
+	
+        {% for contenu in app.session.flashbag.get('notice') %}
+             {% if contenu == "messagesuccess" %}
+				 <div class="success leftSpace rightSpace center">                        
+						 {{ 'client.messagesuccess'|trans({}, 'messages') }}
+				 </div>    
+             {% endif %}
+             {% if contenu == "messageerror" %}
+			  <div class="error leftSpace rightSpace center">
+					 {{ 'client.messageerror'|trans({}, 'messages') }}
+			  </div>
+            {% endif %}                        
+         {% endfor %}       
+        
+		
+	<table class="messagerieTable">
+            <caption>
+                <span class="msgInfo">
+                {{'messagerie.avez'|trans({},'messagerie') }} <strong>{{total}}</strong> {{'messagerie.dont'|trans({},'messagerie') }}<strong> ({{app.request.get('nbreluutil')}})</strong> {{'messagerie.nonLu'|trans({},'messagerie') }}  
+                </span>
+                <span class="msgIconAct">
+                <a href="javascript:void(0);" onclick="deleteAll(getMessagesID()); return false;" > <img src="{{asset('img/client-img/icon-16-bin.png')}}" alt="{{'admin.corbeille'|trans}}" title="{{'admin.corbeille'|trans}}" />  </a>
+                </span>
+                <div class="clr"></div>
+	    </caption>
+
+            <thead> <!-- En-tête du tableau -->
+                <tr>
+                    <th><input  type="checkbox" class="checkall" name="checkall" /></th>
+                    <th> </th>
+                    <th>{{'form.emeteur'|trans({},'messagerie') }}</th>
+                    <th>{{'form.objet'|trans({},'messagerie') }}</th>
+                    <th>{{'form.date'|trans({},'messagerie') }}</th>
+                    <th>{{'client.supprimer'|trans({},'messages') }}</th>
+                </tr>
+            </thead>
+
+            <tbody> <!-- Corps du tableau -->
+            {% for unmessage in listeMessage %}                    
+               {% if unmessage.typeMessage == 1 %} 
+                    <tr class="noticeMsg" >    
+               {% else %}
+                    <tr>           
+               {% endif %}
+                    <td style="width:20px;"><input type="checkbox" name="message[]" value="{{unmessage.idEnvoi}}" rel="message_c" /></td>
+                    <td style="width:20px;"> 
+                           {#% if unmessage.typeMessage == 1 %} 
+                                 <img src="{{ asset('img/client-img/alert.png')}}"  alt="" />    
+                           {% else %#}
+                            {% if unmessage.msgLu == 0 %}
+                                           <img src="{{ asset('img/client-img/mail_get.png')}}"  alt="" />
+                            {% elseif unmessage.msgLu == 1 %}
+                                           <img src="{{ asset('img/client-img/mailappt.png')}}" alt="" />                          
+                            {% endif %}    
+                           {#% endif %#}
+ 
+                    </td>
+                    <td style="width:150px;">{{  unmessage.nomPrenom }} </td>
+                    <td style="width:300px"> 
+                             {% if unmessage.msgLu == 0 %}
+                                <strong><a href="{{ path('utb_client_detailmsgutil',{'idenvoi':unmessage.idEnvoi,'locale':locale,'type':1})}}">{{unmessage.objetMessageClient}} {% if unmessage.typeEnvoi == 2 %}<i class="blueLink">-- copie --</i> {% endif %}<a/></strong>
+                             {% elseif unmessage.msgLu == 1 %}
+                                <a href="{{ path('utb_client_detailmsgutil',{'idenvoi':unmessage.idEnvoi,'locale':locale,'type':1})}}">{{unmessage.objetMessageClient}} {% if unmessage.typeEnvoi == 2 %}<i class="blueLink">-- copie --</i>{% endif %}<a/>                                                                           
+                             {% endif %} 
+                    </td>
+                    <td style="width:100px">{{unmessage.dateEnvoiMsg|date("d/m/Y")}}</td>
+
+                    <td style="width:20px; text-align:right; padding-right:15px;"><a href="javascript:void(0);" onclick="deleteAll({{unmessage.idEnvoi}}); return false;" ><img src="{{asset('img/client-img/icon-16-bin.png')}}" alt="{{'admin.corbeille'|trans}}" title="{{'admin.corbeille'|trans}}" /></a></td>
+                </tr>
+               {% else %}
+                    <tr>
+                       <td colspan="6" class="center">{{ 'messagerie.none'|trans({}, 'messagerie') }} </td>       
+                    </tr>       
+               {% endfor %}                                                               
+            </tbody>
+         </table> 
+        
+        <div>
+            <div class="page ">                
+                {% if last_page > 1 %}
+                    <div class="paginationTry">
+
+                          <a href="{{ path('utb_client_boitereceptionutil', { 'page': 1,'locale':locale }) }}"> <span> << </span> </a> 
+                          <a href="{{ path('utb_client_boitereceptionutil', { 'page': previous_page,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                          {% for page in 1..last_page %}
+                                {% if page == current_page %}
+                                <span>{{ page }}</span>
+                                {% else %}
+                                <span><a href="{{ path('utb_client_boitereceptionutil', { 'page': page,'locale':locale }) }}">{{ page }}</a></span>
+                                {% endif %}
+                          {% endfor %}
+                          <a href="{{ path('utb_client_boitereceptionutil', { 'page': next_page,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                          <a href="{{ path('utb_client_boitereceptionutil', { 'page': last_page,'locale':locale }) }}"> <span> >> </span></a>
+
+                      </div>
+                 {% endif %}
+                  <br/>    
+                <div class="pagination_desc">
+                   <center>
+                       <strong>{{ total }}</strong> {{ 'messagerie.reçu'|trans({}, 'messagerie') }}
+                       {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                   </center>
+                </div>
+                
+            </div>
+        </div>
+<script type="text/javascript">//<!--
+        function change_onglet(name)
+        {
+            document.getElementById('onglet_'+anc_onglet).className = 'onglet_0 onglet';
+            document.getElementById('onglet_'+name).className = 'onglet_1 onglet';
+            document.getElementById('contenu_onglet_'+anc_onglet).style.display = 'none';
+            document.getElementById('contenu_onglet_'+name).style.display = 'block';
+            anc_onglet = name;
+        }
+        //-->
+
+                    //<!--
+    var anc_onglet = 'read';
+    change_onglet(anc_onglet);
+    //-->
+        </script>   
+<script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getMessagesID(){
+           
+            var messages_id = "";
+            
+            $(":input[rel=message_c]:checked").each(function(){
+		messages_id = messages_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });               
+            return messages_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'messagerie.suppression.message'|trans({}, 'messagerie') }}"; 
+ 
+    
+         function deleteAll( messageriesId){
+         //To do
+         if( messageriesId.length == 0 ){              
+              $('#process_tpl').html("{{ 'messagerie.suppression.coche'|trans({}, 'messagerie') }}");
+          var args = {modal: true, autoOpen: false, title: ("{{ 'messagerie.suppression.titre'|trans({}, 'messagerie') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ("{{ 'messagerie.suppression.titre'|trans({}, 'messagerie') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_boitesupprimermsg')}}",
+                                data: {msgsIds:messageriesId},
+                                cache: false,
+                                success: function(data){
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'messagerie.suppression.failure'|trans({}, 'messagerie') }}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'messagerie.suppression.success'|trans({}, 'messagerie') }}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            });    
+            $("#process_tpl").dialog('open'); 
+       } 
+       
+   
+</script>                                                
+ <div id="process_tpl" style="display:none;"></div> 
+{% endblock %}
+                                            

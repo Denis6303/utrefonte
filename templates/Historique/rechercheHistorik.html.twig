@@ -1,0 +1,275 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Historiques de connexion
+{% endblock %}
+  
+{% block client_centre_body %}
+{% set type_user = app.request.get('type_user') %}
+  <ul class="filariane bleuLink">
+                <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+                <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                {% if type_user =="utilisateur" %}
+                <li><a href="{{ path("utb_client_detail_utilisateur",{'locale':locale}) }}">{{'abonnes.perso'|trans({},'abonnes') }}</a></li>
+                {% else %}
+               <li><a href="{{ path("utb_client_detail_abonne",{'locale':locale}) }}">{{'abonnes.perso'|trans({},'abonnes') }}</a></li>                    
+                {% endif%}
+                <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                <li>{{ 'historique.titre'|trans({}, 'messages')}}</li>
+        </ul>
+        {% if(connecte !=0)%}
+                {% set connecte = app.request.get('abonneutil') %}
+        {% else %}
+            {% set connecte = 0 %}
+        {% endif %}
+        
+        {% set type = app.request.get('typecon') %}
+        {% if(datedeb !=0)%}
+                {% set datedebut = app.request.get('datedebut') %}
+        {% else %}
+            {% set datedebut = 0 %}
+        {% endif %}
+        {% if(datefin!=0)%}
+            {% set datefin = app.request.get('datefin') %}
+        {% endif %}
+        {#% set hde = app.request.get('hde') %}
+        {% set ha = app.request.get('ha') %#}
+  
+        {% if datedeb != 0 %}         
+            {% if  app.request.get('datedeb')|trim == null   %}   
+                    {% set datedeb = 0 %}              
+            {% else %}   
+                   {% set datedeb = app.request.get('datedeb')|replace('/','-') %}  
+            {% endif %}
+  
+        {% endif %}
+  
+        {% if datefin != 0 %}   
+            {% if  app.request.get('datefin')|trim == null   %}   
+                    {% set datefin = 0 %}              
+            {% else %}   
+                   {% set datefin = app.request.get('datefin')|replace('/','-') %}  
+            {% endif %} 
+        {% endif %}
+  
+        {% if connecte != 0 %}        
+            {% if  app.request.get('connecte')|trim == null   %}   
+                    {% set connecte = 0 %}              
+            {% else %}                  
+                   {% set connecte = app.request.get('connecte') %}  
+            {% endif %} 
+        {% endif %}
+  
+        {% if typecon != 0 %}         
+            {% if  app.request.get('typecon')|trim == null   %}   
+                    {% set typecon = 0 %}              
+            {% else %}                  
+                   {% set typecon= app.request.get('typecon')|trim %}  
+            {% endif %}
+        {% endif %}
+  
+        {% if an != 0 %}         
+            {% if  app.request.get('an')|trim == null   %}   
+                    {% set an = 0 %}              
+            {% else %}                  
+                   {% set an= app.request.get('an')|trim %}  
+            {% endif %}
+        {% endif %}
+  
+        {% if mois != 0 %}         
+            {% if  app.request.get('mois')|trim == null   %}   
+                    {% set mois = 0 %}              
+            {% else %}                  
+                   {% set mois= app.request.get('mois')|trim %}  
+            {% endif %}
+        {% endif %}
+  
+        <form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_recherche_historik",{'locale':locale,'afficher':1,'connecte':connecte, 'deb':datedebut, 'fin':datefin, 'typecon':typecon  }) }} " method="post"  id="ajoutImage">
+
+               {#<div>                   
+                    <label class="labelLong">{{'histor.typecon'|trans({},'recherche')}}</label>
+                    <select name="typecon">
+                             <option value="0"  selected="selected"  class="choix" >--------</option>
+                             <option value="1" class="choix" >{{'histor.abonne'|trans({},'recherche')}}</option>
+                             <option value="2" class="choix" >{{'histor.utilisateur'|trans({},'recherche')}}</option>
+                    </select>                      
+               </div>
+               <div>
+                    <label class="labelLong">{{'histor.abonne'|trans({},'abonnes')}} <span class="red-text">*</span></label>
+                    <input name="abonneutil" type="text" value="{{ connecte }}" />                        
+               </div>
+               <div>
+                    <label class="labelLong">{{'histor.du'|trans({},'recherche') }} <span class="red-text">*</span></label>
+                    {#<input name="datedebut" type="text" class="montant" id="from2" value="{{ datedebut }}" />#}
+                   {# <input name="datedebut" type="text" class="montant" value="{{ datedebut }}" required="required"/>
+                    <label class="labelLong expLabel">{{'histor.au'|trans({},'recherche') }} <span class="red-text">*</span></label>
+                    {#<input name="datefin"type="text" class="montant" id="to2" value="{{ datefin }}" />#}
+                    {#<input name="datefin"type="text" class="montant"  required="required" value="{{ datefin }}" />
+                    <input name="mois"type="hidden" class=""  value="{{ mois }}" />
+                    <input name="an"type="hidden" class=""  value="{{ an}}" />
+               </div>  #}                    
+               {#<div> 
+                       <label class="labelLong">{{'histor.hMin'|trans({},'recherche')}}</label> <input name="hde" class="montant" type="time" id="montantdeb" />
+                       <label class="labelLong expLabel">{{'histor.hMax'|trans({},'recherche')}}</label> 
+                       <input name="ha" class="montant" type="time" id="montantfin" value="{{ ha }}" /> 
+               </div> 
+                <div>
+                    <input name="datedebut" type="text" class="montant" id="eddat1" value="{{ ladeb }}" />
+                    <input name="datedebut" type="text" class="montant" id="eddat2" value="{{ lafin }}" />
+                </div>
+            
+               <div>
+                    <input class="boutonSubmit" type="submit" value="{{'client.rechercher'|trans({},'messages') }}"/>
+                    <div class="clr"></div>
+               </div>   #}    
+            
+            
+               <div class="label135p">                   
+                    <label class="">{{'histor.typecon'|trans({},'recherche')}}</label>
+                    <select name="typecon">
+                             <option value="0"  selected="selected"  class="choix" >--------</option>
+                             <option value="1" class="choix" >{{'histor.abonne'|trans({},'recherche')}}</option>
+                             <option value="2" class="choix" >{{'histor.utilisateur'|trans({},'recherche')}}</option>
+                    </select>                      
+               </div>
+               <div class="label135p">
+                    <label class="">{{'histor.abonne'|trans({},'recherche')}} <span class="red-text">*</span></label>
+                    <input name="abonneutil" type="text" value="{{ connecte }}" />                        
+               </div>
+               <div class="label135p datage">
+                    <label class="">{{'histor.du'|trans({},'recherche') }} <span class="red-text">*</span></label>
+                    {#<input name="datedebut" type="text" class="montant" id="from2" value="{{ datedebut }}" />
+                    <input name="datedebut" type="text" class="montant" value="{{ datedebut }}" required="required"/>#}
+                    <select name="datedebut">
+                        {% for i in 1..nbjr %}                           
+                                <option value="{{i}}" class="choix" >{{i}}</option>                            
+                        {% endfor %}
+                    </select>
+                    <label class="expLabel">{{'histor.au'|trans({},'recherche') }} <span class="red-text">*</span></label>
+                    <select name="datefin">
+                        {% for i in 1..nbjr %}                           
+                                <option value="{{i}}" class="choix" >{{i}}</option>                               
+                        {% endfor %}
+                    </select>
+                    <input class="boutonSubmit" type="submit" value="{{'client.rechercher'|trans({},'messages') }}"/>
+                    <div class="clr"></div>
+                    
+                    
+                    {#<input name="datefin"type="text" class="montant" id="to2" value="{{ datefin }}" />
+                    <input name="datefin"type="text" class="montant"  required="required" value="{{ datefin }}" />#}
+                    <input name="mois"type="hidden" class=""  value="{{ mois }}" />
+                    <input name="an"type="hidden" class=""  value="{{ an}}" />
+               </div>                      
+               {#<div> 
+                       <label class="labelLong">{{'histor.hMin'|trans({},'recherche')}}</label> <input name="hde" class="montant" type="time" id="montantdeb" />
+                       <label class="labelLong expLabel">{{'histor.hMax'|trans({},'recherche')}}</label> 
+                       <input name="ha" class="montant" type="time" id="montantfin" value="{{ ha }}" /> 
+               </div> 
+                <div>
+                    <input name="datedebut" type="text" class="montant" id="eddat1" value="{{ ladeb }}" />
+                    <input name="datedebut" type="text" class="montant" id="eddat2" value="{{ lafin }}" />
+                </div>#}
+            
+               
+            
+            
+            
+     </form>  
+  
+     {% if afficher ==1 %}
+        <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{ 'historique.titre'|trans({}, 'messages')}}</h2>
+        <div class="marginTop20p">
+                
+                <table class="withTDborder bgHomeGrisTable">                                    
+                    <tr>
+                        <th>&nbsp; </th>
+                        <th>{{ 'historique.dateDeb'|trans({}, 'messages')}}</th>
+                        <th>{{ 'historique.dateFin'|trans({}, 'messages')}}</th>
+                        <th> {{ 'historique.abonne'|trans({}, 'messages')}} </th>
+                        <th> {{ 'historique.utilisateur'|trans({}, 'messages')}} </th>
+                        <th> {{ 'historique.duree'|trans({}, 'messages')}} </th>
+                    </tr>                                    
+
+                {% for histo in listehistor[mois]['liste'] %}                   
+                    <tr>
+                        <td style="width:30px;"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                        <td style="width:300px;">{{histo.dateDeb|date('d/M/Y H:i:s')}}</td>                         
+                        <td style="width:250px">
+                                    {% if histo.dateFin != null %}   
+                                        {{histo.dateFin|date('d/M/Y H:i:s')}}                                
+                                    {% else %} 
+                                         -
+                                    {% endif %} 
+                        </td>                              
+                        <td> <input type="checkbox"  readonly="true" {% if histo.abonne != null %} checked="true"  {% endif %}></td>   
+                        <td> <input type="checkbox"  readonly="true" {% if histo.utilisateur != null %} checked="true"  {% endif %}></td>   
+                        <td style="width:200px;">
+                                    {% if histo.duree != '' %}   
+                                        {{histo.duree}}                                
+                                    {% else %} 
+                                        {% if loop.index != 1 %}
+                                            {{ 'historique.tempsConnexion'|trans({}, 'messages')}}
+                                        {% else %}
+                                            En cours
+                                        {% endif %} 
+                                    {% endif %} 
+                        </td>
+                    </tr>
+                {% endfor %}  
+                </table> 
+            
+            <div class=" bleuLogo marginTop10p">
+            <div class="page center">
+                
+                {% if last_page > 1 %}
+                    <div class="paginationTry">
+
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': 1,'locale':locale }) }}"> <span> << </span> </a> 
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': previous_page,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans({}, 'messages')}} </span> </a>
+                          {% for page in 1..last_page %}
+                                {% if page == current_page %}
+                                <span class="pagination_active">{{ page }}</span>
+                                {% else %}
+                                <span><a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'),'idAbonne':app.request.get('id_abonne'), 'page': page }) }}">{{ page }}</a></span>
+                                {% endif %}
+                          {% endfor %}
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': next_page,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans({}, 'messages')}} </span> </a>
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': last_page,'locale':locale }) }}"> <span> >> </span></a>
+
+                      </div>
+                 {% endif %}
+                  <br/>    
+                <div class="pagination_desc">
+                   <center>
+                       <strong>{{ total }}</strong> {{'client.historique.total'|trans({},'messages') }}
+                       {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                   </center>
+                </div>
+                
+            </div>
+
+            <div class="clear"></div>
+        </div>
+
+        </div>
+        {% endif %}
+        <div class="clr"></div>
+
+	<!-- **************************************************** FIN DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+        {#% if ladeb != null and lafin !=null %#}
+            <script>
+                $(document).ready(function() { 
+                    $("#from2").datepicker('option', 'changeYear', false);
+                    $("#to2").datepicker('option', 'changeYear', false);
+
+                    datedbt = $(this).val().split('-');
+                    $( "#from2" ).datepicker({ minDate: -20, minDate:  new Date(datedbt[2], datedbt[1] , datedbt[0]) });
+                              
+                    datedbt1 = $(this).val().split('-');
+                    $("#to2").datepicker('option', 'maxDate', new Date(datedbt1[2], datedbt1[1] , datedbt1[0]));
+        
+                }); 
+               
+            </script>
+{#% endif %#}    
+        
+{% endblock %}

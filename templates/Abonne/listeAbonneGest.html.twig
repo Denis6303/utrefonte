@@ -1,0 +1,419 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'abonnes.liste.grandtitrepg'|trans({},'abonnes') }}
+{% endblock %}
+
+  {% block client_centre_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+
+    <ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'fond.titre2'|trans({},'fond') }}</li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{ 'utilisateur.gestion.filefonds'|trans({}, 'utilisateurs') }}</li>
+    </ul>
+
+        {#<div style="text-align: right;padding-right:10px;">
+            <a href="#" class="back" >
+                <img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="Retour" title="Retour" />
+            </a>
+        </div>#}
+
+    <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">
+        {{ 'utilisateur.gestion.titrefonds'|trans({}, 'utilisateurs') }} : {{libfonds}}
+    </h2>
+{% for contenu in app.session.flashbag.get('notice') %}
+    {#% if contenu == "success" %}
+        
+            <div class="success rightSpace leftSpace center">                        
+                    {{ 'abonnes.addsuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenu == "modifsuccess" %}
+        
+            <div class="success rightSpace leftSpace center">                        
+                    {{ 'abonnes.modifsuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenu == "failure" %}
+        
+            <div class="error rightSpace leftSpace center">                        
+                    {{ 'abonnes.addfailure'|trans({}, 'abonnes') }}
+            </div>    
+         
+    {% endif %}
+    {% if contenu == "emailerror" %}
+        
+            <div class="error rightSpace leftSpace center">                        
+                    {{ 'abonnes.emailerror'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %#}
+    {% if contenu == "activesuccess" %}
+        
+            <div class="success rightSpace leftSpace center">                        
+                    {{ 'abonnes.activesuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenu == "desactivesuccess" %}
+        
+            <div class="success rightSpace leftSpace center">                        
+                    {{ 'abonnes.desactivesuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+{% endfor %}
+{% for contenus in app.session.flashbag.get('message') %}    
+    {% if contenus == "modifsuccess" %}
+        
+            <div class="success rightSpace leftSpace center">                        
+                    {{ 'abonnes.modifsuccess'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+    {% if contenus == "modiffailure" %}
+        
+            <div class="error rightSpace leftSpace center">                        
+                    {{ 'abonnes.modiffailure'|trans({}, 'abonnes') }}
+            </div>    
+        
+    {% endif %}
+{% endfor %}         
+   
+	
+	<table class="infoCompte noLeftBorder noGras">
+            <tr>
+                <th style="padding-left:10px;"><input type="checkbox" class="checkall" name="checkall"/></th>
+                <th>{{'abonnes.liste.nom'|trans({}, 'abonnes') }}</th>
+                <th>{{'abonnes.liste.username'|trans({}, 'abonnes') }}</th>
+                <th>{{'abonnes.liste.email'|trans({}, 'abonnes') }}</th>
+                <th>{{'abonnes.liste.statut'|trans({}, 'abonnes') }}</th>
+               {# <th>{{'abonnes.liste.statut'|trans({}, 'abonnes') }}</th>
+                <th colspan="2">{{'abonnes.liste.action'|trans({}, 'abonnes') }}</th> #}
+            </tr>            
+            {% for abonne in listeAbonne %}
+                                                    
+            <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                <td><input type="checkbox" name="abonne[]" value="{{abonne.id}}" rel="abonne_c"/></td>
+                <td style="width:350px;"><strong><a href="{{ path('utb_client_detail_abonneadmin',{'id':abonne.id,'locale':locale})}}"> {{abonne.nomPrenom}}</a></strong></td>									
+                <td style="width:130px;"><a href="{{ path('utb_client_detail_abonneadmin',{'id':abonne.id,'locale':locale})}}"> {{abonne.username}}</a></td>
+                <td style="width:200px;">{{abonne.email}}</td>
+                {#<td>{{abonne.libProfil}}</td>#}
+
+                <td style="width:100px;">
+                    {#{abonne.id}#}
+                        
+                    {% if abonne.etatAbonne == 0 %}
+                       {# <a onclick="return confirm('Voulez vous vraiment activer cet utilisateur?')" href="{{path('utb_client_activer_abonne', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/validerSmall.png')}}" alt="{{'admin.activer'|trans({}, 'messages') }}" title="{{'admin.activer'|trans({}, 'messages') }}" /></a>#}		{{'admin.desactive'|trans({}, 'messages') }}                                                            
+                    {% endif %} 
+                    {% if abonne.etatAbonne == 1 %}
+                             {#<a onclick="return confirm('Voulez vous vraiment désactiver cet utilisateur?')" href="{{path('utb_client_desactiver_abonne', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/depublierSmall.png')}}" alt="{{'admin.desactiver'|trans({}, 'messages') }}" title="{{'admin.desactiver'|trans({}, 'messages') }}" /></a>	#}{{'admin.active'|trans({}, 'messages') }}
+                    {% endif %}
+                    {% if abonne.etatAbonne == 2 %}
+                             {#<a onclick="return confirm('Voulez vous vraiment désactiver cet utilisateur?')" href="{{path('utb_client_desactiver_abonne', {'id': abonne.id,'locale': locale})}}" > <img src="{{ asset('img/admin-img/depublierSmall.png')}}" alt="{{'admin.desactiver'|trans({}, 'messages') }}" title="{{'admin.desactiver'|trans({}, 'messages') }}" /></a>	#}{{'client.bloque'|trans({}, 'messages') }}
+                    {% endif %}
+                </td>	
+				
+				
+            </tr>
+            {% else %}
+                    <tr class="bgBlanc">
+                        <td colspan="5" class="titreArtList" align:center<a href=""> {{ 'abonnes.none'|trans({}, 'abonnes') }} </a></td>	
+                    </tr>
+            {% endfor %}
+        </table>
+        <!--Fin tableau liste des abonnés-->
+        <div class=" bleuLogo marginTop10p">
+            <div class="page center">
+                
+                {% if last_page > 1 %}
+                    <div class="paginationTry">
+
+                          <a href="{{ path('utb_client_detailfonds', {'page': 1,'fonds': fonds,'locale':locale }) }}"> <span> << </span> </a> 
+                          <a href="{{ path('utb_client_detailfonds', {'page': previous_page,'fonds': fonds,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans({}, 'messages')}} </span> </a>
+                          {% for page in 1..last_page %}
+                                {% if page == current_page %}
+                                <span class="pagination_active">{{ page }}</span>
+                                {% else %}
+                                <span><a href="{{ path('utb_client_detailfonds', {'page': page,'fonds': fonds,'locale':locale }) }}">{{ page }}</a></span>
+                                {% endif %}
+                          {% endfor %}
+                          <a href="{{ path('utb_client_detailfonds', {'page': next_page,'fonds': fonds,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans({}, 'messages')}} </span> </a>
+                          <a href="{{ path('utb_client_detailfonds', {'page': last_page,'fonds': fonds,'locale':locale }) }}"> <span> >> </span></a>
+
+                      </div>
+                 {% endif %}
+                  <br/>    
+                <div class="pagination_desc">
+                   <center>
+                       <strong>{{ total }}</strong> {{'abonnes.nom'|trans({},'abonnes') }}
+                       {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                   </center>
+                </div>
+                
+            </div>
+           {#<div class="nav">
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_premier.png')}}" /></a></span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_precedent.png')}}" /></a></span>
+                <span>1</span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_suivant.png')}}" /></a></span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_dernier.png')}}" /></a></span>
+            </div>#}
+            <div class="clear"></div>
+        </div>
+    </div>
+    <!--Fin du div contenant le tableau-->
+
+
+
+                        
+<script language="javascript" >
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+           
+      function modifierPhoto(){
+       
+             $("#modifPhoto_container").show(); 
+             $("#modifFicheAbonne_container").hide();
+             $("#modifPwd_container").hide();             
+            var html = '<a class="updateLink" href="#" onClick="AnnulerPhoto( ); return false;">{{ 'admin.annulModif'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+       }
+       
+      function AnnulerPhoto(){
+           
+           $("#modifPhoto_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul2'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+            
+       }    
+       
+       function getAbonnesID(){
+           
+            var abonnes_id = "";
+            
+            $(":input[rel=abonne_c]:checked").each(function(){
+		abonnes_id = abonnes_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return abonnes_id;
+       }
+              
+       function modifierPwd(idabonne){
+       
+             $("#modifPwd_container"+idabonne).show(); 
+             $("#modifPhoto_container").hide();
+             $("#modifFicheAbonne_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerPwd( idabonne); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerPwd(idabonne){
+           
+           $("#modifPwd_container"+idabonne).hide();   
+           /* var html = '<a class="updateLink" href="#" onClick="modifierPwd(+ idabonne+); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/            
+       }       
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "Voulez vous vraiment Supprimer ces utilisateurs ?";
+       var htmldefault2 = "Voulez vous vraiment Activer ces utilisateurs ?";
+       var htmldefault3 = "Voulez vous vraiment Désactiver ces utilisateurs ?";
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( abonnesId ){
+         //To do
+         if( abonnesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+                    
+          $('#process_tpl').html($('#msgconfirmsuppression').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('delete_Allabonnes')}}",
+                                data: {ds:abonnesId},
+                                cache: false,
+                                success: function(data){ 
+                                   var answer = jQuery.parseJSON(data);
+                                   /*if( resJson.result == "success"){
+                                        window.location.reload();
+                                   }
+                                    else
+                                         alert("Erreur durant le traitement. Veuillez réessayer svp.");           
+                                   //console.log(data);*/
+        
+                                   if( answer.result=="error"){
+                                        $('#process_tpl').html($('#suppressionimpossible').html());
+                                    }
+                                    else if (answer.result=="operationerror") {
+                                        $('#process_tpl').html($('#operationexiste').html());
+                                    } 
+                                    else if (answer.result=="success") {
+                                        $('#process_tpl').html($('#suppressionreussie').html());
+                                    }          
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       } 
+       
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( abonnesId ){
+         //To do
+         if( abonnesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmactivation').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('active_Allabonnes')}}",
+                                data: {abonnesIds:abonnesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="profildesactive"){
+                                        $('#process_tpl').html($('#activationimpossible').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#activationreussie').html());
+                                    }
+                                      
+                                  window.location.reload();
+                                    
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function desactiveAll( abonnesId ){
+         //To do
+         if( abonnesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmdesactivation').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('desactive_Allabonnes')}}",
+                                data: {abonnesIds:abonnesId},
+                                cache: false,
+                                success: function(data) {
+                                   
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }
+</script>
+
+<div id="process_tpl" style="display:none;"></div> 
+<div id="sivide" style="display:none;"> {{ 'abonnes.confirmation.sivide'|trans({}, 'abonnes') }} </div>  
+
+<div id="activationimpossible" style="display:none;"> {{ 'abonnes.confirmation.activationimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="activationreussie" style="display:none;"> {{ 'abonnes.confirmation.activationreussie'|trans({}, 'abonnes') }} </div>
+<div id="titreactivation" style="display:none;">{{ 'abonnes.confirmation.titreactivation'|trans({}, 'abonnes') }} </div> 
+<div id="msgconfirmactivation" style="display:none;">   {{ 'abonnes.confirmation.activation'|trans({}, 'abonnes') }}</div> 
+
+<div id="desactivationimpossible" style="display:none;"> {{ 'abonnes.confirmation.desactivationimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="desactivationreussie" style="display:none;"> {{ 'abonnes.confirmation.desactivationreussie'|trans({}, 'abonnes') }} </div>                     
+<div id="titredesactivation" style="display:none;">{{ 'abonnes.confirmation.titredesactivation'|trans({}, 'abonnes') }}</div> 
+<div id="msgconfirmdesactivation" style="display:none;"> {{ 'abonnes.confirmation.desactivation'|trans({}, 'abonnes') }}</div>      
+
+<div id="suppressionimpossible" style="display:none;"> {{ 'abonnes.confirmation.supimpossible'|trans({}, 'abonnes') }}</div> 
+<div id="suppressionreussie" style="display:none;"> {{ 'abonnes.confirmation.supreussie'|trans({}, 'abonnes') }} </div>
+<div id="titresuppression" style="display:none;">{{ 'abonnes.confirmation.titresup'|trans({}, 'abonnes') }}</div> 
+<div id="msgconfirmsuppression" style="display:none;"> {{ 'abonnes.confirmation.suppression'|trans({}, 'abonnes') }}</div>      
+
+<div id="operationexiste" style="display:none;"> {{ 'abonnes.confirmation.operationexiste'|trans({}, 'abonnes') }} </div> 
+
+{% endblock %}
+
+

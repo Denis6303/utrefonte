@@ -1,0 +1,425 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'users.ajout.grandtitrepg'|trans({}, 'users') }}
+{% endblock %}
+
+  {% block client_centre_body %}
+ 
+    <ul class="filariane bleuLink">
+		<li><a href=""><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li><a href="">{{'abonnes.gestion.titre'|trans({},'abonnes') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'abonnes.ajoutsa'|trans({},'abonnes') }}</li>
+    </ul>                            
+
+                             
+	  {% for contenu in app.session.flashbag.get('notice') %}            
+		{% if contenu == "emailerror" %}
+			<div class="error rightSpace leftSpace center">                        
+					{{ 'users.emailerror'|trans({}, 'users') }}
+			</div>  
+		{% endif %}
+  
+		{% if contenu == "compteerror" %}
+			<div class="error rightSpace leftSpace center">                        
+					{{ 'compte.compteerror'|trans({}, 'compte') }}
+			</div>  
+		{% endif %}
+
+		{% if contenu == "loginerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'users.loginerror'|trans({}, 'users') }}
+			</div>    
+		{% endif %}
+  
+		{% if contenu == "categorieerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'abonnes.categorieerror'|trans({}, 'abonnes') }}
+			</div>    
+		{% endif %}
+  
+		{% if contenu == "emailformaterror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'users.emailformaterror'|trans({}, 'users') }}
+			</div>    
+		{% endif %}
+		{% if contenu == "passworderror" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'users.passworderror'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+		{% if contenu == "smallpassworderror" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'users.smallpassworderror'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+	
+                {% if contenu == "errorsmalllogin" %}
+		   <div class="error rightSpace leftSpace center">                        
+				{{ 'users.errorsmalllogin'|trans({}, 'users') }}
+		   </div>    
+		{% endif %}
+                
+		{% if contenu == "errorcomptesvide" %}
+			   <div class="error rightSpace leftSpace center">                        
+					   {{ 'utilisateur.error.cptesvides'|trans({}, 'utilisateurs') }}
+			   </div>    
+		{% endif %} 
+                
+		{% if contenu == "errorlogincaracint" %}
+			   <div class="error rightSpace leftSpace center">                        
+					   {{ 'utilisateur.error.login.carcteresinterdits'|trans({}, 'utilisateurs') }}
+			   </div>    
+		{% endif %} 
+	
+	{% endfor %}
+			
+			
+	{#% set dot = "<span> *</span>" %#}		
+  <style>
+      .AjoutDUnAbonne label{width: 150px;}
+      .AjoutDUnAbonne input{width: 200px;}
+      .label2ligne label{width: 155px;}
+      .label2ligne input{width: 195px;}
+  </style>
+  <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'abonnes.ajoutsa'|trans({},'abonnes') }}</h2>
+	<div class="marginBottom20p paddingBottom20p">
+            <h4 style="font-weight:normal;font-style: italic;text-align: right;"><span style="color: blue;"> * </span>{{'client.obligatoire'|trans({}, 'messages')}}</h4>
+	<form class="form_search"  action="{{ path('utb_client_add_sub_abonne',{'locale':locale}) }}" {{ form_enctype(form) }} method="post" id="ajoutUser">
+									
+            <div class="FrmAbonne AjoutDUnAbonne">
+                    {{ form_errors(form.nomPrenom) }}
+                    {{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom3'|trans({}, 'abonnes')|raw) }}
+                    {{ form_widget(form.nomPrenom) }}
+                    <div class="clr"></div>
+            </div>
+
+            <div class="FrmAbonne AjoutDUnAbonne">
+                    {{ form_errors(form.email) }}
+                    {{ form_label(form.email, 'abonnes.form.email3'|trans({}, 'abonnes'))}}
+                    {{ form_widget(form.email) }}
+                    <div class="clr"></div>
+            </div>								
+
+
+            <div class="FrmAbonne champsGrp AjoutDUnAbonne">
+                    {{ form_errors(form.telAbonne) }}
+                    {{ form_errors(form.celAbonne) }}
+                    {{ form_label(form.telAbonne, 'abonnes.form.tel'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.telAbonne) }}
+                    {{ form_label(form.celAbonne, 'abonnes.form.cel3'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.celAbonne) }}
+                    <div class="clr"></div>
+            </div>
+
+            <div class="FrmAbonne AjoutDUnAbonne">
+                    {{ form_errors(form.adresseAbonne) }}
+                    {{ form_label(form.adresseAbonne, 'abonnes.form.adresse3'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.adresseAbonne) }}
+                    <div class="clr"></div>
+            </div>
+
+            <div class="FrmAbonne AjoutDUnAbonne">
+                    {{ form_errors(form.username) }}
+                    {{ form_label(form.username, 'abonnes.form.username3'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.username) }}
+                    <div class="clr"></div>
+                    <span class="gris-comment"><em>{{'users.form.nbcaract2'|trans({},'users')}}</em></span>
+            </div>
+
+            <div class="FrmAbonne champsGrp AjoutDUnAbonne">
+                    {{ form_errors(form.password) }}
+                    {{ form_errors(form.cpassword) }}
+                    {{ form_label(form.password, 'abonnes.form.password3'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.password) }}
+                    <span class="label2lign">{{ form_label(form.cpassword, 'abonnes.form.cpassword3'|trans({}, 'abonnes')) }}</span>
+                    {{ form_widget(form.cpassword) }}
+                    <div class="clr"></div>
+                    <span class="gris-comment"><em>{{'users.form.nbcaract3'|trans({},'users')}} </em></span>
+            </div>
+
+
+            <div class="FrmAbonne inputMin AjoutDUnAbonne">
+                    {{ form_errors(form.radicalAbonne) }}
+                    {{ form_label(form.radicalAbonne, 'abonnes.form.radical'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.radicalAbonne) }}
+                    <div class="clr"></div>
+                    <div id="errorRadical" style="display: none"><i> Le radical doit comporter  6 chiffres</i> </div>
+            </div> 
+            <div class="FrmAbonne inputMin AjoutDUnAbonne" id="comptesPere">
+                   
+            </div> 
+
+            <div class="FrmAbonne AjoutDUnAbonne">
+                    {{ form_errors(form.profil) }}
+                    {{ form_label(form.profil, 'abonnes.form.profil'|trans({}, 'abonnes')) }}
+                    {{ form_widget(form.profil) }}
+                    <div class="clr"></div> 
+            </div>  
+                    
+                <style>
+                ul.comptes select{margin-left: 30px;}    
+                ul.comptes .compteini{margin-left: 155px;}    
+                ul.comptes div.legendeCpt{margin-left: 155px;}    
+                </style>
+
+                <input type="text" name="lesComptes" id="lesComptes" class="lesComptes" style="display: none" />
+                <input id = "validSubAb" class="boutonSubmit" onclick="recuCompte()" type="submit" value="{{'client.valider'|trans({},'messages') }}"/>
+            
+            <a  href="{{ path('utb_client_liste_abonne',{'locale':locale}) }}">
+                
+            <input id = "anulSubAb" type="button" class="annulerBut back" value="{{'client.annuler'|trans({},'messages') }}" name="" id="" > </a>
+            
+	</form>
+
+	</div>
+  
+    <script language="javascript" >                         
+                                // Récupère le div qui contient la collection de tags
+      var collectionHolder = $('ul.comptes');
+      // ajoute un lien « add a tag »
+      //var $addTagLink = $('<a href="#" class="add_tag_link">Ajouter un Numéro de Compte </a> ');
+      
+      var $addTagLink = $('<a href="#" class="add_tag_link">Ajouter un Numéro de Compte </a>');
+      var $newLinkLi = $('<li></li>').append($addTagLink);
+      
+      
+      
+
+      jQuery(document).ready(function() {
+          
+          $("#validSubAb").hide();
+          
+          $('#utb_clientbundle_abonnetype_radicalAbonne').focus(function() {
+            $("#validSubAb").hide();
+          });
+
+
+          $('#utb_clientbundle_abonnetype_radicalAbonne').blur(function() {
+              
+             // alert('HHH') ;
+              
+            afficherCompte($('#utb_clientbundle_abonnetype_radicalAbonne').val());
+
+          });   
+    
+    
+            collectionHolder.append($newLinkLi); 
+           // addCompteForm(collectionHolder, $newLinkLi);
+{#            $('.petitinput').focus(function() {
+                 addRadical();
+             });#}
+            $('.Champ1').focus(function() {
+                   $('.Champ1').css( "background-color", "#EEE" );
+                    });     
+                   
+            $('#utb_clientbundle_abonnetype_radicalAbonne').blur(function() {
+               
+                if(($('#utb_clientbundle_abonnetype_radicalAbonne').val()).length<6){
+                      $('#errorRadical').show();
+                      $('#utb_clientbundle_abonnetype_radicalAbonne').css("border-color","#F00");
+                }else{
+                     $('#utb_clientbundle_abonnetype_radicalAbonne').css("border-color","#CCC");
+                }
+                addRadical();
+              
+                
+          });
+
+            $('#utb_clientbundle_abonnetype_username').blur(function() {
+                if(($('#utb_clientbundle_abonnetype_username').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_username').css("border-color","#F00");
+                      alert("Le nom d'utilisateur doit contenir au moins 5 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_username').css("border-color","#CCC");
+                }               
+          });     
+
+            $('#utb_clientbundle_abonnetype_password').blur(function() {
+                if(($('#utb_clientbundle_abonnetype_password').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_password').css("border-color","#F00");
+                      alert("Le mot de passe doit contenir au moins 6 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_password').css("border-color","#CCC");
+                }               
+          });
+          
+            $('#utb_clientbundle_abonnetype_cpassword').blur(function() {
+                if($('#utb_clientbundle_abonnetype_cpassword').val()!= $('#utb_clientbundle_abonnetype_password').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_abonnetype_password').css("border-color","#F00");
+                      $('#utb_clientbundle_abonnetype_cpassword').css("border-color","#F00");
+                      alert("Les mots de passe  doivent être identiques !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_abonnetype_cpassword').css("border-color","#CCC");
+                    $('#utb_clientbundle_abonnetype_password').css("border-color","#CCC");
+                }               
+          });
+         
+
+            // controle des types de compte
+            $('.myselect').change(function (){
+                    var	i =$(this).children('option:selected').attr("value");
+                    if(i!=3){
+                                    $('.Champ1').attr("disabled","disabled").css("background","#cccccc");
+                                    $('.Champ2').attr("disabled","disabled").css("background","#cccccc");
+                                    $('.Champ9').attr("disabled","disabled").css("background","#cccccc");
+                                    $('.Champ15').attr("disabled","disabled").css("background","#cccccc");
+                                    $('.Champ1').attr("disabled","disabled").val("");
+                                    $('.Champ2').attr("disabled","disabled").val("");
+                                    $('.Champ9').attr("disabled","disabled").val("");
+                                    $('.Champ15').attr("disabled","disabled").val("");                                        
+                                    $(this).parent().children("input").eq(0).removeClass('required');
+                                    $(this).parent().children("input").eq(1).removeClass('required');
+                                    $(this).parent().children("input").eq(8).removeClass('required');
+                                    $(this).parent().children("input").eq(14).removeClass('required');
+                                    $('.Champ10').focus();
+
+                    }
+                    else{
+                                    $('.Champ1').removeAttr("disabled");
+                                    $('.Champ1').css("background","#fff");
+                                    $('.Champ2').removeAttr("disabled");
+                                    $('.Champ2').css("background","#fff");
+                                    $('.Champ9').removeAttr("disabled");
+                                    $('.Champ9').css("background","#fff");
+                                    $('.Champ15').removeAttr("disabled");
+                                    $('.Champ15').css("background","#fff");
+                                    $('.Champ1').focus();
+                    }	
+            });
+                
+      });
+
+          $addTagLink.on('click', function(e) {
+              // empêche le lien de créer un « # » dans l'URL   
+              e.preventDefault();
+              //alert('Test');
+                          
+              // ajoute un nouveau formulaire tag (voir le prochain bloc de code)
+              addCompteForm(collectionHolder, $newLinkLi);
+          });
+          
+          
+    function recuCompte()
+    {
+        var lesComptes = getCheckedId('comptePere', 'compteValue', false);
+         
+        var lesComptesTab = prepareAjaxData(lesComptes);
+        $("#lesComptes").val(lesComptesTab);
+          
+    }
+    
+    
+    function afficherCompte(val) {
+            var DATA = 'radical=' + val;
+          
+            $.ajax({
+                type: "POST",
+                url: "{{path('utb_client_affiche_comptes_pere')}}",
+                data: DATA,
+                cache: false,
+                success: function(data)
+                {
+                    var answer = jQuery.parseJSON(data);
+                    var liste = answer.list.liste;
+                    var error = answer.list.error;
+                   
+                    $("#comptesPere").html('');
+                   if(error == "") {
+                    for (var i = 0; i < liste.length; i++) {
+{#                        console.log(liste[i].compte);#}
+                        $("#comptesPere").append(
+                                '<tr><td><input type= "checkbox" name="compte'+[i]+'" compteValue="' + liste[i].compte + '"  value="' + liste[i].compte + '"  class="comptePere"/>' + liste[i].compte + '</td></tr>'
+                         );
+                    }
+                    $("#validSubAb").show();
+                   
+                }else {
+	               $("#comptesPere").append(
+                                '<tr><td>'+error+'<td><tr>'
+                     ); 
+                     $("#validSubAb").hide();
+                }
+
+                }
+
+            });
+        }
+        
+    /**
+ * Retourne un tableau contenant les valeurs des checkboxs cochés ayant la class nomClass
+ * 
+ * @param {string} nomClass
+ * @param {string} valeurAttribut : nom de l'attribut du checkbox contenant la valeur à récupérer
+ * @param {boolean} isNombre : indique si la valeur à récuperer est un nombre, si oui une conversion de type a lieu
+ * 
+ * @returns {Array}
+ */
+    function getCheckedId(nomClass, valeurAttribut, isNombre) {
+    var tab = [], i = 0;
+    $('.' + nomClass).each(function() {
+        if ($(this).is(':checked')) {
+            var val = ($(this).attr(valeurAttribut));
+
+            if (isNombre) {
+                val = parseInt(val);
+            }
+            tab[i++] = val;
+        }
+    });
+
+    return tab;
+}
+
+    /**
+ * Cré un string qui sera envoyé par ajax au serveur, à partir du contenu du tableau tab
+ * exple [2, 7, 8] donnera : |2|7|8 
+ * @param {type} tab
+ * @returns {String}
+ */
+    function prepareAjaxData(tab) {
+    var rep = '';
+    var max = tab.length;
+    var nb = max-1;
+    for (var i = 0; i < max; i++) {
+        if(max == 1){
+        rep = tab[i];
+    }
+     else if(i == nb){
+	  rep += tab[i];
+       }
+    else {
+	  rep += tab[i]+ '|' ;
+       }
+
+    }
+
+    return rep;
+}
+
+
+    </script>      
+    
+    {% if error == 1 %}
+        
+         <script>
+               // alert('GAUTIER') ;
+                
+                afficherCompte($('#utb_clientbundle_abonnetype_radicalAbonne').val());
+                
+             //$("#utb_clientbundle_abonnetype_radicalAbonne").blur();
+             
+         </script>
+    {% endif %}     
+    
+  {% endblock %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

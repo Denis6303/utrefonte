@@ -1,0 +1,109 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite2.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Contact
+{% endblock %}
+  
+  {% block public_body %}
+      {#<div class="span-24 all-lookupCategorie marginBottom10p">
+                  <div class="leftSpace blocArPartContact">
+                       <div class="lookupCategorie coinsArrondis border-gris2 ">
+                            <div>
+                                <h4> <a href="{{ path("utb_site_contact",{'locale': locale})}}">{{ 'acceuil.nous'|trans({}, 'site') }}</a> </h4>
+                            </div>
+                        </div>                        
+                       <div class="lookupCategorie coinsArrondis border-gris2 ">
+                            <div>
+                                <h4> <a href="{{ path("utb_site_reclamations",{'locale': locale})}}">{{ 'reclamations'|trans({}, 'site') }}</a> </h4>
+                            </div>
+                        </div>                        
+                       <div class="lookupCategorie active-lookupCategorie coinsArrondis border-gris2 ">
+                            <div>
+                                <h4> <a href="{{ path("utb_site_alertes",{'locale': locale})}}">{{ 'alertes'|trans({}, 'site') }}</a> </h4>
+                            </div>
+                        </div>                        
+                  </div>
+            </div>#}
+            <div class="span-24 marginBottom20p borderBotStyle paddingBottom10p bgBlanc"> 
+            <div class="leftSpace rightSpace positionRelative">	<!-- DEBUT COLONNE GAUCHE-->
+                
+              {% for contenu in app.session.flashbag.get('notice') %}
+                    {% if contenu == "success" %}
+                                  <div class="msgenvoye">{{ 'contact.msgenvoye'|trans({}, 'site') }}</div>
+                    {% endif  %}
+                    {% if contenu == "isrobot" %}
+                                  <div class="msgenvoye">{{ 'contact.isrobot'|trans({}, 'site') }}</div>
+                    {% endif  %}
+             {% endfor  %}
+				
+               <h1 class="boxSection-titre bleuLogo title-WithLeftBar"> {{ 'alertes'|trans({}, 'site') }} </h1>
+            
+               <div class="bolder"><i>{{ 'contact.champs'|trans({}, 'site') }}</i></div>
+                <div class="formContact">
+                    <form action="{{ path('utb_site_alertes',{'type': 0, 'locale':locale}) }}" method="post" id="formContact">
+                       {% if reponse == "oui"%} {{ 'contact.mail'|trans({}, 'site') }} {% endif %}
+                       {#<p>
+                           <input type="checkbox" name="recevoir" value="oui" id="recevoir"/> <label for="recevoir"> {{ 'contact.copie'|trans({}, 'site') }}</label>
+                           <div class="clr"></div>
+                       </p>#}
+                            {{ form_widget(form) }}
+                            
+                            {#<p>
+                                <div style="margin-left: 180px;" class="g-recaptcha" data-sitekey="6LdPHiUUAAAAAMEAeZUgkQL-BIGK13FjW8JWUeaG"></div>
+                                <div class="clr"></div>
+                            </p>#}
+                            
+                            <p class="btn_formContact" style="margin-right: -12px;">
+                                <a href="{{ path('utb_site_homepage',{'locale':locale}) }}" class="back" > 
+                                    <input type="reset" value="{{ 'contact.anu'|trans({}, 'site') }}" />
+                                </a>
+								<input type="submit" value="{{ 'contact.env'|trans({}, 'site') }}" />
+                            <div class="clr"></div>   
+                            </p>
+                            <div class="clr"></div>
+                    </form>
+                </div>
+               <div class="span-9 leftSpace">
+                   
+                   <h1 class="title2" ><a style="color:#ff8f0f;" href="{{ path("utb_site_rubrique",{'locale': locale,'id':12, 'type':17})}}">{{ 'contact.agences'|trans({}, 'site') }}</a></h1>
+                                    {% for unagence in listeAgence %}
+                                        <div class="boxInterieur-type2 borderBotStyle bgHoverBox bgBlanc">
+                                            <div class="cnt-boxInterieur-type2">
+                                                <div class="image-boxInterieur-type2"> 
+                                                    <img src="{{ asset('upload/articles/'~unagence.urlMedia)}}" alt="" title=""   />
+                                                </div>
+                                                <div class="descr-boxInterieur-type2">
+                                                    <h3 class="title3 bleuLink">{{unagence.titreArticle}}</h3>
+                                                    <div class=""> 
+                                                       {{unagence.descriptionArticle|raw}}
+                                                    </div>
+                                                </div>
+                                                <div class="clr"></div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    
+             </div> <!-- Fin liens utiles -->
+               <div class="clr"></div>
+            </div>
+            </div>
+			
+	<script>
+    function effacer (formulaire) {
+        $(formulaire+' :input') .not(':button, :submit, :reset') .css("border-color", "lightgray"); 
+        $(formulaire+' :input') .not(':button, :submit, :reset') .val('') .removeAttr('checked') .removeAttr('selected'); 
+    } 
+
+    {setInterval(function(){
+        $('.msgenvoye').hide(200);//fait un effet de smooth disappearance au div
+{#        $("#reinit").click();#}
+    },5000);}
+    
+    {% if annuler == 1 %}
+        effacer('#formContact');
+    {% endif %}
+
+</script>
+  {% endblock %}
+  

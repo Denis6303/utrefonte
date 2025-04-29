@@ -1,0 +1,792 @@
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+  
+     									<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_listetoutarticle',{'locale': locale})}}">{{ 'admin.layout.menu.articles'|trans}}</a> > 
+    
+          {#  {{ 'admin.layout.menu.articles'|trans}} #}<!-- TRADUCTION DE ARTICLES -->
+    
+            {% if statut == 1 %}   <!-- DEBUT TRADUCTION PAR STATUT -->
+               {{ 'articles.liste.ecr2'|trans({}, 'articles') }}		{# ecr #}
+            {% elseif statut == 2 %}
+               {{ 'articles.liste.spvart'|trans({}, 'articles') }}   {# spv #}
+            {% elseif statut == 3 %}      
+               {{ 'articles.liste.eapart'|trans({}, 'articles') }}   {# eap #}
+            {% elseif statut == 4 %} 
+               {{ 'articles.liste.publies2'|trans({}, 'articles') }}   {# recentarts #}
+            {% elseif statut == 5 %} 
+               {{ 'articles.liste.depublies2'|trans({}, 'articles') }}   {# depublies #}
+            {% elseif statut == 0 %}       
+               {{ 'articles.liste.horsligne2'|trans({}, 'articles') }}   {# horsligne #}
+            {% elseif statut == 6 %}       
+               {{ 'articles.liste.rejected'|trans({}, 'articles') }}   {# rejetés #}            
+            {% endif %}      <!-- FIN TRADUCTION PAR STATUT -->
+    
+    
+    
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div  {% if statut == 3 %} class="span-11" {% else %} class="span-10" style="" {% endif %}>
+						<div class="logoModulePage">
+                            <img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="Articles" title="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" />
+                        </div>
+						<div class="titreModule colorBleu">
+								<h1>
+							  
+								  {% if statut == 1 %}   
+									  {{ 'articles.liste.ecr2'|trans({}, 'articles') }}
+								  {% elseif statut == 2 %}
+									  {{ 'articles.liste.spvart'|trans({}, 'articles') }}   
+								  {% elseif statut == 3 %}      
+									  {{ 'articles.liste.eapart'|trans({}, 'articles') }}   
+								  {% elseif statut == 4 %} 
+									  {{ 'articles.liste.publies2'|trans({}, 'articles') }}   
+								  {% elseif statut == 5 %} 
+									  {{ 'articles.liste.depublies2'|trans({}, 'articles') }}   
+								  {% elseif statut == 6 %} 
+									  {{ 'articles.liste.rejected'|trans({}, 'articles') }}
+								  {% else %}       
+									  {{ 'articles.liste.horsligne2'|trans({}, 'articles') }}   
+								  {% endif %}    
+                                                                    
+								<h1>
+							</div>	
+						<div class="clr"></div>
+					</div>
+					
+					<div {% if statut == 3 %} class="span-13 last" {% else %} class="span-14 last" {% endif %}>
+                                            
+					{% if (statut == 0)  %} 
+		
+						<div class="ecarSpecial stat-0">&nbsp;</div>
+						
+						<!-- Soumettre -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="gererAll(getArticlesID(),2); return false;">
+								<div>
+								<img src="{{ asset('img/admin-img/soumettre.png')}}" alt="{{ 'admin.soumettre'|trans({}, 'messages') }}" title="{{ 'admin.soumettre'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.soumettre'|trans({}, 'messages') }}
+							</a>
+						</div>                                                        
+						
+						<div class="ecartBoutons">&nbsp;</div>
+						
+						<!-- Valider -->
+						<div class="boutonGestion">
+							 <a href="javascript:void(0);" onclick="gererAll(getArticlesID(),3); ">
+								 <div>
+								<img src="{{ asset('img/admin-img/valider.png')}}" 
+												   alt="{{ 'admin.btnvalider'|trans({}, 'messages') }}" 
+												   title="{{ 'admin.btnvalider'|trans({}, 'messages') }}" />
+								</div> {{ 'admin.btnvalider'|trans({}, 'messages') }}
+							 </a>
+						</div>
+						
+						<div class="ecartBoutons">&nbsp;</div>
+						
+						<!-- Publier -->
+						<div class="boutonGestion">
+						   <a href="javascript:void(0);" onclick="gererAll(getArticlesID(),4); ">
+								 <div><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans({}, 'messages') }}" title="{{ 'admin.publier'|trans({}, 'messages') }}" />
+								 </div>{{ 'admin.publier'|trans({}, 'messages') }}
+						   </a>
+						</div>
+						
+						<div class="ecartBoutons-ArchCorb">&nbsp;</div>
+						
+						<!-- Archiver -->
+						<div class="boutonGestion">
+								<a href="javascript:void(0);" onclick="archiveAll( getArticlesID() ); return false;" >
+										<div>
+										<img src="{{ asset('img/admin-img/archiver.png')}}" alt="{{ 'admin.archiver'|trans({}, 'messages') }}" title="{{ 'admin.archiver'|trans({}, 'messages') }}" />
+										</div>{{ 'admin.archiver'|trans({}, 'messages') }}
+								</a>
+						</div>
+						<!-- Corbeille -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="corbeilleAll( getArticlesID() ); return false;" >
+								<div>
+										<img src="{{ asset('img/admin-img/corbeille.png')}}" alt="" title="" />
+								</div>{{ 'admin.corbeille'|trans({}, 'messages') }}
+							</a>
+						</div>                                       
+						
+					
+					{% elseif (statut in [1,6])  %}
+
+						<div class="ecarSpecial stat-3but">&nbsp;</div>
+						
+						<!-- Soumettre -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="gererAll(getArticlesID(),2); return false;">
+								<div>
+									<img src="{{ asset('img/admin-img/soumettre.png')}}" alt="{{ 'admin.soumettre'|trans({}, 'messages') }}" title="{{ 'admin.soumettre'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.soumettre'|trans({}, 'messages') }}
+							</a>
+						</div>  
+						
+						<div class="ecartBoutons-ArchCorb">&nbsp;</div>
+						
+						<!-- Archiver -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="archiveAll( getArticlesID() ); return false;" >
+								<div>
+								<img src="{{ asset('img/admin-img/archiver.png')}}" alt="{{ 'admin.archiver'|trans({}, 'messages') }}" title="{{ 'admin.archiver'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.archiver'|trans({}, 'messages') }}
+							</a>
+						</div>
+						<!-- Corbeille -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="corbeilleAll( getArticlesID() ); return false;" >
+								<div>
+										<img src="{{ asset('img/admin-img/corbeille.png')}}" alt="" title="" />
+								</div>{{ 'admin.corbeille'|trans({}, 'messages') }}
+							</a>
+						</div> 
+                                                
+                                              
+                                                
+						
+					{% elseif (statut in [2,5])  %}
+					 
+						<div class="ecarSpecial stat-3but">&nbsp;</div>
+						
+						<!-- Valider -->
+						<div class="boutonGestion">
+							 <a href="javascript:void(0);" onclick="gererAll(getArticlesID(),3); ">
+								 <div>
+									 <img src="{{ asset('img/admin-img/valider.png')}}" 
+											   alt="{{ 'admin.btnvalider'|trans({}, 'messages') }}" 
+											   title="{{ 'admin.btnvalider'|trans({}, 'messages') }}" />
+								</div> {{ 'admin.btnvalider'|trans({}, 'messages') }}
+							 </a>
+						</div>
+						
+                                                {% if statut == 2 %}
+                                                <div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="gererAll(getArticlesID(),6); return false;" >
+								<div>
+									<img src="{{ asset('img/admin-img/bloquer.png')}}" alt="{{ 'admin.rejeter'|trans({}, 'messages') }}" title="{{ 'admin.rejeter'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.rejeter'|trans({}, 'messages') }}
+							</a>
+						</div>
+						{% endif %}
+						<!-- Archiver -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="archiveAll( getArticlesID() ); return false;" >
+								<div>
+								<img src="{{ asset('img/admin-img/archiver.png')}}" alt="{{ 'admin.archiver'|trans({}, 'messages') }}" title="{{ 'admin.archiver'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.archiver'|trans({}, 'messages') }}
+							</a>
+						</div>
+						<!-- Corbeille -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="corbeilleAll( getArticlesID() ); return false;" >
+								<div>
+										<img src="{{ asset('img/admin-img/corbeille.png')}}" alt="" title="" />
+								</div>{{ 'admin.corbeille'|trans({}, 'messages') }}
+							</a>
+						</div>                                                  
+                                                                                                
+						
+					{% elseif (statut == 3)  %}
+						
+						<div class="ecarSpecial stat-3but">&nbsp;</div>
+						
+						<!-- Publier -->
+						<div class="boutonGestion">
+						   <a href="javascript:void(0);" onclick="gererAll(getArticlesID(),4); ">
+								 <div><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans({}, 'messages') }}" title="{{ 'admin.publier'|trans({}, 'messages') }}" />
+								 </div>{{ 'admin.publier'|trans({}, 'messages') }}
+						   </a>
+						</div> 
+						
+						<div class="ecartBoutons-ArchCorb">&nbsp;</div>
+						
+						<!-- Archiver -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="archiveAll( getArticlesID() ); return false;" >
+								<div>
+								<img src="{{ asset('img/admin-img/archiver.png')}}" alt="{{ 'admin.archiver'|trans({}, 'messages') }}" title="{{ 'admin.archiver'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.archiver'|trans({}, 'messages') }}
+							</a>
+						</div>
+						<!-- Corbeille -->
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="corbeilleAll( getArticlesID() ); return false;" >
+								<div>
+										<img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.corbeille'|trans({}, 'messages') }}" title="{{ 'admin.corbeille'|trans({}, 'messages') }}" />
+								</div>{{ 'admin.corbeille'|trans({}, 'messages') }}
+							</a>
+						</div>  
+						
+					{% elseif (statut == 4)  %} 
+						
+						<!-- depublier -->
+						<div class="ecarSpecial stat-1but">&nbsp;</div>
+						<div class="boutonGestion">
+							<a href="javascript:void(0);" onclick="gererAll(getArticlesID(),5); return false;">
+								<div>
+										<img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.depublier'|trans({}, 'messages') }}" title="{{ 'admin.depublier'|trans({}, 'messages') }}" />
+								</div>
+								{{ 'admin.depublier'|trans({}, 'messages') }}
+							</a>
+						</div>     
+                                                        
+						{% endif %}
+
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+				                                        
+                                                {# STATISTIQUES #}  
+                                                {{ information.stats(listestat) }}  
+
+                                            
+                    </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+					
+                                  {#{dump(listestat1[1])}#}          
+                                            
+                                  {% if ((listestat1[0].valeur>0) or  (listestat1[1].valeur>0)) and (listestat1 is not null) %}
+					<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">                                             
+                                                    
+                                                         {% if (statut == 2)  and (id == 0) %}  
+                                                            {{ information.stat_alerte(listestat1,'[3]') }}  
+                                                         {% elseif (statut == 2)  and (id >0) %}    
+                                                            {{ information.stat_alerte(listestat1,'[24]') }} 
+                                                         {% elseif (statut == 3)  and (id == 0) %}
+                                                            {{ information.stat_alerte(listestat1,'[2]') }} 
+                                                         {% elseif (statut == 3)  and (id > 0) %}
+                                                            {{ information.stat_alerte(listestat1,'[23]') }}  
+                                                         {% else %}
+                                                            {{ information.stat_alerte(listestat1,'[2,3,24,23]') }}
+                                                         {% endif %}  
+                                                         {# ALERTE STATISTIQUES #}
+                                                    
+							<div class="clr"></div>
+						</div>			<!-- FIN colRightContentPadding-->
+					</div>
+                                 {% endif %}                                                        
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							{# <!--<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+									<option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+									<option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+									<option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+									<option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+									<option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+									<option>Présentation</option>
+									<option>Produits-Services</option>
+									<option>Actualités</option>
+									<option>FAQ</option>
+									<option>Brèves</option>
+								</select>
+								<select class="filterAutor">
+									<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+									<option>Armand K.</option>
+									<option>Benoit G.</option>
+									<option>Serges A.</option>
+								</select>
+								<select class="filterLanguage">
+									<option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+									<option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+									<option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+								</select>
+								<div class="clr"></div>
+							</div>	-->	#}				<!-- FIN filtersArticles-->												
+                                                            <table class="listMenusCateg listArticlesRub">
+                                                                    
+                                                                    {{ information.entete_article_avec_action() }} 
+                                                                    
+                                                                    {% for article in listearticle %}
+                                                                      {% if article.titreArticle is not null %}                                                                      
+                                                                        <tr {%if (statut == 4) %} id="recordsArray_{{article.id}}" {% endif %} {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+
+                                                                                <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                                                <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                
+                                                                                {{ information.statutlisteaccordeon(article) }} 
+                                                                                                                                                                
+                                                                                <td class="dateArtList"> {{article.nomRubrique}}</td>
+                                                                                <td class="autorArtList">
+                                                                                    {% for user in listeuser %}
+                                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                                             {{user.NameUser}}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}                                                                                    
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                <td class="langArtList"> {{locale}}</td>
+                                                                                <td class="numArtList"> {{'N°'~article.id}}</td>
+                                                                                
+                                                                                <td class="statutArtList">
+                                                                                    
+                                                                                    {% if article.statutArticle in [1,2,5,6] %}
+                                                                                            <a href="{{path('utb_admin_modifarticle', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                    {% elseif article.statutArticle == 3 %} 
+                                                                                            <a href="{{path('utb_admin_modifarticlevalide', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>                                                                                        
+                                                                                    {% elseif article.statutArticle == 4 %}         
+                                                                                            <a href="{{path('utb_admin_modifarticlepublie', {'id': article.id,'locale': locale,'type':article.idrubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                    {% endif %} 
+                                                                                        
+                                                                                </td>        
+                                                                        </tr>  
+                                                                      {% endif %} 
+                                                                    {% endfor %}
+
+                                                             </table>
+						<br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{#{ path('utb_admin_listearticleattente', { 'page': 1 }) }#}
+                                                           {{ path('utb_admin_ListeParStatut', {'id': id,'page': 1,'statut': statut,'locale': locale}) }} "> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_ListeParStatut', {'id': id, 'page': previous_page,'statut': statut,'locale': locale }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_ListeParStatut', { 'id': id, 'page': page,'statut': statut,'locale': locale }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_ListeParStatut', { 'id': id,'page': next_page,'statut': statut,'locale': locale }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_ListeParStatut', { 'id': id,'page': last_page,'statut': statut,'locale': locale }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> 
+                                                {#% if statut in [1..2] %}
+                                                    {{ 'admin.layout.menu.articles'|trans}} 
+                                                {% endif %#}
+                                               
+                                                {% if statut == 1 %}   <!-- DEBUT TRADUCTION PAR STATUT -->
+                                                   {{ 'admin.layout.menu.articlespar'|trans}}  
+                                                   {{ 'articles.liste.ecr'|trans({}, 'articles') }}
+                                                {% elseif statut == 6 %}   
+                                                   {{ 'admin.layout.menu.articlespar'|trans}}
+                                                   {{ 'articles.liste.rejected'|trans({}, 'articles') }} 
+                                                {% elseif statut == 2 %}
+                                                   {{ 'admin.layout.menu.articlespar'|trans}}
+                                                   {{ 'articles.liste.spv'|trans({}, 'articles') }}   
+                                                {% elseif statut == 3 %}      
+                                                   {{ 'admin.layout.menu.articlespar'|trans}}
+                                                   {{ 'articles.liste.eap'|trans({}, 'articles') }}   
+                                                {% elseif statut == 4 %} 
+                                                   {{ 'articles.liste.publies'|trans({}, 'articles') }}   
+                                                {% elseif statut == 5 %} 
+                                                   {{ 'admin.layout.menu.articlespar'|trans}}
+                                                   {{ 'articles.liste.depublies'|trans({}, 'articles') }}   
+                                                {% elseif statut == 0 %}       
+                                                   {{ 'articles.liste.horsligne'|trans({}, 'articles') }}   
+                                                {% endif %}      <!-- FIN TRADUCTION PAR STATUT -->
+                                               
+                                               
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+							
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>	
+
+                        {{ information.popupaddarticle(listeRubrique) }}                        
+ <script language="javascript" >
+       
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+           
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'articles.onearticle.confirmation2'|trans({}, 'articles') }}";
+       var htmldefault2 = "{{ 'articles.onearticle.confirmation3'|trans({}, 'articles') }}";
+       var htmldefault3 = "{{ 'articles.onearticle.confirmation4'|trans({}, 'articles') }}";
+       
+       //function pour supprimer plusieurs elements a la fois
+       function publishAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_publierAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblepub').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitepub').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }    
+    
+       //function gererAll( articlesId,etat){
+       function gererAll( articlesId,etat){
+         
+           if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+              
+            if (etat == 2) {   
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsub').html())};
+            }else if (etat == 3){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmval').html())};
+            }else if (etat == 4){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+            }else if (etat == 5){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdepub').html())};
+            }else if (etat == 6){
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmrej').html())};
+            }                           
+         
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+           $("#process_tpl").dialog('open'); 
+              return false;
+          }     
+          
+          if    (etat == 6) {   
+                $('#process_tpl').html($('#msgconfirmrej').html());
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmrej').html())};
+          }else if (etat == 2) {   
+                $('#process_tpl').html($('#msgconfirmsub').html());
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsub').html())};
+          }else if (etat == 3){
+                $('#process_tpl').html($('#msgconfirmval').html());
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmval').html())};
+          }else if (etat == 4){
+                $('#process_tpl').html($('#msgconfirmpub').html());
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmpub').html())};
+          }else if (etat == 5){
+                $('#process_tpl').html($('#msgconfirmdepub').html());
+                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdepub').html())};
+          }
+
+          //var args = {modal: true, autoOpen: false, title: ('Changer le statut des articles')};
+         
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+
+                            $('#process_tpl').html(html);                                                    
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gererAllarticles')}}",
+                                data: {articlesIds:articlesId,etat:etat},
+                                cache: false,
+                                success: function(data){ 
+                            
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        
+                                        if (etat == 6) {   
+                                              $('#process_tpl').html($('#impossiblerej').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 2) {   
+                                              $('#process_tpl').html($('#impossiblesub').html());
+                                              window.location.reload();
+                                        }                                        
+                                        
+                                        if (etat == 3){
+                                              $('#process_tpl').html($('#impossibleval').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 4){
+                                              $('#process_tpl').html($('#impossiblepub').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 5){
+                                              $('#process_tpl').html($('#impossibledepub').html());
+                                              window.location.reload();
+                                        }  
+                                         
+                               
+                                    }
+                                    else{
+                                                                                
+                                        if (etat == 6) {   
+                                              $('#process_tpl').html($('#reussiterej').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 2) {   
+                                              $('#process_tpl').html($('#reussitesub').html());
+                                              window.location.reload();
+                                        }                                        
+                                        
+                                        if (etat == 3){
+                                              $('#process_tpl').html($('#reussiteval').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 4){
+                                              $('#process_tpl').html($('#reussitepub').html());
+                                              window.location.reload();
+                                        }
+                                        
+                                        if (etat == 5){
+                                              $('#process_tpl').html($('#reussitedepub').html());
+                                              window.location.reload();
+                                        }     
+                                         //window.location.reload();                                                  
+                                    }                                                    
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }     
+    
+       //function pour archiver plusieurs articles a la fois(edem)
+       function archiveAll( articlesId ){
+       
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+
+              var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())}; 
+   
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmarch').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarch').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_archiveAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblearch').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitearch').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }            
+     
+       //function pour  supprimer plusieurs elements a la fois 
+       function corbeilleAll( articlesId ){
+    
+          if( articlesId.length == 0 ){              
+          $('#process_tpl').html($('#vide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmcorb').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+                              $('#process_tpl').html($('#msgconfirmcorb').html());        
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmcorb').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() { 
+                            $('#process_tpl').html(html);//
+                                           
+
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeilleAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblecorb').html());
+                                    }
+                                    else{
+                                        $('#process_tpl').html($('#reussitecorb').html());
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       }        
+           
+       
+</script>
+
+    {% if statut == 4 %}
+     <script>       
+            $(function() {
+
+                     $(".listArticlesRub tbody").sortable({ opacity: 0.6, cursor: 'move', update:
+                         function() {
+                             var order = $(this).sortable("serialize"); 
+                             $.ajax({
+                                 type: "POST",
+                                 url: "{{path('utb_admin_updateOrdreArticle',{ 'locale': locale, 'page':current_page})}}",
+                                 data: {formdata:order},
+                                 cache: false,
+                                 success: function(data){
+                                     var resJson = jQuery.parseJSON(data);
+                                      //console.log(resJson);
+                                 }
+                             });	                
+                         }								  
+                     });
+            }); 
+      </script> 
+    {%  endif %}
+
+    {{ information.msgjquerytranslate() }} 
+
+    {{ information.decochetoutbox() }}
+
+    <div id="process_tpl" style="display:none;"></div>   
+    
+{% endblock %}

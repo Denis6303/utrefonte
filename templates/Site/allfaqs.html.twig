@@ -1,0 +1,76 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - FAQ
+{% endblock %}
+  
+{% block public_body %}  
+ 	
+	<div class="span-24 marginBottom20p borderBotStyle paddingBottom20p bgBlanc">
+		<div class="span-24">	<!-- DEBUT COLONNE GAUCHE-->
+			<div class="listeDocuments leftSpace rightSpace">	<!-- DEBUT COLONNE GAUCHE-->                            
+                                <form action="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': 1,'locale':locale }) }}" method="post">
+                                    <h1 class="boxSection-titre bleuLogo tWithLeftBar">{{'faq.toutequestions'|trans({},'faqs') }}</h1>
+                                    <div class="filterPageBox coinsArrondis" style="width: 550px;">
+                                            <label class="labelLg">{{'faq.themequestion'|trans({},'faqs') }}</label>
+                                                <select name ="theme" class="" style="display: inline;">
+                                                        <option value="0">{{'faq.aucun'|trans({},'faqs') }}</option>
+                                                        {% for theme in listerubriquefaq  %}                                                        
+                                                           {% if id == theme.id %}                                                          
+                                                                <option value="{{theme.id}}" selected ="{{id}}" >{{theme.nomRubrique}}</option>
+                                                           {% else %}  
+                                                                <option value="{{theme.id}}"  >{{theme.nomRubrique}}</option>
+                                                           {% endif %}                                                                
+                                                        {% endfor %}
+                                                </select>
+                                            <input type="submit" value="{{'faq.rechercher'|trans({},'faqs') }}" style="display: inline;margin-top: 15px;margin-left: 20px;"/><div class="clr"></div>
+                                            
+                                    </div>		<!-- FIN filterPageBox coinsArrondis -->
+				<form>
+				<div class="resultsFilter rslfaqs">
+                                      <div class="paginResults">  
+                                         <div class="nbResults">{{total}}&nbsp;{{'faq.resultats'|trans({},'faqs') }}</div> 
+                                         {% if last_page > 1 %}
+                                              <div class="pagins">                                                  
+                                                  <a href="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': 1,'locale':locale }) }}"><< </a> 
+                                                  <a href="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': previous_page,'locale':locale }) }}"><</a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                            <a class="currentF" href="">{{ page }}</a>
+                                                        {% else %}
+                                                            <a href="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': page,'locale':locale}) }}">{{ page }}</a>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': next_page,'locale':locale }) }}"> > </a>
+                                                  <a href="{{ path('utb_admin_resultatFAQ', { 'id': id, 'page': last_page,'locale':locale }) }}"> >> </a>
+                                                  
+                                              </div>
+                                         {% endif %}   
+                                         <div class="clr"></div>
+                                      </div>
+                                     {# Fin Pagination #}					
+					<div class="allQR">	<!-- FAQ-->
+						<ul>
+                                                    {% for article in listearticlefaq %}
+							<li class="activeFaq">{{article.titreArticle}}
+								<ul style="padding: 10px;border-radius: 10px;">
+									<li>	<!-- Un seul LI imbriqué pour afficher la réponse à la qest dans le div qi suit -->
+										<div class="">	<!-- Réponse à la question dans le Div-->                                                                                                                                                                    
+										     {{article.descriptionArticle|raw}}                                                                                          
+						 				</div>	<!-- FIN DIV FIN Réponse à la question-->
+									</li>
+								</ul>
+							</li>
+                                                    {% endfor %}    
+						</ul>
+					</div>					
+				</div>
+			</div>		<!-- FIN listeDocuments leftSpace-->
+		</div>		<!-- FIN span-18-->		
+		<div class="span-6 last">	
+			&nbsp;
+		</div>	
+	</div>			<!-- FIN SPAN 24-->
+{% endblock %}
+  

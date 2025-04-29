@@ -1,0 +1,75 @@
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Toutes nos publications
+{% endblock %}
+  
+{% block public_body %}  
+ 	
+	<div class="span-24 marginBottom20p borderBotStyle paddingBottom20p bgBlanc">
+		<div class="span-18">	<!-- DEBUT COLONNE GAUCHE-->
+			<div class="listeDocuments leftSpace rightSpace">	<!-- DEBUT COLONNE GAUCHE-->
+				<h1 class="boxSection-titre bleuLogo tWithLeftBar">Toutes nos Publications</h1>
+                                <form  action=" {{ path("utb_site_rubrique", {'id': 4,'locale':locale, 'type':4}) }} " method="post"  id="ajoutImage">
+				<div class="filterPageBox coinsArrondis">
+					<label>Types document</label>
+					<select name="typecate">
+						<option value="0">Aucun</option>
+                                                {% for unnature in natureDoc %}
+                                                    <option value="{{unnature.getId()}}">{{unnature.getLibNatureDoc()}}</option>
+                                                {% endfor %}
+
+					</select>
+					<div class="clr"></div>
+					{#<label>Dates</label>
+					<select class="">
+						<option>2011</option>
+						<option>2012</option>
+						<option>2013</option>
+					</select>
+					<div class="clr"></div>#}
+					<input type="submit" value="Rechercher" />
+				</div>		<!-- FIN filterPageBox coinsArrondis -->
+				</form>
+				<div class="resultsFilter rsldocs">
+					{#<div class="paginResults">
+						<div class="nbResults">12 résultats</div>
+						<div class="pagins">
+							<a class="currentF" href="">1</a>
+							<a href="">2</a>
+							<a href="">3</a>
+							<a href="">4</a>
+						</div>
+						<div class="clr"></div>
+					</div>#}
+					<table>
+						<tr><th>Date</th> <th>Titre</th></tr>
+                                                
+                                                {% for publication in listepublication  %} 
+                                                                                                 
+						<tr>
+							<td class="oneDoc-date">{{publication.articleDateAjout|date("d/m/Y")}}</td> 
+							<td>
+								<div class="oneDoc">	<!-- un document-->
+									<img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+									<p class="oneDoc-titre"><a class="bleuLink" href="{{ asset('upload/articles/'~publication.urlMedia)}}">{{publication.titreArticle}}</a></p>
+									<div class="clr"></div>
+									<p class="oneDoc-descrp">{{publication.descriptionArticle|raw}}</p>
+									<p class="oneDoc-type bgGrisatr1"><span class="">Catégories:</span> <span class="bleuLogo">{{publication.libNatureDoc}}</span></p>
+								</div>
+							</td>
+						</tr>
+                                                {% endfor  %} 
+					</table>
+				</div>
+			</div>		<!-- FIN listeDocuments leftSpace-->
+		</div>		<!-- FIN span-19-->
+		
+		<div class="span-6 last">	
+			&nbsp;
+		</div>	
+	</div>			<!-- FIN SPAN 24-->
+{% endblock %}
+        
+        
+  

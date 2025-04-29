@@ -1,0 +1,24 @@
+	<form action=" " method="post" {{ form_enctype(form) }} id="ajoutAgence" class="">
+		<div class="FrmAbonne champsGrp">
+			{{ form_errors(form.codeAgence) }}
+			{{ form_label(form.codeAgence, 'agence.form.code'|trans({}, 'agences')) }}
+			{{ form_widget(form.codeAgence) }}
+                    
+			{{ form_errors(form.libAgence) }}
+			{{ form_label(form.libAgence, 'agence.form.lib'|trans({}, 'agences')) }}
+			{{ form_widget(form.libAgence) }}
+			
+			{{ form_errors(form.telAgence) }}
+			{{ form_label(form.telAgence, 'agence.form.tel'|trans({}, 'agences')) }}
+			{{ form_widget(form.telAgence) }}
+			
+			
+			{{ form_errors(form.adresseAgence) }}
+			{{ form_label(form.adresseAgence, 'agence.form.adresse'|trans({}, 'agences')) }}
+			{{ form_widget(form.adresseAgence) }}
+			
+                       
+			<div class="clr"></div>
+		</div>
+		<input type="submit" class="boutonSubmit" value="{{ 'client.ajouter'|trans({}, 'messages') }} " name="op" id="j_bouton">
+	</form>

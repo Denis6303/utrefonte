@@ -1,0 +1,110 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'rubriques.ajout.grandtitrepg'|trans({}, 'rubriques') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+       <!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }}</a> {% for rubrique in larubrique%}{% if rubrique.nomRubrique!="" %}> <a href="{{path('utb_admin_detailrubrique',{'locale': locale,'id':rubrique.id})}}">{{rubrique.nomRubrique}}</a>{% endif %}{% endfor %} > {{ 'articles.ajout.grandtitrepg'|trans({}, 'articles') }}
+            </div>
+
+  <div class="span-25">     <!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris"> <!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+                <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article-add.png')}}" alt="{{ 'articles.ajout.titre1'|trans({}, 'articles')}}" title="{{ 'articles.grandsoustitre'|trans({}, 'articles')}}" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'articles.liste.titrepg.ajoutpublication'|trans({}, 'articles') }} <span> {{ 'articles.ajout.titre2'|trans({}, 'articles') }}<h1></div>	
+                        <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>          <!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>            <!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">           <!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">            <!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">         <!-- COLONNE GAUCHE-->
+
+                                      {# STATISTIQUES #}    
+                                      {{ information.stats(listestat) }}                                   
+
+                                  </div>      <!-- Fin COLONNE COLLEFT-->
+                              </div>        <!-- Fin COLONNE GAUCHE span 6-->
+
+
+						  <div class="span-19 last">            <!-- COLONNE DROITE-->
+							  <div class="colRight">            <!-- COLONNE DROITE-->
+
+								  <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+									  <div class="colRightContentPadding">
+										{#<h2 class="titleArticle colorBleu"><a href=" {{ path("utb_admin_detailarticle",{'locale': locale,'type': type, 'id': id}) }}" >{{larticleAnglais.getTitreArticle}} </a></h2><hr />#}  
+										<form action=" {{ path("utb_admin_languearticle",{'locale': locale,'type': type, 'id': id}) }} " method="post" {{ form_enctype(form) }} id="ajoutRubrique">
+                                                          
+											<div class="FrmAjoutArt">
+											{{ form_errors(form.titreArticle) }}
+											<span class="labelCourt">
+											{{ form_label(form.titreArticle, 'articles.form.titre'|trans({}, 'articles')) }}</span> 
+											{{ form_widget(form.titreArticle) }}
+											<div class="clr"></div>
+											</div>
+												
+											<div class="FrmAjoutArt">
+											{{ form_errors(form.descriptionArticle) }}
+											<span class="labelNoFloat">
+											{{ form_label(form.descriptionArticle, 'articles.form.desc'|trans({}, 'articles')) }}</span> 
+											{{ form_widget(form.descriptionArticle) }}
+											</div>										
+                                 
+											<input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none"><a href=""></a>
+										</form>
+                                            
+									  </div>      <!-- FIN colRightContentPadding-->
+								  </div>      <!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+								  
+								  <div class="bottomButAction coinsArrondisMin colorCadreArrondi bgGris">
+										<div class="ecartBoutonsForBottom">&nbsp;</div>
+										<div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="#" class="back"  ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+								</div>     	 <!-- div.bottomButAction-->  
+							  </div>    <!--  FIN COL RIGHT -->
+						  </div>      <!--  FIN  SPAN - 19 -->
+
+					  </div>        <!--  FIN SPAN - 25 -->
+  
+                      {{ information.popupaddarticle(listeRubrique) }}  
+
+  {% endblock %}

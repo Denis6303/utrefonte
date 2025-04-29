@@ -1,0 +1,245 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Informations d'un utilisateur
+{% endblock %}
+  
+  {% block administration_body %}
+  {% for user in unUser %}
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_userProfilListe',{'locale': locale})}}" title="{{ 'admin.layout.menu.titreusers'|trans}}">{{ 'admin.layout.menu.users'|trans }}</a> > 
+                <a href="{{path('liste_utilisateur', {'locale': locale})}}">{{ 'users.liste.grandtitrepg'|trans({}, 'users') }}</a> > {{ 'users.fiche'|trans({}, 'users')}}
+            </div><!-- {{path('utb_admin_listeprofil',{ 'locale': locale })}} 
+			{{path('liste_utilisateur')}}-->
+  
+    {% for contenu in app.session.flashbag.get('notice') %}
+        {% if contenu == "success" %}
+            <div class="span-25">
+                <div class="success successMsg">                        
+                        {{ 'users.addsuccess'|trans({}, 'users') }}
+                </div>    
+            </div> 
+        {% endif %}
+        {% if contenu == "errortypficart" %}
+                        <div class="span-25">
+                             <div class="error errorMsg">
+            {{ 'notification.errortype'|trans({}, 'articles') }}
+                             </div>
+                        </div> 
+       {% endif %}
+       {% if contenu == "successmodifmediaart" %}
+                       <div class="span-25">
+                            <div class="success successMsg">
+           {{ 'notification.modifmediabn'|trans({}, 'articles') }}
+                            </div>
+                       </div> 
+      {% endif %}
+  
+      {% if contenu == "modifsuccess" %}
+            <div class="span-25">
+                <div class="success successMsg">                        
+                        {{ 'users.modifsuccess'|trans({}, 'users') }}
+                </div>    
+            </div> 
+      {% endif %} 
+
+      {% if contenu == "errancienpwd" %}
+            <div class="span-25">
+                <div class="success successMsg">                        
+                        {{ 'users.errancienpwd'|trans({}, 'users') }}
+                </div>    
+            </div> 
+      {% endif %}                         
+
+      {% if contenu == "passworderror" %}
+            <div class="span-25">
+                <div class="success successMsg">                        
+                        {{ 'users.passworderror'|trans({}, 'users') }}
+                </div>    
+            </div> 
+      {% endif %}                         
+                        
+    {% endfor %}
+  
+	<div class="span-25">			<!-- Contien les menus -->
+		<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+			<div class="span-19">
+				<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="" title="" /></div>
+				<div class="titreModule colorBleu"><h1>{{'users.detail.titre1'|trans({}, 'users')}} <span>: {{ 'users.detail.titre2'|trans({}, 'users')}}</span></h1></div>	
+				<div class="clr"></div>
+			</div>
+			<div class="span-5 last"> &nbsp;</div>					<!--  FIN allBoutonsGestion -->
+			<div class="clr"></div>
+		</div>						<!--  FIN toulbar 3 -->
+	</div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+	<div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+		<div class="MarginBottomBox"></div>
+
+		<div class="span-6">						<!-- COLONNE GAUCHE-->
+			<div class="colLeft">					<!-- COLONNE GAUCHE-->
+			{# BOX INFOS }    
+			{{ information.boxinfos(infos,infos.paramDescription,infos.actif) }
+			#}
+			{{ information.statsdynamique(listestat) }} 
+		</div>			<!-- Fin COLONNE COLLEFT-->
+		</div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+		<div class="span-19 last">						<!-- COLONNE DROITE-->
+			<div class="colRight">	
+				<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+				<div class="colRightContentPadding">
+				
+					<div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+						<div class="FrmAjoutArt FrmTopDetailArt FrmInArticleTop" id="modifPhoto_container" style="display:none;">
+							<div style="float:left;">
+								{{ render(controller('utbUserBundle:User:modifier', {'id': user.id,'locale':locale,'genre':1})) }}  
+							</div>
+							<a href="#" class="noSoulignHover" onClick="AnnulerPhoto(); return false;">{{'admin.annuler'|trans}}</a>
+							<div class="clr"></div>
+						</div>
+						
+						<div class="boxImgFloatLeft avatarUserDetail">
+
+
+                                                                <img class="ilustrArticleImg" src="{{ asset('upload/photos/'~user.urlPhoto)}}" alt="utilisateur" title="utilisateur" width="200" height="150" />
+                                                      
+                                                        
+							{%if userid == user.id %}
+							<div class="butGestImgIlustr">
+							<p class="updateImgInArt"><a class="updateLink" href="#" onClick="modifierPhoto(); return false;">{{ 'admin.modifimgul2'|trans({}, 'messages') }}</a></p> </div>  
+							{% endif %}
+						</div>
+						
+						<div class="detailsInfoUsers">
+							<h2 class="colorBleu">{{user.libProfil}}</h2>
+							<fieldset class="colorCadreArrondi">
+								<legend>Infos Générales</legend>
+								<div class="FrmAjoutArt">
+									<div class="MarginLeftBox">
+										<label class="colorBleu">{{ 'users.form.nom'|trans({}, 'users')}} :</label> 
+										<span class="">{{user.nameUser}}</span>
+									<div class="clr"></div></div>
+									
+									<div class="MarginLeftBox">
+										<label class="colorBleu">E mail :</label> 
+										<span class="">{{user.email}}</span>
+									<div class="clr"></div></div>
+                                                                        
+									<div class="">
+                                    <label class="colorBleu">Login :</label> 
+									<span class="">{{user.username}}</span>
+									<div class="clr"></div></div>
+								</div>
+								{%if userid == user.id %}
+								<a href="#" class="a1a noSoulignHover" onClick="modifierFicheUser(); return false;">{{ 'admin.modifier'|trans({}, 'messages') }}</a>
+								{% endif %}
+								<div class="clr"></div>
+							</fieldset>					
+							
+							<fieldset class="colorCadreArrondi">
+								<legend>Mot de passe</legend>
+								<div class="FrmAjoutArt">
+									<label class="colorBleu">{{ 'users.form.pass'|trans({}, 'users')}}</label>
+									<span class="">********</span>
+									<div class="clr"></div>
+								</div>
+								{%if userid == user.id %}
+								<a href="#" class="a2a noSoulignHover" onClick="modifierPwd(); return false;">{{ 'admin.modifier'|trans({}, 'messages') }}</a>
+							{% endif %}
+								<div class="clr"></div>
+							</fieldset>					
+						<div class="clr"></div>
+						</div>	<!-- FIN detailsInfoUsers -->
+					</div>		<!-- FrmAjoutArt colorCadreArrondi bgBlanc -->
+					
+					
+					
+					<div class="FrmAjoutArt FrmTopDetailArt FrmUserIn" id="modifFicheUser_container" style="display:none;">
+						<div class="FrmUserIn2">
+						{{ render(controller('utbUserBundle:User:modifSuivantType', {'id': user.id,'locale':locale,'type':2})) }}  
+						<div class="clr"></div></div>
+						<div class="noEffectBack"><a href="#" onClick="AnnulerFicheUser(); return false;">{{'admin.annuler'|trans}}</a></div>
+						<div class="clr"></div>
+					</div> 
+					<div class="FrmAjoutArt FrmTopDetailArt FrmUserIn" id="modifPwd_container" style="display:none;">
+						<div class="FrmUserIn2">
+						{{ render(controller('utbUserBundle:User:modifSuivantType', {'id': user.id,'locale':locale,'type':1})) }}  
+						<div class="clr"></div></div>
+						<div class="noEffectBack"><a href="#" class="" onClick="AnnulerPwd(); return false;">{{'admin.annuler'|trans}}</a></div>
+						<div class="clr"></div>
+					</div>                                                              
+												
+				</div>			<!-- FIN colRightContentPadding-->
+				</div>			<!-- FIN MarginBottomBox colorCadreArrondi coinsArrondis bgGris-->
+			</div>				<!--  FIN COL RIGHT -->
+		</div>					<!--  FIN  SPAN - 19 -->
+	</div>						<!--  FIN SPAN - 25 -->
+
+  {% endfor %}
+<script language="javascript" >  
+      function modifierPhoto(){
+       
+             $("#modifPhoto_container").show(); 
+             $("#modifFicheUser_container").hide();
+             $("#modifPwd_container").hide();             
+            var html = '<a class="updateLink" href="#" onClick="AnnulerPhoto( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);
+       }
+       
+      function AnnulerPhoto(){
+           
+           $("#modifPhoto_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul2'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+            
+       }   
+       
+       function modifierFicheUser(){
+             $("#modifPhoto_container").hide();
+             $("#modifFicheUser_container").show();
+             $("#modifPwd_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerFicheUser(){
+           
+           $("#modifFicheUser_container").hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierFicheUser( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }
+       
+       function modifierPwd(){
+       
+             $("#modifPwd_container").show(); 
+             $("#modifPhoto_container").hide();
+             $("#modifFicheUser_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerPwd( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerPwd(){
+           
+           $("#modifPwd_container").hide();   
+           /* var html = '<a class="updateLink" href="#" onClick="modifierPwd( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }
+       
+      $( document ).ready(function() {
+        $(".ilustrArticleImg").mouseover( function() {$(".butGestImgIlustr").show() });
+      })
+      
+</script>
+  {% endblock %}
+  

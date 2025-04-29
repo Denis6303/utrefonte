@@ -1,0 +1,193 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{'abonnes.infosabonnes.titre'|trans({},'abonnes') }}
+{% endblock %}
+  
+  {% block client_centre_body %}
+  {% for abonne in unAbonne %}
+    {% for contenu in app.session.flashbag.get('notice') %}
+  
+      {% if contenu == "modifpwdsuccess" %}
+			<div class="success leftSpace rightSpace center">                        
+				{{ 'abonnes.modifpwdsuccess'|trans({}, 'abonnes') }}
+			</div>    
+      {% endif %}
+                        
+    {% endfor %}
+  
+
+  
+  
+	<ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'abonnes.perso'|trans({},'abonnes') }}</li>
+	</ul>
+
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'abonnes.code'|trans({},'abonnes') }}</h2>
+	{#	{{'abonnes.detail.titre1'|trans({}, 'abonnes')}} <span>: {{ 'abonnes.detail.titre2'|trans({}, 'abonnes')}}	#}
+	
+	<div class="marginBottom20p">
+		<div>
+			<h3 class="oneCompte titleStyleTB title3 bleuLink shortTitle"><a href="#">{{'abonnes.form.adresse'|trans({},'abonnes') }}</a></h3>
+			<!-- <div class="printBut"> <a href="" title="Imprimer le détail des transactions">Imprimer</a></div> -->
+			<div class="clr"></div>
+		</div>
+		<table class="infoCompte">
+			<tr><td style="width:310px">{{'abonnes.form.nomPrenom2'|trans({},'abonnes') }}</td> <td>{{abonne.nomPrenom}}</td></tr>
+			<tr><td>{{'abonnes.form.email'|trans({},'abonnes') }}</td> <td>{{abonne.email}}</td></tr>
+			<tr><td>{{'abonnes.form.tel'|trans({},'abonnes') }}</td> <td>{% if abonne.telAbonne !="" %}{{abonne.telAbonne}}{%else%}-{% endif %}</td></tr>
+			<tr><td>{{'abonnes.form.cel'|trans({},'abonnes') }}</td> <td>{% if abonne.celAbonne !="" %}{{abonne.celAbonne}}{%else%}-{% endif %}</td></tr>
+			<tr><td>{{'abonnes.form.adresse'|trans({},'abonnes') }}</td> <td>{% if abonne.adresseAbonne !="" %}{{abonne.adresseAbonne}}{%else%}-{% endif %}</td></tr>
+		</table>
+		<div class="rightPosition">
+            <a href="{{ path("utb_client_envoimessagerieabonne",{'locale':locale,'type':4,'typemsg':1}) }}" class="boutonLink">{{'abonnes.demande'|trans({},'abonnes') }}</a>
+        <div class="clr"></div>
+    </div>
+	</div>	<!-- FIN div.marginBottom10p-->
+	
+	<div>
+		<h3 class="operCompte titleStyleTB title3 bleuLink shortTitle"><a href="#">{{'abonnes.code2'|trans({},'abonnes') }}</a></h3>
+		<div class="clr"></div>
+	</div>
+		
+	<!-- <h4 class="title3">CONRAD Blewoussi</h4> -->
+	<table class="infoCompte">
+		<tr> <td style="width:310px">{{'abonnes.form.username'|trans({},'abonnes') }}</td> <td>{{abonne.username}}</td> </tr>
+		<tr> <td>{{'abonnes.form.password'|trans({},'abonnes') }}<!-- {{'abonnes.form.pass'|trans({}, 'abonnes')}} --></td> <td class="bleuLogo">* * * * *</td> </tr>
+	</table>
+	<div class="rightPosition">
+            <a href="{{ path("utb_client_change_infosabonne",{'locale':locale,'type':1}) }}" class="boutonLink">{{'abonnes.form.modifPwd'|trans({},'abonnes') }}</a>
+        <div class="clr"></div>
+    </div>
+		
+	
+
+{#<h2 class="colorBleu">{{abonne.libProfil}}</h2>#}
+							
+{#%if abonneid == abonne.id %#}
+{#% endif %#}
+
+{#%if abonneid == abonne.id %#}
+{#% endif %#}
+	
+                                        
+
+					
+					
+                                                            
+{#% if type_user == "abonne" %} 		
+	<table class="listMenusCateg listArticlesRub">
+	<tr>
+	<th><input type="checkbox" class="checkall" name="checkall" /></th>
+
+	<th>{{'chargement.numcpt'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.typecpte'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.libop'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.mtt'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.dateval'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.dateop'|trans({}, 'chargement')}}</th>
+	</tr>	
+
+	{% for operation in listeOperation %} 
+	<tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+	<td class="statutArtList"> <input type="checkbox" name="operation[]"  rel="operation_c" value="{{operation.id}}" /> </td>
+
+	<td class="titreList"> {{operation.numeroCompte|raw }} </td> 
+	<td class="titreList"> {{operation.libTypeCompte|raw }} </td> 
+	<td class="titreList"> {{operation.libOperation|raw }} </td> 
+	<td class="titreList"> {{operation.montant|raw }} </td>
+	<td class="titreList"> {{operation.dateValeur|date("d/m/Y") }} </td> 
+	<td class="titreList"> {{operation.dateOperation|date("d/m/Y") }} </td>
+
+	</tr>
+	{% else %}
+	<tr>
+	<td colspan="4">{{ 'chargement.operation.none'|trans({}, 'chargement') }} </td>       
+	</tr>       
+	{% endfor %}                                                                                                       
+	</table>  
+
+
+	<table class="listMenusCateg listArticlesRub">
+	<tr>
+	<th><input type="checkbox" class="checkall" name="checkall" /></th>
+
+	<th>{{'chargement.numcpt'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.typecpte'|trans({}, 'chargement')}}</th>
+	<th>{{'chargement.libop'|trans({}, 'chargement')}}</th>
+
+	</tr>	
+
+	{% for unsolde in listeSolde %} 
+	<tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+	<td class="statutArtList"> <input type="checkbox" name="operation[]"  rel="operation_c" value="{{unsolde.id}}" /> </td>
+
+	<td class="titreList"> {{unsolde.numeroCompte|raw }} </td> 
+	<td class="titreList"> {{unsolde.solde|raw }} </td>
+	{% if unsolde.solde > 0 %}
+	<td class="titreList"> + </td> 
+	{% else %}
+	<td class="titreList"> - </td>
+	{% endif %}
+	</tr>
+	{% else %}
+	<tr>
+	<td colspan="4">{{ 'chargement.operation.none'|trans({}, 'chargement') }} </td>       
+	</tr>       
+	{% endfor %}                                                                                                       
+	</table>                                       
+                              {% endif %#}
+	
+
+  {% endfor %}
+<script language="javascript" >           
+       function modifierFicheAbonne(){
+           
+             $("#modifPhoto_container").hide();
+             $("#modifFicheAbonne_container").show();
+             $("#modifPwd_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheAbonne( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerFicheAbonne(){
+           
+           $("#modifFicheAbonne_container").hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierFicheAbonne( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }
+       
+       function modifierPwd(){
+       
+             $("#modifPwd_container").show(); 
+             $("#modifPhoto_container").hide();
+             $("#modifFicheAbonne_container").hide();
+
+            var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerPwd( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerPwd(){
+           
+           $("#modifPwd_container").hide();   
+           /* var html = '<a class="updateLink" href="#" onClick="modifierPwd( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       }
+       
+      $( document ).ready(function() {
+        $(".ilustrArticleImg").mouseover( function() {$(".butGestImgIlustr").show() });
+      })
+      
+</script>
+  {% endblock %}
+  

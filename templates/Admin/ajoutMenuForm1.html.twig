@@ -1,0 +1,717 @@
+		
+                    <form method="POST" id="form_menu">  
+                        <input type="hidden" name="idgroupemenu" id="idgroupemenu" value="">
+                    <table class="typeMenu" id="form1">
+			<tr>
+                            <td class="radioTypeMenu"><input type="hidden" name="locale" id="locale" value="{{locale}}"/> </td>
+                            <td class="iconTypeMenu"> </td>
+                            <td class="libTypeMenu"> </td>
+                            <td class="commentTypeMenu"> </td>
+			</tr>
+                        <tr>
+                            <td><input type="radio" name="typeMenu" value="1" class="typeMenuRadio"/></td>
+                            <td><img src="{{ asset('img/admin-img/menus_accueil.png')}}" alt="Public Link" title="Article en ligne" /></td>
+                            <td>{{ 'admin.accueil'|trans({}, 'messages') }}</td>
+                            <td class="commentTypeMenu">{{ 'menus.ajoutlienaccueil'|trans({}, 'menus') }}</td>
+			</tr>
+			{#<tr>
+                            <td><input type="radio" name="typeMenu" value="2"/></td>
+                            <td><img src="{{ asset('img/admin-img/menus_rubriques.png')}}" alt="Public Link" title="Liste ou arborescence de rubrique" /></td>
+                            <td>Articles de rubrique</td>
+                            <td class="commentTypeMenu">Ajoute un lien dirigeant vers une page de garde des articles de la rubrique</td>
+			</tr>
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="3" /></td>
+                            <td><img src="{{ asset('img/admin-img/menus_articles_rubrique.png')}}" alt="Public Link" title="Articles de rubrique" /></td>
+                            <td>Liste ou arborescence de rubrique</td>
+                            <td class="commentTypeMenu">Ajoute un lien présentant les sous - rubriques de la rubrique parent</td>
+			</tr>#}
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="4" class="typeMenuRadio"/></td>
+                            <td><img src="{{ asset('img/admin-img/menus_objet.png')}}" alt="{{ 'menus.lienpublic'|trans({}, 'menus') }}" title="{{ 'menus.lienrubrique'|trans({}, 'menus') }}" /></td>
+                            <td>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</td>
+                            <td class="commentTypeMenu">{{ 'menus.ajoutlienpagerubrique'|trans({}, 'menus') }}</td>
+			</tr>
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="5" class="typeMenuRadio"/></td>
+                            <td><img src="{{asset('img/admin-img/icon-24-article.png')}}" alt="{{ 'menus.lienpublic'|trans({}, 'menus') }}" title="{{ 'menus.lienarticle'|trans({}, 'menus') }}" /></td>
+                            <td>{{ 'articles.ajout.titre1'|trans({}, 'articles') }}</td>
+                            <td class="commentTypeMenu">{{ 'menus.ajoutlienarticle'|trans({}, 'menus') }}</td>
+			</tr>
+								
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="6" class="typeMenuRadio"/></td>
+                            <td><img src="{{asset('img/admin-img/menus_page_speciale.png')}}" alt="{{ 'menus.lienpublic'|trans({}, 'menus') }}" title="{{ 'menus.liensquelette'|trans({}, 'menus') }}" /></td>
+                            <td>{{ 'menus.liensquelette'|trans({}, 'menus') }}</td>
+                            <td class="commentTypeMenu">{{ 'menus.lienpagespeciale'|trans({}, 'menus') }}</td>
+			</tr>
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="7" class="typeMenuRadio"/></td>
+                            <td><img src="{{asset('img/admin-img/menus_lien.png')}}" alt="{{ 'menus.lienpublic'|trans({}, 'menus') }}" title="{{ 'menus.lienarticleexterne'|trans({}, 'menus') }}" /></td>
+                            <td>{{ 'menus.pageexterne'|trans({}, 'menus') }}</td>
+                            <td class="commentTypeMenu">{{ 'menus.lienpageexterne'|trans({}, 'menus') }}</td>
+			</tr>
+                        {#
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="8" /></td>
+                            <td><img src="{{asset('img/admin-img/menus_lien.png')}}" alt="Public Link" title="Lien vers Article Externe" /></td>
+                            <td>Modele de Page 1 </td>
+                            <td class="commentTypeMenu">Lien allant vers le  modele 1</td>
+			</tr>  
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="9" /></td>
+                            <td><img src="{{asset('img/admin-img/menus_lien.png')}}" alt="Public Link" title="Lien vers Article Externe" /></td>
+                            <td>Modele de Page 2 </td>
+                            <td class="commentTypeMenu">Lien allant vers le  modele 2</td>
+			</tr> 
+                        
+			<tr>
+                            <td><input type="radio" name="typeMenu" value="10" /></td>
+                            <td><img src="{{asset('img/admin-img/menus_lien.png')}}" alt="Public Link" title="Lien vers Article Externe" /></td>
+                            <td>Modele de Page 3 </td>
+                            <td class="commentTypeMenu">Lien allant vers le  modele 3</td>
+			</tr>  #}
+		</table>     
+
+		<div class="FrmAjoutArt" id="form2" style="display:none; float:left;">
+                    <div class="MarginBottomBox ">
+                            <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.titrefacultatif'|trans({}, 'menus') }}</span> 
+                            <input type="text" name="titreMemu" id="titreMemu" style="width:300px;">
+                            <div class="clr"></div>
+                    </div> 
+                    <div class="">
+                            <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.menuparent'|trans({}, 'menus') }} :</span>
+                            <select class="" name="menuParent" id="menuParent">
+                                <option value="0">{{ 'menus.aucun'|trans({}, 'menus') }}</option>
+                                {% for pMenu in listePmenu %}
+                                    <option value="{{ pMenu.getId }}">{{ pMenu.getLibMenu }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="clr"></div>
+                    </div>
+                        
+                        
+                    <div id="rubrique_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.typepresentation'|trans({}, 'menus') }}</span>
+                        
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {#% for rb in rubriques %#}
+                                   <option value="1">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'menus.rubriqueparent'|trans({}, 'menus') }} 1</option>
+                                   <option value="12">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'menus.rubriqueparent'|trans({}, 'menus') }} 2</option>
+                                   <option value="13">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'menus.rubriqueparent'|trans({}, 'menus') }} 3</option>
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}1</option>
+                                   <option value="2">{{ 'menus.presentation'|trans({}, 'menus') }}2</option>
+                                   <option value="7">{{ 'menus.presentation'|trans({}, 'menus') }}3</option>
+                                   <option value="6">{{ 'menus.presentation'|trans({}, 'menus') }}4</option>
+                                   <option value="16">{{ 'menus.presentation'|trans({}, 'menus') }}5</option>
+                                   <option value="3">{{ 'menus.presentation'|trans({}, 'menus') }}6</option>
+                                   <option value="8">{{ 'menus.correspondant'|trans({}, 'menus') }}7</option>
+                                   <option value="17">{{ 'menus.correspondant'|trans({}, 'menus') }}8</option>
+
+                              {#% endfor %#}
+                        </select>                        
+                        <div class="clr"></div>
+                        <div >
+                            <h3 id="presentitlus"><span class="colorBleu">Voir nos présentations</span></h3>
+                            <div id="contentitlus" style="display:none;">
+                            <table>
+                               <tr>
+                                   <td>
+                                       
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_9.jpg')}}" data-lightbox="Image_12">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} 1</a></div>                                       
+                                        {#<img src="{{ asset('img/admin-img/pres1.png')}}" alt="{{ 'menus.presentation'|trans({}, 'menus')}} 1" title="{{ 'menus.presentation'|trans({}, 'menus')}} 1"  width="50"/>#}
+                                   </td>   
+                                   <td>                                                                            
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_12.jpg')}}" data-lightbox="Image_13">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} 2</a></div>                                       
+ 
+                                   </td>                                    
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_13.jpg')}}" data-lightbox="Image_14">{{ 'menus.presentation'|trans({}, 'menus')}} {{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} 3</a></div>   
+                                   </td>                                                                                              
+                               </tr>  
+                               
+                               <tr>
+                                   <td>
+                                       
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_1.jpg')}}" data-lightbox="Image_1">{{ 'menus.presentation'|trans({}, 'menus')}} 1</a></div>                                       
+                                        {#<img src="{{ asset('img/admin-img/pres1.png')}}" alt="{{ 'menus.presentation'|trans({}, 'menus')}} 1" title="{{ 'menus.presentation'|trans({}, 'menus')}} 1"  width="50"/>#}
+                                   </td>   
+                                   <td>                                                                            
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_2.png')}}" data-lightbox="Image_2">{{ 'menus.presentation'|trans({}, 'menus')}} 2</a></div>                                       
+ 
+                                   </td>                                    
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_3.jpg')}}" data-lightbox="Image_3">{{ 'menus.presentation'|trans({}, 'menus')}} 3</a></div>   
+                                   </td>                                                                                              
+                               </tr>  
+                               <tr>
+
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_4.jpg')}}" data-lightbox="Image_4">{{ 'menus.presentation'|trans({}, 'menus')}} 4</a></div> 
+                                   </td>                                                                                             
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_5.jpg')}}" data-lightbox="Image_5">{{ 'menus.presentation'|trans({}, 'menus')}} 5</a></div>
+                                   </td>                                                
+
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_6.jpg')}}" data-lightbox="Image_6">{{ 'menus.presentation'|trans({}, 'menus')}} 6</a></div>
+                                   </td>                                                
+                                               
+                               </tr>  
+                               <tr>
+
+                                   <td>
+                                        <div class=""><a href="{{ asset('img/admin-img/Presentation_5.jpg')}}" data-lightbox="Image_5">{{ 'menus.presentation'|trans({}, 'menus')}} 7</a></div>
+                                   </td>                                                
+
+
+                                   <td>
+                                     <div class=""><a href="{{ asset('img/admin-img/Presentation_7.jpg')}}" data-lightbox="Image_7">{{ 'menus.presentation'|trans({}, 'menus')}} 8</a></div >   
+                                   </td>                                                
+                                   <td>
+                                        
+                                   </td>                                               
+                               </tr>                                
+                                
+                            </table>
+                            </div>
+                        </div><!-- Fin div#menuaccordion -->
+                        
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.rubriqueparent'|trans({}, 'menus') }}:</span>
+                        <select class="" name="rubrique" id="form_rubrique">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+
+
+                    </div>
+                    
+                        
+                    <div id="rubriquearborescence_container" style="display:none;">
+                        {#<span class="colorBleu" style="width:120px; float:left;">Type de présentation article </span>
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">--- Sélectionnez un --- </option>
+                             {#% for rb in rubriques %}
+                                   <option value="2">Presentation1</option>
+                                   <option value="3">Presentation2</option>
+                                   <option value="4">Presentation3</option>
+                                   <option value="5">Presentation4</option>
+                                   <option value="6">Presentation5</option>
+                                   <option value="8">Correspondant</option>
+                              {% endfor %}
+                        </select>  #}                      
+                        <div class="clr"></div> 
+                        
+                        <span class="colorBleu" style="width:120px; float:left;">Rubrique Parent :</span>
+                        <select class="" name="rubrique" id="form_rubriquearborescence">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>                       
+                    </div>
+                        
+                        
+                    <div id="rubriquearticles_container" style="display:none;">
+                       {# <span class="colorBleu" style="width:120px; float:left;">Type de présentation</span>
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">--- Sélectionnez un --- </option>
+                             {#% for rb in rubriques %}
+                                   <option value="2">Presentation1</option>
+                                   <option value="3">Presentation2</option>
+                                   <option value="4">Presentation3</option>
+                                   <option value="5">Presentation4</option>
+                                   <option value="6">Presentation5</option>
+                                   <option value="8">Correspondant</option>
+                              {#% endfor %
+                        </select>  #} 
+                            
+                        <div class="clr"></div>                           
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.rubriqueparent'|trans({}, 'menus') }}:</span>
+                        <select class="" name="rubrique" id="form_rubriquearticles">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                    </div>
+                        
+                    <div id="modele1_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.typepresentation'|trans({}, 'menus') }}</span>
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {#% for rb in rubriques %#}
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}1</option>
+                                   <option value="2">{{ 'menus.presentation'|trans({}, 'menus') }}2</option>
+                                   <option value="7">{{ 'menus.presentation'|trans({}, 'menus') }}3</option>
+                                   <option value="6">{{ 'menus.presentation'|trans({}, 'menus') }}4</option>
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}5</option>
+                                   <option value="10">{{ 'menus.presentation'|trans({}, 'menus') }}6</option>
+                                   <option value="8">{{ 'menus.correspondant'|trans({}, 'menus') }}</option>
+                              {#% endfor %#}
+                        </select>                        
+                        <div class="clr"></div>                         
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.rubriqueparente'|trans({}, 'menus') }} :</span>
+                        <select class="" name="rubrique" id="form_modele1">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                       
+                    </div>  
+                        
+                    <div id="modele2_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.typepresentation'|trans({}, 'menus') }}</span>
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {#% for rb in rubriques %#}
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}1</option>
+                                   <option value="2">{{ 'menus.presentation'|trans({}, 'menus') }}2</option>
+                                   <option value="7">{{ 'menus.presentation'|trans({}, 'menus') }}3</option>
+                                   <option value="6">{{ 'menus.presentation'|trans({}, 'menus') }}4</option>
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}5</option>
+                                   <option value="10">{{ 'menus.presentation'|trans({}, 'menus') }}6</option>
+                                   <option value="8">{{ 'menus.correspondant'|trans({}, 'menus') }}</option>
+                              {#% endfor %#}
+                        </select>                        
+                        <div class="clr"></div> 
+                        
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.rubriqueparent'|trans({}, 'menus') }} :</span>
+                        <select class="" name="rubrique" id="form_modele2">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                    </div>
+                        
+                    <div id="modele3_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.typepresentation'|trans({}, 'menus') }}</span>
+                        <select class="" name="rubrique" id="typepres_rubrique">
+                            <option value="1">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}1</option>
+                                   <option value="2">{{ 'menus.presentation'|trans({}, 'menus') }}2</option>
+                                   <option value="7">{{ 'menus.presentation'|trans({}, 'menus') }}3</option>
+                                   <option value="6">{{ 'menus.presentation'|trans({}, 'menus') }}4</option>
+                                   <option value="5">{{ 'menus.presentation'|trans({}, 'menus') }}5</option>
+                                   <option value="10">{{ 'menus.presentation'|trans({}, 'menus') }}6</option>
+                                   <option value="8">{{ 'menus.correspondant'|trans({}, 'menus') }}</option>
+                              {#% endfor %#}
+                        </select>
+                        <div class="clr"></div> 
+                        
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.rubriqueparent'|trans({}, 'menus') }} :</span>
+                        <select class="" name="rubrique" id="form_modele3">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for rb in rubriques %}
+                                   <option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                    </div>
+                        
+                        
+                    <div id="article_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.listearticle'|trans({}, 'menus') }}:</span>
+                        <select class="" name="article" id="form_article" style="width:300px;">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for ar in articles %}
+                                   <option value="{{ ar.getId }}">{{ ar.getTitreArticle }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                    </div>
+                    <div id="page_container" style="display:none;">
+                        <span class="colorBleu" style="width:120px; float:left;">{{ 'menus.listepage'|trans({}, 'menus') }}:</span>
+                        <select class="" name="page" id="form_page">
+                            <option value="0">{{ 'menus.selectionner'|trans({}, 'menus') }}</option>
+                             {% for pa in pages %}
+                                   <option value="{{ pa.getPageurl }}">{{ pa.getPage }}</option>
+                              {% endfor %}
+                        </select>
+                        <div class="clr"></div>
+                    </div>                        
+                       <div class="">
+                            <span class="colorBleu" style="width:120px; float:left;">Url :</span>
+                                 <input type="hidden" name="url_menu" id="url_menu"  style="width:300px;"/> 
+                                 <input type="text" name="url_menu" id="url_menu2" class="lurl" style="width:300px;"/> 
+                            <div class="clr"></div>
+                      </div>    
+                     <div class="" style="margin:50px 0px 0px 170px;">
+                                <div id="wait_bloc" style="float:left;margin-right: 15px;display:none;">
+                                       <img src='{{ asset('img/wait.gif') }}' />
+                                </div>
+                                <input  value="{{ 'admin.enregistrer'|trans({}, 'messages') }}" id="submit_menu_form" style="text-align:center; cursor:pointer">
+                                <div class="clr"></div>         
+                     </div>
+
+                </div>
+                           <input type="hidden" name="modif_menu_id" id="modif_menu" value="" />
+                           <div class="clr"></div>
+                </form>
+        
+ <style>
+    .border_red { border: 1px solid red; }
+</style>
+<script>
+    var listTypeMenu = ["{{ 'menus.aucun'|trans({}, 'menus') }}","{{ 'admin.accueil'|trans({}, 'messages') }}","{{ 'menus.articlerubrique'|trans({}, 'menus') }}","{{ 'menuslisterubrique'|trans({}, 'menus') }}","{{ 'admin.rubrique'|trans({}, 'messages') }}","{{ 'articles.ajout.titre1'|trans({}, 'articles') }}","{{ 'menus.liensquelette'|trans({}, 'menus') }}","{{ 'menus.pageexterne'|trans({}, 'menus') }}"];
+    var type_menu = 0;
+    $('input:radio').change(function(){
+        init_data();
+        type_menu = $(this).val();   
+        
+        if( type_menu <6 || type_menu >7 ){  
+            $("#titreMemu").val( listTypeMenu[type_menu] );
+        }
+        else{
+             $("#titreMemu").addClass( "border_red" );
+        }
+        $("#titreMemu").keyup(function(){
+             $("#titreMemu").removeClass( "border_red" );
+        });
+         
+        $("#url_menu").keyup(function(){
+             $("#url_menu").removeClass( "border_red" );
+        });
+        
+        if( type_menu !=1 ){
+            
+            if( type_menu==4  ){
+                r_container_show();
+                a_container_hide();    
+                p_container_hide();
+                ra_container_hide();
+                rb_container_hide(); 
+                m2_container_hide();
+                m1_container_hide();
+                m3_container_hide();
+            }
+            
+            else if( type_menu == 2 ){
+                ra_container_show();
+                rb_container_hide();
+                r_container_hide();
+                a_container_hide();    
+                p_container_hide();
+                m2_container_hide();
+                m1_container_hide();
+                m3_container_hide();
+            }             
+            
+            else if( type_menu == 3 ){
+                rb_container_show();
+                ra_container_hide();
+                r_container_hide();
+                a_container_hide();    
+                p_container_hide();
+                m2_container_hide();
+                m1_container_hide();
+                m3_container_hide();
+            }            
+            
+            else if( type_menu == 5 ){
+                 a_container_show();
+                 r_container_hide();
+                 p_container_hide();
+                 m2_container_hide();
+                 m1_container_hide();
+                 m3_container_hide();
+            }
+            else if( type_menu == 6 ){
+              p_container_show();
+              r_container_hide();
+              a_container_hide(); 
+              m2_container_hide();
+              m1_container_hide();
+              m3_container_hide();    
+            }  
+            else if( type_menu == 8 ){
+                m1_container_show();
+                m3_container_hide();
+                m2_container_hide();
+                ra_container_hide();
+                rb_container_hide();
+                r_container_hide();
+                a_container_hide();    
+                p_container_hide();
+            }
+            else if( type_menu == 9 ){
+                m2_container_show();
+                m3_container_hide();
+                m1_container_hide();
+                ra_container_hide();
+                rb_container_hide();
+                r_container_hide();
+                a_container_hide();    
+                p_container_hide();
+            }
+            else if( type_menu == 10 ){
+                m3_container_show();
+                m2_container_hide();
+                m1_container_hide();
+                ra_container_hide();
+                rb_container_hide();
+                r_container_hide();
+                a_container_hide();    
+                p_container_hide();
+            }            
+            
+            else{
+              p_container_hide();
+              r_container_hide();
+              a_container_hide();   
+              $("#url_menu").addClass( "border_red" );
+            }
+        }
+        else{
+            p_container_hide();
+            r_container_hide();
+            a_container_hide();
+            $("#url_menu").val("utb_site_homepage");
+        }
+        click_suivant();   
+    });
+    
+    
+    $("#form_rubrique").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    });
+    
+    $("#form_rubriquearticles").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    }); 
+    
+    $("#form_modele1").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    });
+    $("#form_modele2").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    });
+    
+    $("#form_modele3").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    });    
+    
+    $("#form_rubriquearborescence").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        $("#url_menu2").val("utb_site_rubrique|"+$("#typepres_rubrique").val()+"|"+$(this).val());
+        
+    }); 
+    
+    $("#typepres_rubrique").change(function(){
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubriquearborescence").val());
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele3").val());
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele2").val());
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele1").val());
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubriquearticles").val());
+        $("#url_menu").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubrique").val());
+        
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubriquearborescence").val());
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele3").val());
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele2").val());
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_modele1").val());
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubriquearticles").val());
+        $("#url_menu2").val("utb_site_rubrique|"+$(this).val()+"|"+$("#form_rubrique").val());        
+
+        
+    });
+    
+        
+    $("#form_article").change(function(){
+        $("#url_menu").val("utb_site_article|"+$(this).val());
+        $("#url_menu2").val("utb_site_article|"+$(this).val());
+        
+    }); 
+     $("#form_page").change(function(){
+        $("#url_menu").val($(this).val());
+        $("#url_menu2").val($(this).val());
+        
+    }); 
+    
+    function r_container_show(){
+        $("#rubrique_container").show();
+    }
+    function r_container_hide(){
+        $("#rubrique_container").hide();
+    } 
+    
+    function m1_container_show(){
+        $("#modele1_container").show();
+    }
+    function m1_container_hide(){
+        $("#modele1_container").hide();
+    } 
+    
+    function m2_container_show(){
+        $("#modele2_container").show();
+    }
+    function m2_container_hide(){
+        $("#modele2_container").hide();
+    } 
+        
+    function m3_container_show(){
+        $("#modele3_container").show();
+    }
+    function m3_container_hide(){
+        $("#modele3_container").hide();
+    }
+    
+    function ra_container_show(){
+        $("#rubriquearticles_container").show();
+    }
+    function ra_container_hide(){
+        $("#rubriquearticles_container").hide();
+    } 
+    
+    function rb_container_show(){
+        $("#rubriquearborescence_container").show();
+    }
+    function rb_container_hide(){
+        $("#rubriquearborescence_container").hide();
+    }     
+    
+    
+    function a_container_show(){
+         $("#article_container").show();
+    }
+    function a_container_hide(){
+        $("#article_container").hide();
+    }     
+    function p_container_show(){
+         $("#page_container").show();
+    }
+    function p_container_hide(){
+        $("#page_container").hide();
+    }      
+    function init_data() {
+        $("#titreMemu").val("");
+        //$("#menuParent").val("");
+        $("#form_rubrique").val("");
+        $("#form_article").val("");
+        $("#form_page").val("");
+        $("#url_menu").val("");
+        $("#form_modele1").val("");
+        $("#form_modele2").val("");
+        $("#form_modele3").val("");        
+        $("#form_rubriquearborescence").val("");
+        $("#form_rubriquearticles").val("");
+        
+    }
+    var etatcache = true;
+    $("#presentitlus").click(function(){
+        if(etatcache===true){$("#contentitlus").show(); etatcache = false; $("#presentitlus").css({background: 'url({{ asset('img/admin-img/down.png') }}) no-repeat'});}
+        else if(etatcache===false){$("#contentitlus").hide(); etatcache = true; $("#presentitlus").css({background: 'url({{ asset('img/admin-img/up.png') }}) no-repeat'});}
+       // $("#contentitlus").hide("slow");
+    });
+    $("#submit_menu_form").click(function(){ 
+        $("#wait_bloc").show();
+        
+        var error = false;
+         
+         if(  $("#titreMemu").val() == "" ){
+                alert("{{ 'menus.champvide'|trans({}, 'menus') }}");
+                 $("#wait_bloc").hide();
+                 error = true;
+         }
+         
+         if( type_menu==2  ){
+             if(  $("#form_rubriquearticles").val() == 0 ){
+                alert("{{ 'menus.rubobligatoire'|trans({}, 'menus') }}");
+                 $("#wait_bloc").hide();
+                  error = true;
+             }   
+         }
+         
+         if( type_menu==4 ){
+             if(  $("#form_rubrique").val() == 0 ){
+                alert("{{ 'menus.rubobligatoire'|trans({}, 'menus') }}");
+                 $("#wait_bloc").hide();
+                  error = true;
+             }   
+         }
+         if( type_menu==3  ){
+             if(  $("#form_rubriquearborescence").val() == 0 ){
+                alert("{{ 'menus.rubobligatoire'|trans({}, 'menus') }}");
+                 $("#wait_bloc").hide();
+                  error = true;
+             }   
+         }         
+         else if( type_menu == 5 ){
+             if(  $("#form_article").val() == 0 ){
+                alert("{{ 'menus.rubobligatoire'|trans({}, 'menus') }}");  
+                 $("#wait_bloc").hide();
+                  error = true;
+             }   
+          } 
+         else if( type_menu == 6 ){
+              
+               if(  $("#titreMemu").val() == "" ){
+                   alert("{{ 'menus.titremenuobligatoire'|trans({}, 'menus') }}");
+                    $("#wait_bloc").hide();
+                     error = true;
+               }             
+             if(  $("#form_page").val() == 0 ){
+                alert("{{ 'menus.pageobligatoire'|trans({}, 'menus') }}");  
+                 $("#wait_bloc").hide();
+                  error = true;
+             }   
+          }           
+          else if( type_menu >= 7 ){
+              
+               if(  $("#titreMemu").val() == "" ){
+                   alert("{{ 'menus.titremenuobligatoire'|trans({}, 'menus') }}");
+                    $("#wait_bloc").hide();
+                     error = true;
+               }
+              if(  $("#url_menu").val() == "" ){
+                   alert("{{ 'menus.urlobligatoire'|trans({}, 'menus') }}");
+                    $("#wait_bloc").hide();
+                     error = true;
+              }
+               
+          }
+          
+          //TO DO désactiver tous les bouttons quand l'enregistrement est en cours
+          //Caché le input de url quand on a pas besoin de le saisir
+          
+          //Maintenant on commence le traitement des données pour l'insertion dans la BD
+          if( ! error ){
+          $.ajax({
+               type: "POST",
+                url: "{{ path('utb_admin_ajoutMenuSave')}}",
+                data: {formdata:$('#form_menu').serialize(),locale:$("#locale").val()},
+                cache: false,
+                success: function(data){
+                      var resJson = jQuery.parseJSON(data);
+                      if( resJson.result == "success"){
+                          $(".typeMenuRadio").attr('checked', false);
+                           window.location.reload();
+                      }      
+                       else
+                            alert("{{ 'menus.erreurtraitement'|trans({}, 'menus') }}");           
+                     //console.log(data);
+                }
+          }); 
+          }
+    });
+    
+</script>

@@ -1,0 +1,10 @@
+	<form action=" {{ path("utb_admin_modifnaturedoc",{'id': id,'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutNatureDoc">
+		<div class="FrmAjoutArt">
+			{{ form_errors(form.libNatureDoc) }}
+			{{ form_widget(form.libNatureDoc) }}
+			<div class="clr"></div>
+		</div>                                                                 
+
+		<input type="submit" value="{{ 'admin.modifier'|trans({}, 'messages') }}" name="op" id="j_bouton" >
+	</form>                                                         
+                                              

@@ -1,0 +1,108 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'services.ajout.grandtitrepg'|trans({}, 'services') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listeservice', {'locale': locale})}}">{{ 'admin.layout.contact'|trans}} </a> > <a href="{{path('utb_admin_listeservice', {'locale': locale})}}">{{'services.ajout.titre1'|trans({}, 'services')}}</a> > {{'admin.ajouter'|trans()}} 
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Service" title="" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'services.ajout.titre1'|trans({}, 'services') }} <span>: {{ 'services.ajout.titre2'|trans({}, 'services') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+                              
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.valider'|trans}}" title="{{ 'admin.valider'|trans}}" /></div>
+                                  {{ 'admin.ajouter'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a class="back" href="#"><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                         {# STATISTIQUES #}    
+                                         {{ information.stats(listestat) }} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                              <div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+                                                  <div class="MarginBottomBox">
+                                                      <form action=" {{ path("utb_admin_ajoutservice") }} " method="post" {{ form_enctype(form) }} id="ajoutService">
+														<div class="FrmAjoutArt">
+                                                           {{ form_errors(form.libService) }}
+                                                           {{ form_label(form.libService, 'services.form.nom'|trans({}, 'services')) }}
+														   {{ form_widget(form.libService) }}
+                                                            <div class="clr"></div>
+														</div>
+
+														<div class="FrmAjoutArt">
+                                                           {{ form_errors(form.emailService) }}
+                                                            {{ form_label(form.emailService, "Email") }}
+															{{ form_widget(form.emailService) }}
+                                                            <div class="clr"></div>
+														</div>
+														
+														
+														<div class="FrmAjoutArt addServicDescrp">
+                                                           {{ form_errors(form.descriptionService) }}
+														   <span class="labelNoFloat labelLong">
+                                                           {{ form_label(form.descriptionService, 'services.form.desc'|trans({}, 'services')) }}</span> 
+															{{ form_widget(form.descriptionService) }}
+														</div>
+                                                                
+																
+                                                               <input type="submit" value="{{ 'admin.ajouter'|trans}}" name="op" id="j_bouton" style="display: none">
+															   <a href=""></a>
+                                                                                                                              
+                                                          </form>
+                                                  </div>
+
+                                              </div>
+
+
+                                          </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>			<!--  FIN  SPAN - 19 -->
+
+                          </div>				<!--  FIN SPAN - 25 -->
+  
+  
+
+  {% endblock %}

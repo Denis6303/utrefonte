@@ -1,0 +1,12 @@
+{# src/utb/AdminBundle/Resources/views/layoutAdmin.html.twig #}
+{% extends "::layoutAdmin.html.twig" %}
+{% block title %}
+{{ parent() }} - {{ 'admin.espaceadmin'|trans}}
+{% endblock %}
+
+{% block body %}
+
+    {% block administration_body %}
+    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,519 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_ajoutParams',{ 'locale': locale })}}"> {{ 'admin.layout.menu.maintenance'|trans}}</a> > 
+    <a href="{{path('utb_admin_ListeDiffusion', {'etat': 1,'ajoutliste': 0,'locale': locale})}}">{{'admin.layout.gestnewsletter'|trans}}</a> > 
+    {{'listedif.liste'|trans}}
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-14">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-new-privatemessage.png')}}" alt="" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1> {{'admin.layout.gestnewsletter'|trans}}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-10 last">
+
+                            <div class="ecartBoutonsFirst for3ButonsLg">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="#" onClick="editionlisteDiffusion();
+                                        return false;"><img id="btn_ajout_listeDif" src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{'admin.ajouter'|trans}}" title="{{'admin.ajouter'|trans}}" /></div>
+							{{ 'admin.ajouter'|trans}}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="gereAll(getListeDiffusionID(), 1);
+                                        return false;"><img src="{{ asset('img/admin-img/valider.png')}}" alt="{{'admin.activer'|trans}}" title="{{'admin.activer'|trans}}" /></div>
+                                    {{'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                <div><a href="javascript:void(0);" onclick="gereAll(getListeDiffusionID(), 0);
+                                        return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{'admin.desactiver'|trans}}" title="{{'admin.desactiver'|trans}}" /></div>
+                                    {{'admin.desactiver'|trans}}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll(getListeDiffusionID());
+                                        return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{'admin.supprimer'|trans}}" title="{{'admin.supprimer'|trans}}" /></div>
+                                  {{ 'admin.supprimer'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+                                        <h3 class="colorBleu titreInfos">{{ 'admin.infos'|trans({}, 'messages')}}</h3>
+                                        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                            <div class="cntLeftBox"> 
+                                                {{ 'admin.layout.textenewsletter'|trans({}, 'messages')}}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                            <!-- FIN filtersArticles-->
+
+                                            <div class="FrmAjoutArt FrmTopDetailArt FrmInArticleTop" id="editionListe_container" style="display:none;">
+                                                <div style="float:left;">
+													{{ render(controller('utbAdminBundle:AdminAutre:EditionListeDiffusion', {'id': 0, 'locale':locale})) }}  
+                                                </div>
+                                                <a href="#" class="noSoulignHover" onClick="AnnulerEditionlisteDif();
+                                                        return false;">{{'admin.annuler'|trans}}</a>
+                                                <div class="clr"></div>
+                                            </div>                                                         
+
+                                            <table class="listMenusCateg listArticlesRub">
+                                                <tr>
+                                                    <th style="width:40px"><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                    <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                    <th style="width:60px">{{'admin.statut'|trans}}</th>
+                                                    <th colspan="3" style="width:60px">{{'admin.action'|trans}}</th>
+                                                </tr>
+													   {% for liste in listediffusion %}
+                                                <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+                                                    <td>
+                                                        <input type="checkbox" name="liste[]" value="{{liste.id}}" rel="liste_c"/>
+                                                    </td>
+                                                    <td style="text-align:left; padding-left:10px;"> 
+
+
+													 {{liste.nomListeDiffusion }}
+
+                                                        <div class="FrmInTable formnews" id="{{"ModifListeDif_container"~liste.id}}" style="display:none;">
+												  {{ render(controller('utbAdminBundle:AdminAutre:EditionListeDiffusion', {'id':liste.id,'locale':locale})) }}  
+                                                            <a href="#" class="noSoulignHover" onClick="AnnulerModiflisteDif({{liste.id}});
+                                                                    return false;">{{'admin.annuler'|trans}}</a>
+                                                            <div class="clr"></div>
+                                                        </div>                                                            
+
+                                                    </td>
+                                                    <td class="statutArtList">
+													{% if liste.actif ==0  %}
+													   {{'admin.desactive'|trans}}
+													{% elseif liste.actif ==1 %}														
+														{{'admin.active'|trans}}
+													{% endif %}
+                                                    </td>
+
+                                                    <td class="{{"modif"~liste.id}}">              
+                                                        <a href="#" onClick="ModiflisteDif({{liste.id}});
+                                                                return false;">
+                                                            <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/>
+                                                        </a>
+                                                    </td> 
+
+                                                    <td>                                                                                                  
+                                                        <a href="{{ path("utb_admin_SendMailsToListe",{'idliste': liste.id , 'locale': locale})}}" >    
+                                                            <img src="{{ asset('img/admin-img/icon-messagingSmall.png')}}" alt="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}" title="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}" />
+                                                        </a>
+                                                    </td>
+
+                                                    <td>                                                                                                  
+                                                        <a href="{{ path("utb_admin_detailsListeDiffusion",{'locale': locale,'idliste': liste.id,'etat':1})}}" >    
+                                                            <img src="{{ asset('img/admin-img/details.png')}}" alt="{{ 'admin.detail'|trans({}, 'messages')}}" title="{{ 'admin.detail'|trans({}, 'messages')}}" />
+                                                        </a>
+                                                    </td>                                                                                                
+
+
+                                                </tr>
+
+														{% else %}
+                                                <tr>
+                                                    <td colspan="4">  {{'admin.noneliste'|trans({},'messages') }} <td>       
+                                                </tr>       
+														{% endfor %}
+                                            </table>
+
+
+                                        </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                    </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                </div>		<!--  FIN COL RIGHT -->
+                            </div>			<!--  FIN  SPAN - 19 -->
+
+                        </div>
+
+ {# <div id="formNewsletter_container" style="display:none;">
+      <form id="form_groupe" method="POST" style="margin-top:15px;">
+ 
+              <div class="clr"></div>
+              
+              <div id="destinatiaire" class="FrmAjoutArt changeRubZoomBox">
+                  <label>Destinataires Message{#{ 'articles.titrearticle'|trans({}, 'articles') }#} </label>
+              {#     form_widget(form.destinatairesMsg)           
+				<div class="clr"></div>
+              </div>              
+              
+              
+              <div class="FrmAjoutArt changeRubZoomBox">
+                  <label>Titre Message{#{ 'articles.titrearticle'|trans({}, 'articles') }#} </label>
+                  {#{ form_widget(form.titreMessage) }}          
+				<div class="clr"></div>
+              </div>#}
+
+
+           {#   <div class="FrmAjoutArt changeRubZoomBox">
+                  <label> Contenu Message {#{ 'articles.lastrub'|trans({}, 'articles') }#} </label>
+                    {# form_widget(form.contenuMessage) }          
+                  <div class="clr"></div>
+              </div>
+             
+                            
+              
+             {# <div class="clr"></div>#}
+
+             {# <div id="wait_bloc_m" style="display:none;margin-left:15px;">
+                         <img src="{{ asset('img/wait.gif') }}" />
+              </div>
+                            
+             <div class="clr"></div> #}        
+ {#     </form>    
+  </div>  #}                       
+
+
+                        <script language="javascript" >
+
+                            function editionlisteDiffusion() {
+                                //$("#editionListe_container").hide();
+                                $("#editionListe_container").show();
+
+                            }
+
+                            function AnnulerEditionlisteDif() {
+
+                                $("#editionListe_container").hide();
+                                    {#var html = '<a class="updateLink" href="#" onClick="modifierFicheUser( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+                                    $(".updateImgInArt").html(html);#}
+
+                            }
+
+
+                            function ModiflisteDif(idliste) {
+                                $("#ModifListeDif_container" + idliste).show();
+                                $("#editionListe_container").hide();
+
+                                var html = '';
+                                $(".modif" + idliste).html(html);
+                            }
+
+
+                            function AnnulerModiflisteDif(idliste) {
+
+                                $("#ModifListeDif_container" + idliste).hide();
+                                var html = '<a href="#" onClick="ModiflisteDif(' + idliste + '); return false;"><img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/></a>';
+                                $(".modif" + idliste).html(html);
+                            }
+
+
+                            $(".checkall").click(function() {
+                                $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+                            });
+
+                            function getListeDiffusionID() {
+
+                                var listes_id = "";
+
+                                $(":input[rel=liste_c]:checked").each(function() {
+                                    listes_id = listes_id.concat("|" + $(this).val());
+                                });
+
+                                return listes_id;
+                            }
+
+
+                            var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>";
+
+                            //function pour supprimer plusieurs elements a la fois
+                            function deleteAll(listesId) {
+                                if (listesId.length == 0) {
+                                    $('#process_tpl').html($('#sivide').html());
+                                    var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+                                    $('#process_tpl').dialog(args);
+                                    $('#process_tpl').dialog({
+                                        buttons: {
+                                            "OK": function() {
+                                                $(this).dialog("close");
+                                            }
+                                        }
+                                    })
+                                    $("#process_tpl").dialog('open');
+                                    return false;
+                                }
+
+                                $('#process_tpl').html($('#msgconfirmsup').html());
+                                var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+                                $('#process_tpl').dialog(args);
+                                $('#process_tpl').dialog({
+                                    buttons: {
+                                        "OK": function() {
+                                            $('#process_tpl').html(html);
+
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "{{ path('utb_admin_supprimerListeDiffusion')}}",
+                                                data: {listesIds: listesId},
+                                                cache: false,
+                                                success: function(data) {
+                                                    var answer = jQuery.parseJSON(data);
+                                                    if (answer.result == "erreurstatut") {
+                                                        $('#process_tpl').html($('#impossiblesup').html());
+                                                    }
+                                                    else if (answer.result == "success") {
+                                                        $('#process_tpl').html($('#reussitesup').html());
+                                                    }
+                                                    else {
+                                                        $('#process_tpl').html($('#accessdenied').html());
+                                                    }
+
+                                                    window.location.reload();
+                                                }
+                                            });
+
+                                        },
+                                        "{{ 'admin.annuler'|trans({}, 'messages')}}": function() {
+                                            $(this).dialog("close");
+                                        }
+                                    }
+                                })
+                                $("#process_tpl").dialog('open');
+
+                            }
+                            //function pour  activer plusieurs elements a la fois
+                            function gereAll(listesId, etat) {
+                                //To do
+                                if (listesId.length == 0) {
+                                    $('#process_tpl').html($('#sivide').html());
+
+                                    if (etat == 1) {
+                                        var args = {modal: true, autoOpen: false, title: ($('#titreconfirmact').html())};
+                                    } else if (etat == 0) {
+                                        var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesact').html())};
+                                    }
+
+                                    $('#process_tpl').dialog(args);
+                                    $('#process_tpl').dialog({
+                                        buttons: {
+                                            "OK": function() {
+                                                $(this).dialog("close");
+                                            }
+                                        }
+                                    })
+                                    $("#process_tpl").dialog('open');
+                                    return false;
+                                }
+
+
+                                if (etat == 1) {
+                                    $('#process_tpl').html($('#msgconfirmact').html());
+                                    var args = {modal: true, autoOpen: false, title: ($('#titreconfirmact').html())};
+                                } else if (etat == 0) {
+                                    $('#process_tpl').html($('#msgconfirmdesact').html());
+                                    var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesact').html())};
+                                }
+
+
+                                $('#process_tpl').dialog(args);
+                                $('#process_tpl').dialog({
+                                    buttons: {
+                                        "OK": function() {
+                                            $('#process_tpl').html(html);
+
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "{{ path('utb_admin_gererListeDiffusion')}}",
+                                                data: {listesIds: listesId, etat: etat},
+                                                cache: false,
+                                                success: function(data) {
+                                                    var answer = jQuery.parseJSON(data);
+                                                    if (answer.result == "success") {
+                                                        if (etat == 1) {
+                                                            $('#process_tpl').html($('#reussiteact').html());
+                                                        } else if (etat == 0) {
+                                                            $('#process_tpl').html($('#reussitedesact').html());
+                                                        }
+                                                    }
+                                                    if (answer.result == "erreur") {
+                                                        if (etat == 1) {
+                                                            $('#process_tpl').html($('#impossibleact').html());
+                                                        } else if (etat == 0) {
+                                                            $('#process_tpl').html($('#impossibledesact').html());
+                                                        }
+                                                    }
+                                                    if (answer.result == "accessdenied") {
+                                                        $('#process_tpl').html($('#accessdenied').html());
+                                                    }
+                                                    window.location.reload();
+                                                }
+                                            });
+
+                                        },
+                                        "{{ 'admin.annuler'|trans({}, 'messages')}}": function() {
+                                            $(this).dialog("close");
+                                        }
+                                    }
+                                })
+                                $("#process_tpl").dialog('open');
+                            }
+
+
+                            function modifierRubrique(idArticle, listedestin) {
+
+
+                                var args = {modal: true, autoOpen: false, title: ('{{ 'articles.onearticle'|trans({}, 'deplacer')}}'), width: 600, height: 300};
+                                $('#formNewsletter_container').dialog(args);
+                                $('#formNewsletter_container').dialog({
+                                    buttons: {
+                                        "Submit": function() {
+
+                                            $("#destinataire").val = listedestin;
+
+                                            if ($("#form_rubrique").val() == 0) {
+                                                alert('{{ 'articles.selectRubrique'|trans({}, 'articles')}}');
+                                                return false;
+                                            }
+
+                                            $("#wait_bloc_m").show();
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "{{ path('utb_admin_detailarticle')}}",
+                                                data: {formdata: $('#form_groupe').serialize()},
+                                                cache: false,
+                                                success: function(data) {
+
+                                                    var resJson = jQuery.parseJSON(data);
+                                                    if (resJson.result == "success") {
+                                                        window.location.reload();
+                                                    }
+                                                    else
+                                                        alert("{{ 'messageries.mail.erreurchargement'|trans({}, 'messageries')}}");
+                                                    //console.log(data);
+                                                }
+                                            });
+                                        },
+                                        "{{ 'admin.annuler'|trans}}": function() {
+                                            $(this).dialog("close");
+                                        }
+                                    }
+                                })
+                                $('#formNewsletter_container').dialog('open');
+
+                            }
+
+
+
+                        </script>
+
+
+
+
+
+{% if ajoutliste == 1 %}
+                        <script>
+                            $("#btn_ajout_listeDif").click();
+                        </script>
+{% endif %} 
+
+                        <div id="process_tpl" style="display:none;"></div>  
+
+                        <div id="accessdenied" style="display:none;"> 
+{{ 'confirmation.accessdenied'|trans({}, 'articles') }} 
+                        </div>
+
+  {# Test si rien n'est coché #}
+                        <div id="vide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+                        <div id="sivide" style="display:none;"> 
+    {{ 'confirmation.sivide'|trans({}, 'messages') }} 
+                        </div> 
+
+  {# activer une liste diffusion #}
+                        <div id="msgconfirmact" style="display:none;">
+    {{ 'listedif.activer'|trans({}, 'messages') }}
+                        </div>   
+
+                        <div id="titreconfirmact" style="display:none;">
+    {{ 'listedif.titreact'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="impossibleact" style="display:none;"> 
+    {{ 'listedif.impossibleact'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="reussiteact" style="display:none;"> 
+    {{ 'listedif.succesact'|trans({}, 'messages') }} 
+                        </div> 
+
+   {# desactiver une liste diffusion #}
+                        <div id="msgconfirmdesact" style="display:none;">
+    {{ 'listedif.desactiver'|trans({}, 'messages') }}
+                        </div>   
+
+                        <div id="titreconfirmdesact" style="display:none;">
+    {{ 'listedif.titredesact'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="impossibledesact" style="display:none;"> 
+    {{ 'listedif.impossibledesact'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="reussitedesact" style="display:none;"> 
+    {{ 'listedif.succesdesact'|trans({}, 'messages') }} 
+                        </div> 
+
+    {# supprimer une liste diffusion #}
+                        <div id="msgconfirmsup" style="display:none;">
+    {{ 'listedif.supprimer'|trans({}, 'messages') }}
+                        </div>   
+
+                        <div id="titreconfirmsup" style="display:none;">
+    {{ 'listedif.titresup'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="impossiblesup" style="display:none;"> 
+    {{ 'listedif.impossiblesup'|trans({}, 'messages') }}
+                        </div> 
+
+                        <div id="reussitesup" style="display:none;"> 
+    {{ 'listedif.successup'|trans({}, 'messages') }} 
+                        </div> 
+
+  {{ information.decochetoutbox() }}                        
+
+{% endblock %}

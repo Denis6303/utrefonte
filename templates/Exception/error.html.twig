@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Union Togolaise de Banque</title>
+
+	<link rel="stylesheet" href="{{ asset('css/site-css/screen.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/site-css/style.min.css') }}">
+
+        <script type="text/javascript">
+		$().ready(function() {
+			$('#ban-dyn').codaSlider({
+				autoSlide: true,
+				dynamicArrows: false,
+				autoSlideStopWhenClicked: true
+			});
+		});
+	</script>
+         <script type="text/javascript">
+                    function date_heure(id)
+                    {
+                    date = new Date;
+                    annee = date.getFullYear();
+                    moi = date.getMonth();
+                    mois = new Array("{{'date.mois.janvier'|trans({},'dates') }}", "{{'date.mois.fevrier'|trans({},'dates') }}", "{{'date.mois.mars'|trans({},'dates') }}", "{{'date.mois.avril'|trans({},'dates') }}", "{{'date.mois.mai'|trans({},'dates') }}", "{{'date.mois.juin'|trans({},'dates') }}", "{{'date.mois.juillet'|trans({},'dates') }}", "{{'date.mois.aout'|trans({},'dates') }}", "{{'date.mois.septembre'|trans({},'dates') }}", "{{'date.mois.octobre'|trans({},'dates') }}", "{{'date.mois.novembre'|trans({},'dates') }}", "{{'date.mois.decembre'|trans({},'dates') }}");
+                    j = date.getDate();
+                    jour = date.getDay();
+                    jours = new Array("{{'date.jour.dimanche'|trans({},'dates') }}", "{{'date.jour.lundi'|trans({},'dates') }}", "{{'date.jour.mardi'|trans({},'dates') }}", "{{'date.jour.mercredi'|trans({},'dates') }}", "{{'date.jour.jeudi'|trans({},'dates') }}", "{{'date.jour.vendredi'|trans({},'dates') }}", "{{'date.jour.samedi'|trans({},'dates') }}");
+                    h = date.getHours();
+                    if(h<10)
+                    {
+                    h = "0"+h;
+                    }
+                    m = date.getMinutes();
+                    if(m<10)
+                    {
+                    m = "0"+m;
+                    }
+                    s = date.getSeconds();
+                    if(s<10)
+                    {
+                    s = "0"+s;
+                    }
+                    {% set currentPath = app.request.attributes.get('_route') %}
+							   {% if locale=="fr" %}       
+                    resultat = ''+jours[jour]+' '+j+' '+mois[moi]+' '+annee+' - '+h+':'+m+':'+s;
+                    {% else %}
+                        if(j===1||j===21||j===31){
+                            resultat = ''+jours[jour]+' '+j+'st'+' '+mois[moi]+' '+annee+' - '+h+':'+m+':'+s;
+    }
+                        else if(j===2||j===22){
+                            resultat = ''+jours[jour]+' '+j+'nd'+' '+mois[moi]+' '+annee+' - '+h+':'+m+':'+s;
+                        }
+                        
+                        else if(j==3||j===23){
+                            resultat = ''+jours[jour]+' '+j+'rd'+' '+mois[moi]+' '+annee+' - '+h+':'+m+':'+s;
+                        }
+                        
+                        else{resultat = ''+jours[jour]+' '+j+'th'+' '+mois[moi]+' '+annee+' - '+h+':'+m+':'+s;}
+                       
+                     {% endif  %}
+                    document.getElementById(id).innerHTML = resultat;
+                    setTimeout('date_heure("'+id+'");','1000');
+                    return true;
+                    }
+            </script>
+</head>
+    
+<body>
+	<div class="divBody1"> 		<!-- DIV BODY-->
+		<div class="container">
+			<div  id="header" class="span-24 paddingBottom20p bgBlanc"> 				<!--DÃ©but Hearder-->
+				<div class="span-12"> 		<!-- Logo -->
+					<div class="logoSite leftSpace"> <!-- Logo -->
+						<a href="{{path('utb_site_homepage',{'locale':locale}) }}">
+							<div class="header-logo">
+								<h1 class="hide">Union Togolaise de Banque</h1>	<!-- Pour un bon rÃ©fÃ©rencement -->
+							</div>
+							<div class="header-slogan">
+								<h2 class="hide">Votre satisfaction fait notre rÃ©putation</h2><!-- Pour un bon rÃ©fÃ©rencement -->
+							</div>
+							<div class="clr"></div>
+						</a>
+					</div>
+				</div>
+				<div class="span-12 last"> 		<!-- Acces Rapide Boutons -->
+					<!-- <div id="menuToolTop" class="rightSpace">
+						<ul id="navTop">
+							<li><a href="">Correspondants</a></li>
+							<li><a href="">GAB & TPE</a></li>
+							<li><a href="">Agences</a></li>
+							<li><a href="">Horaires</a></li>
+							<div class="clr"></div>
+						</ul>
+					</div>-->
+					<div class="header-rapidAcces rightSpace">
+										
+                                                <div class="bleuLogo rightPosition paddingBottom10p" style="padding-right:10px;">
+                                                     <span id="date_heure"></span>
+                                                        <script type="text/javascript">window.onload = date_heure('date_heure');</script>
+                                                </div>
+						<div class="clr"></div>
+						
+						<div class="clr"></div>
+                                             
+					
+						<!-- <div class="boxRecherche coinsArrondis">
+							<input type="text" class="gris-comment" value="Recherche" />
+							<input type="submit" class="btRecherche coinsArrondis" value="">
+							<div class="clr"></div>
+						</div> -->
+						<div class="clr"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="span-24">		 <!--   MENU Horizontal-->
+						<!-- FIN DIV.menuTool -->
+			</div> 			<!--   Fin Menu du site-->
+			
+					<!-- FIN Banniere SPAN-24-->			
+		</div>		<!-- FIN CONTAINER 1 - HEADER + BG BLEU-->			
+	</div>		<!-- DIV BODY-->
+	
+	<div class="divBody2">
+		<div class="container container2">	
+			<div class="span-24 banSite borderBotStyle marginBottom20p paddingBottom10p bgBlanc"> <!-- Début banniere -->
+                            {% if locale|trim == 'fr' %}
+				
+                            <div class="infosTool rightSpace leftSpace">
+					<h2> Contactez nous au  <span class="bleuLogo">00 228 22 23 43 00</span> ou <a href="">par email</a></h2>
+					<div class="infoP1"><p class="gris-comment">Plusieurs milliers de clients nous font confiance...</p></div>
+					<div class="mhr"><hr></div>
+					<div class="infoP2"><p>depuis 1964</p></div>
+					<span class="clr"></span>
+				</div>
+                            {% endif %}
+                {% if locale|trim == 'en' %}
+                            
+                            <div class="infosTool rightSpace leftSpace">
+					<h2> Contact us at <span class="bleuLogo">00 228 22 23 43 00</span> or <a href="">by email</a></h2>
+					<div class="infoP1"><p class="gris-comment">Thousands of customers trust us ... </p></div>
+					<div class="mhr"><hr></div>
+					<div class="infoP2"><p>since 1964</p></div>
+					<span class="clr"></span>
+				</div>
+                            {% endif %}
+			</div>		<!-- span-24 banSite borderBotStyle paddingBottom20p bgBlanc -->
+			
+		<!-- **************************************************** DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+		
+		
+		<!-- Fin span-24 Catégories clients - Particulier, Professionnel, Entreprise-->
+
+		<!-- FIN Ligne Produits 1 -->
+	
+	
+	<!-- Ligne Produits 2 -->
+			<!-- FIN Ligne Produits 2 -->
+
+	<!-- Ligne Correspondants -->
+	<!-- FIN Correspondants-->
+
+        <div class="span-24 errorBox" >
+            <div class="span-12" >
+                <div class="" style="">
+                    <img src="{{asset('img/site-img/error.png')}}" alt="" title="" style="width: 450px;" />
+                </div>
+                <div class="clr"></div>
+                
+            </div>
+            <div class="span-12 last" >
+                {% if locale|trim == 'fr' %}
+                <div class="" style="padding-top: 100px; padding-right: 20px;">
+                    <span style="font-size: 50px;"> Desolé !</span>
+                    <br/> <span style="font-size: 15px;"> La page que vous demandez n'existe pas ou a été déplacée. Veuillez contacter l'administrateur du site.</span>
+                    <br/><br/> <a href="{{path('utb_site_homepage',{'locale':locale}) }}" style="color:#0049ba;"> Retour sur la page d'accueil </a>
+                </div>
+                {% endif %}
+                {% if locale|trim == 'en' %}
+                <div class="" style="padding-top: 100px; padding-right: 20px;">
+                    <span style="font-size: 50px;"> Sorry !</span>
+                    <br/> <span style="font-size: 15px;"> The page you requested does not exist or has been moved. Please contact the site administrator.</span>
+                    <br/><br/> <a href="{{path('utb_site_homepage',{'locale':locale}) }}" style="color:#0049ba;"> Back to the homepage </a>
+                </div>
+                {% endif %}
+                
+            </div>
+        </div>
+
+
+		
+		<!-- **************************************************** FIN DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+
+		</div>		<!-- FIN DIV.container container2 -->
+                
+	</div>		<!-- FIN DIV.divBody2 container2 -->
+	
+	<div class="divBody3">
+		<div class="container container3">
+			
+			
+			<div class="span-24 footerDown404 ">
+				<div class="divBody3Top"> </div>
+				<div class="footerDown-cnt">
+					&copy; 2006 - 2009 Union Togolaise de Banque · SWIFT : UNTBTGTG · Informations Légales 
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+		<ul class="filariane bleuLink">
+                        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> Tableau de Bord</a></li>
+                        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li>{{'operation.titre'|trans({},'recherche')}}</li>
+                </ul>
+          
+               
+                
+        {% set tab = {'imprimer':1,'listeOperation':listeOperation} %}   
+        {% if mttap == 0 %}        
+            {% if  app.request.get('mtta')|trim == null   %}   
+                    {% set mttap = 0 %}       
+            {% else %}                       
+                    {% set mttap = app.request.get('mtta') %} 
+            {% endif %}    
+         {% endif %}  
+        {% if mttde == 0 %}        
+            {% if  app.request.get('mttde')|trim == null   %}   
+                    {% set mttde = 0 %}              
+            {% else %}   
+                   {% set mttde = app.request.get('mttde') %}  
+            {% endif %} 
+         {% endif %}
+        {% if datedeb == 0 %}         
+            {% if  app.request.get('datedeb')|trim == null   %}   
+                    {% set datedeb = 0 %}              
+            {% else %}   
+                   {% set datedeb = app.request.get('datedeb')|replace('/','-') %}  
+            {% endif %}
+        {% endif %}
+        {% if datefin == 0 %}   
+            {% if  app.request.get('datefin')|trim == null   %}   
+                    {% set datefin = 0 %}              
+            {% else %}   
+                   {% set datefin = app.request.get('datefin')|replace('/','-') %}  
+            {% endif %} 
+        {% endif %}
+        {% if cpte == 0 %}        
+            {% if  app.request.get('compte')|trim == null   %}   
+                    {% set cpte = 0 %}              
+            {% else %}                  
+                   {% set cpte = app.request.get('compte') %}  
+            {% endif %} 
+        {% endif %}
+        {% if sens == 0 %}         
+            {% if  app.request.get('sens')|trim == null   %}   
+                    {% set sens = 0 %}              
+            {% else %}                  
+                   {% set sens= app.request.get('sens')|trim %}  
+            {% endif %}
+        {% endif %}
+  
+                <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'operation.titre'|trans({},'recherche')}}</h2>
+		<!--  Debut du box compte-->
+                 <form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_recherche_operationadmin",{'locale':locale,'afficher':1,'post':1}) }} " method="post"  id="ajoutImage">
+		                
+                      <div>
+                                <label class="labelLong">{{'abonnes.form.numCompte'|trans({},'abonnes')}} <span class="red-text">*</span></label>
+                                <input name="numCompte" type="text" value="{{ cpte }}" id="numCompte"/>
+                        </div>
+			<div>
+				<label class="labelLong">{{'operation.du'|trans({},'recherche') }} <span class="red-text">*</span></label>
+				<input name="datedebut" type="text" class="montant" id="from" value="{{ datedeb }}" />
+				<label class="labelLong expLabel">{{'operation.au'|trans({},'recherche') }} <span class="red-text">*</span></label>
+				<input name="datefin"type="text" class="montant" id="to" value="{{ datefin }}" />
+                        </div>                      
+                        <div> 
+				<label class="labelLong">{{'operation.montantMin'|trans({},'recherche')}}</label> <input name="mttde" class="montant" type="text" id="montantdeb" value="{{ mttde }}" />
+				<label class="labelLong expLabel">{{'operation.montantMax'|trans({},'recherche')}}</label> <input name="mtta" class="montant" type="text" id="montantfin" value="{{ mttap }}" /> 
+			</div> 
+			<div>
+				<label class="labelLong">{{'operation.sens'|trans({},'recherche')}}</label>
+				<select name="sens" id="sens">
+                    <option value=""  {% if post == 1 %}{% if sens|lower != "d" and sens|lower == "c" %} selected="selected" {% endif %}{% endif %}  class="choix" >{{'operation.tiret'|trans({},'recherche')}}</option>
+					<option value="D" {% if sens|lower == "d" %} selected="selected" {% endif %}  class="choix" >{{'operation.debit'|trans({},'recherche')}}</option>
+                    <option value="C" {% if post == 1 %}{% if sens|lower == "c" %} selected="selected" {% endif %}{% endif %}  class="choix" >{{'operation.credit'|trans({},'recherche')}}</option>
+				</select>
+				<input class="boutonSubmit" type="submit" value="{{'client.rechercher'|trans({},'messages') }}"/>
+				<div class="clr"></div>
+			</div>
+                                                              
+                 
+              </form>
+                
+         
+                
+       {% if afficher==1%}         
+                <div class=" marginBottom10p"></div>
+               <div class="result_recherch">
+			<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'operation.resultat'|trans({},'recherche')}}</h2>
+		</div>            
+	<div class="marginBottom10p">  
+             <form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_exporter_operationadmin",{'locale':locale,'cpte':cpte,'deb':datedeb,'fin':datefin,'mttde':mttde,'mtta':mttap,'sens':sens|upper}) }} " method="post"  id="ajoutImage" target="_blank">
+                 <div class="printBut"> <a href="{{path('utb_client_exporter_operationadmin',{'imprimer':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mttde':mttde,'mtta':mttap,'sens':sens|upper})}}" target="_blank">
+                                {{'operation.imprimer'|trans({},'recherche')}}</a></div>
+		{#<form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_recherche_operationadmin",{'locale':locale}) }} " method="post"  id="ajoutImage">#}
+                        <div class="downloadBut">
+                                <a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/client-img/icon-24-download.png')}}" alt="Télécharger" title="{{'compte.telecharge'|trans({},'compte') }}" />
+                                <span>{{'operation.telecharger'|trans({},'recherche')}} </a></span>
+                                <select name="typefichier">
+                                    
+                                        <option value="1" >EXCEL</option>
+                                        <option value="2" >CSV</option>
+                                        <option value="3" >TXT</option>
+                                        <option value="4" >PDF</option>
+                                </select>
+                                <input type="submit" value="Ok" id="j_bouton" style="display: none"/>
+                                <div class="clr"></div>
+                        </div>
+                
+               </form>
+		<div class="clr"></div>
+            
+	</div>
+         {#       
+                <br/>
+                
+       <div class="marginBottom10p">  
+           
+           {  dump(last_page)  }} - {{  dump(previous_page)  }} - 
+           {{  dump(current_page)  }} - {{  dump(next_page)  }} - {{  dump(total)  }
+		
+           <div class="clr"></div>
+            
+	</div>
+                
+                <br/>#}
+                
+  
+    
+    <table class="listMenusCateg listArticlesRub">
+                <tr>
+                        <th><input type="checkbox" class="checkall" name="checkall" /></th>                        
+                        <th>{{'operation.dateop'|trans({}, 'recherche')}}</th>
+                        {# <th>{{'operation.dateval'|trans({}, 'recherche')}}</th> #}
+                        <th>{{'operation.numcpt'|trans({}, 'recherche')}}</th>                        
+                        <th>{{'operation.libop'|trans({}, 'recherche')}}</th>
+                        <th style="text-align: right;">{{'operation.mttdebit'|trans({}, 'recherche')}}</th>
+                        <th style="text-align: right;">{{'operation.mttcredit'|trans({}, 'recherche')}}</th>                        
+                        <th>{{'operation.actions'|trans({}, 'recherche')}}</th>
+                </tr>	
+
+                {% for operation in listeOperation %} 
+                        <tr  {% if operation.codOperation == '01' or operation.codOperation == '07' %}  class="soldes" {% else %} {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} {% endif %} >
+                                <td class="statutArtList"> <input type="checkbox" name="operation[]"  rel="operation_c" value="{{operation.id}}" /> </td>
+                                <td class="titreList"> {{operation.dateOperation|date("d/m/Y")|datelangue(locale) }} </td>   
+                                {# <td class="titreList"> 
+                                    {% if operation.dateValeur|date('Y')|trim =='-0001' %}                                                             
+                                    {% else %}     
+                                      {{operation.dateValeur|date("d/m/Y") }} 
+                                    {% endif %}      
+                                 </td> #}
+                                <td class="titreList"> {{operation.numeroCompte|raw }} </td>                                                               
+                                <td class="titreList">
+                                {% if operation.codOperation == '01' %}
+                                    {{ 'operation.soldedeb'|trans({}, 'recherche')}} 
+                                {% elseif operation.codOperation == '07' %}
+                                    {{ 'operation.soldefin'|trans({}, 'recherche')}}
+                                 {% else %}
+                                    {{operation.libOperation|raw }}
+                                 {% endif %}
+                                </td> 
+                                     <td class="titreList w100" style="text-align: right;">
+                                 {% if operation.sensOperation == 'D' %}
+                                    {{operation.montant|number_format(0, '', ' ') }}
+                                 {% else %}
+                                 {% endif %}
+                                </td>
+                                <td class="titreList w100" style="text-align: right;">
+                                 {% if operation.sensOperation == 'C' %}
+                                    {{operation.montant|number_format(0, '', ' ') }}
+                                 {% else %}
+                                 {% endif %}
+                                </td>
+                           
+                                <td class="titreList">
+                                    <div id="basic-modal">
+                                        {% if operation.codOperation == '01' or operation.codOperation == '07' %}
+                                        {% else %}							
+                                            <a href="#" onClick="ouvrirdetail({{operation.id}});" class="basic"><img src='{{ asset('img/client-img/icon-25-magnifying-glass.png')}}' alt='' /></a>
+                                        {% endif %}
+                                    </div>
+                                    <div id="{{"basic-modal-content"~operation.id}}" class="basic-modal-content"> 
+                                        <h3>{{ 'operation.detailsoperation'|trans({}, 'recherche')}}</h3>
+                                        <div class="ligne">
+                                            <div class="part1">{{ 'abonnes.form.numCompte'|trans({}, 'abonnes')}} :</div> <div class="part2">{{operation.numeroCompte|raw }}</div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">{{ 'operation.libop'|trans({}, 'recherche')}} :</div> 
+                                            <div class="part2">
+                                                {% if operation.codOperation == '01' %}
+                                                    {{ 'operation.soldedeb'|trans({}, 'recherche')}} 
+                                                {% elseif operation.codOperation == '07' %}
+                                                    {{ 'operation.soldefin'|trans({}, 'recherche')}} 
+                                                 {% else %}
+                                                    {{operation.libOperation|raw }}
+                                                 {% endif %}
+                                            </div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">
+                                                {{ 'operation.montant'|trans({}, 'recherche')}} {% if operation.sensOperation == 'C' %}(crédit){% elseif operation.sensOperation == 'D'  %}(débit){% endif %}                                                
+                                            </div>
+                                            <div class="part2" style="text-align: right;">
+                                                {% if operation.sensOperation == 'C' %}{{operation.montant|number_format(0, '', ' ') }}{% elseif operation.sensOperation == 'D'  %}{{operation.montant|number_format(0, '', ' ') }}{% endif %}  
+                                            </div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">{{ 'operation.nummouvement'|trans({}, 'recherche')}} :</div> <div class="part2">{{operation.numeroMvt }}</div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">{{ 'operation.dateop'|trans({}, 'recherche')}} :</div> <div class="part2">{{operation.dateOperation|date("d/m/Y")|datelangue(locale) }}</div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">{{ 'operation.dateval'|trans({}, 'recherche')}} :</div> 
+                                            <div class="part2">
+                                                {% if operation.dateValeur|date('Y')|trim =='-0001' %} 
+                                                    ---
+                                                {% else %}     
+                                                  {{operation.dateValeur|date("d/m/Y")|datelangue(locale) }} 
+                                                {% endif %}
+                                            </div>
+                                            <div class="clr"></div>
+                                        </div>
+                                        <div class="ligne">
+                                            <div class="part1">{{'operation.soldeligne'|trans({}, 'recherche')}} :</div> 
+                                            <div class="part2">
+                                             {% if operation.soldeEnLigne != 0 %}
+                                                             {{operation.soldeEnLigne|number_format(0, '', ' ') }} 
+                                                            {% endif %}    
+                                            </div>
+                                            <div class="clr"></div>
+                                        </div>
+                                    </div>
+                                    <!-- preload the images -->
+                                    <div style='display:none'>
+                                         <img src='{{ asset('img/client-img/x.png')}}' alt='' />
+                                    </div>
+                                </td>
+                        </tr>
+                {% else %}
+                         <tr>
+                           <td colspan="7" class="">{{ 'operation.operation.none'|trans({}, 'recherche') }} </td>       
+                         </tr>       
+                {% endfor %}                                                                                                       
+   </table> 
+		<!--Fin du box compte-->
+
+            <div class="page center">
+                
+                {% if last_page > 1 %}
+                    <div class="paginationTry">
+
+                          <a href="{{ path('utb_client_recherche_operationadmin', { 'page': 1,'imprimer':0,'afficher':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mtta':mttap,'mttde':mttde,'sens':sens,'locale':locale, }) }}"> <span> << </span> </a> 
+                          <a href="{{ path('utb_client_recherche_operationadmin', { 'page': previous_page,'imprimer':0,'afficher':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mtta':mttap,'mttde':mttde,'sens':sens,'locale':locale, }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                          {% for page in 1..last_page %}
+                                {% if page == current_page %}
+                                <span class="pagination_active">{{ page }}</span>
+                                {% else %}
+                                <span><a href="{{ path('utb_client_recherche_operationadmin', { 'page': page,'imprimer':0,'afficher':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mtta':mttap,'mttde':mttde,'sens':sens,'locale':locale, }) }}">{{ page }}</a></span>
+                                {% endif %}
+                          {% endfor %}
+                          <a href="{{ path('utb_client_recherche_operationadmin', { 'page': next_page,'imprimer':0,'afficher':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mtta':mttap,'mttde':mttde,'sens':sens,'locale':locale, }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                          <a href="{{ path('utb_client_recherche_operationadmin', { 'page': last_page,'imprimer':0,'afficher':1,'cpte':cpte,'deb':datedeb,'fin':datefin,'mtta':mttap,'mttde':mttde,'sens':sens,'locale':locale, }) }}"> <span> >> </span></a>
+
+                      </div>
+                 {% endif %}
+                  <br/>    
+                <div class="pagination_desc">
+                   <center>
+                       <strong>{{ total }}</strong> {{ 'operation.trouve'|trans({}, 'recherche') }}
+                       {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                   </center>
+                </div>
+                
+            </div>
+{% endif%}
+	<script type="text/javascript">
+            
+            function ouvrirdetail(id){
+        
+		$('#basic-modal-content'+id).modal();
+		return false;	
+            }
+            
+            $(".montant").numeric();
+            $('.boutonSubmit').click(function() { 
+                if($("#numCompte").val()==0 && $("#from").val()==0 && $("#to").val()==0 && $("#montantdeb").val()==0 && $("#montantfin").val()==0 && $("#sens").val()==""){
+                    alert('{{'operation.critere'|trans({}, 'recherche')}}');
+                    return false;
+                }
+            });
+	</script>                 
+{% endblock %}
+		

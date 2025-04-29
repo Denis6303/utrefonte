@@ -1,0 +1,128 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig -----------------#}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+  
+{% block public_body %}
+        {% if larubrique[0].id != 7 %}
+		<div class="span-24 borderBotStyle marginBottom10p paddingBottom20p bgBlanc">		<!-- borderBotStyle bgBlanc -->
+		<!-- <h1 class="paddingTopBot20p paddingBottom20p bleuLogo center">Nos Produits et Services offerts aux Particuliers</h1> -->
+		<div class="boxEinfo leftSpace rightSpace">
+			<h1 class="boxSection-titre title-WithLeftBar gris-text">{{larubrique[0].nomRubrique}}</h1>
+			<div class="">
+                                {% for uneimage in image %}
+                                    <div class="einfoIlustr"> <img src="{{ asset('upload/rubriques/'~uneimage.urlMedia)}}" alt="" title=""/></div>
+				{% endfor %}
+                                <div class="einfoDescr useOth listItem4">
+                                    {% if larubrique[0].descriptionRubrique != "- default text -" %}
+					 {{larubrique[0].descriptionRubrique|raw}}
+                                    {% endif %}
+				</div>
+				<div class="clr"></div>
+			</div>
+		</div>
+		</div>
+	{% endif %}
+        <div class="span-24 marginBottom10p paddingTopBot10p borderBotStyle bgBlanc">		
+                
+		<div class="rubriquePGarde leftSpace rightSpace marginBottom10p">
+			<h1 class="boxSection-titre title-WithLeftBar gris-text">
+			{% if larubrique[0].id != 7 %} 
+				{{ 'agence.prod'|trans({}, 'site') }}
+                {% else %}
+				{{ 'agence.res'|trans({}, 'site') }}
+                {% endif %}			
+			</h1><div class="clr"></div>
+		</div>		
+                <div class="span-24"> <!--  -->
+                        <div class="leftBigCol leftSpace rightSpace">                        
+                                <div class="all-boxInterieur-type1"> 
+								 {% if larubrique[0].id != 7 %} 
+								 <div class="boxInterieur-type1">
+					<div class="cnt-boxInterieur-type1 border-ciel borderBotStyle">
+						<div class="titre-boxInterieur-type1">
+							<h1 class="bleuLink title3" style="margin-left:25px; background:none; margin-right:0px; float:left; width:100px;"><a href="">{{ 'agence.avis'|trans({}, 'site') }}</a></h1>
+							<div class="butNavigActuHome butNavigActuHomeRub">
+								<span class="prevItem"> </span>
+								<span class="nextItem"> </span>
+							</div><div class="clr"></div>
+						</div>
+						<div class="text-boxInterieur-type1">
+							<div class="carousel-actus">
+                                                            <ul>
+                                                                {% for actualite in listeactualite %}                                                    
+                                                                    <li>
+
+                                                                       {% if actualite.idrubrique == 6 %}
+                                                                                    <div class="one-actusavis bleuLogo">	<!-- une actualité/avis-->
+                                                                       {% else %}
+                                                                                    <div class="one-actusavis">        
+                                                                       {% endif %}
+                                                                            {% if actualite.urlMedia == "default.png"%}
+                                                                            {% else%} 
+                                                                                            <img src="{{asset('upload/articles/'~actualite.urlMedia)}}" alt="" title="" />
+                                                                            {% endif%}
+                                                                                    <p class="actusavis-descrp">
+                                                                                                                    <span class="actusavis-date">{{actualite.articleDateAjout|date("d/m/Y")}}</span><br/>
+                                                                                                                    <a class="actusavis-titre bleuLogo LkUnderline strong" href="{{ path('utb_site_article',{'id': actualite.id,'locale':locale}) }}">{{actualite.titreArticle}}</a>
+                                                                                                                    <div class="partieDesc" style="padding-top:5px;">{% if actualite.introTexteArticle == "" %}{{actualite.descriptionArticle|raw}}{% else %}{{actualite.introTexteArticle|raw}}{% endif %} </div>
+                                                                                                                  
+                                                                                    </p>	<!-- FIN p.actusavis-descrp-->
+                                                                                    </div>
+
+                                                                    </li>
+                                                                {% endfor  %}
+							    </ul>
+							</div>
+						</div>	<!-- FIN DIV.cnt-boxInterieur-type1 -->
+						<div class="descr-boxInterieur-type1 rightPosition" style="height:auto; padding:0 10px 10px 0; border:none;">
+							<a class="blueLink seeAll" href="{{ path("utb_site_rubrique",{'locale': locale,'id': 2, 'type':7,'typecate': 0, 'date':0})}}">{{ 'agence.voir'|trans({}, 'site') }} </a>
+						</div>	<!-- FIN DIV.desc-boxInterieur-type1 -->
+                                                <div class="clr"></div>
+					</div>
+				</div>
+				{% endif %}				 								
+                                {% for sousrubrique in listesousrub %}
+
+                                        {{allmacro.AfficherSousRub(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.descriptionRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,locale)}}
+
+                                 {% endfor %}
+                                <div class="clr"></div>
+			</div>	<!-- FIN DIV.leftBigCol leftSpace marginBottom10p-->
+                </div>		<!-- FIN DIV.SPAN-24-->
+        </div>	                
+        </div>	    
+                <div class="span-24 paddingTopBot10p marginBottom20p borderBotStyle bgBlanc">
+                    <div class="rubriquePGarde leftSpace rightSpace marginBottom10p">
+                        <h1 class="boxSection-titre title-WithLeftBar gris-text">{{ 'agence.hor'|trans({}, 'site') }}</h1><div class="clr"></div>
+                    </div>
+                    <div class="othersPrdSrv leftSpace rightSpace">                            
+                        <div style="margin-bottom:15px;">
+                           
+                              {{notrearticle.descriptionArticle|raw}}
+                        
+
+                        </div>
+                    </div>	
+                </div>            
+        <div class="span-24 paddingTopBot10p marginBottom20p borderBotStyle bgBlanc">
+                     <div class="rubriquePGarde leftSpace rightSpace marginBottom10p">
+                             <h1 class="boxSection-titre title-WithLeftBar gris-text">{{ 'agence.serv'|trans({}, 'site') }}</h1><div class="clr"></div>
+                     </div>
+                     <div class="othersPrdSrv leftSpace">                            
+             {{allmacro. AfficherSolutionGral(solutiongenerale,locale)}}           
+         </div>	
+       </div>         <!-- FIN span-24 marginBottom20p paddingTopB  ot20p borderBotStyle bgBlanc-->	
+    <script type="text/javascript"> 
+        $('.partieDesc').truncate({
+                width: '1000px',
+              
+                token: '...',
+                side: 'right',
+                addclass: false,
+                addtitle: true,
+        });       
+    </script>
+{% endblock %}

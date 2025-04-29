@@ -1,0 +1,163 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'messageries.liste.grandtitrepg'|trans({}, 'messageries') }}
+{% endblock %}
+
+  {% block client_centre_body %} 
+  
+  {% if notification|length == 1%}
+
+    {% else%}
+  
+  <script type="text/javascript">
+
+    function generate(text,layout) {
+        var n = noty({
+            text: text,
+            type: 'warning',
+            dismissQueue: true,
+            layout: layout,
+            theme: 'defaultTheme'
+        });
+        console.log('html: ' + n.options.id);
+    }
+
+    function generateAll() {
+        
+        generate('{{notification|raw}}','bottomRight');
+    }
+
+    $(document).ready(function() {
+
+        generateAll();
+
+    });
+
+</script>
+
+           
+    {% endif%}
+	<!-- **************************************************** CENTRE + DROITE ********************************************** -->
+         <div class="paddingBottom20p">
+             {% for message in app.session.flashbag.get('accesdenied') %}
+                <div class="error rightSpace leftSpace center">{{ message|trans }}</div>
+              {% endfor %}
+	<ul class="filariane bleuLink">
+		<li><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</li>
+	</ul>
+
+        {#{% if notification|length == 1%}
+ 
+        {% else%}
+            <div class="">
+                <a href="#" id="zoombox1" onclick="$.zoombox.html({{'\"'~notification|raw~'\"'}}, {theme: 'prettyphoto', width: 650, overflow: false});
+                        return false;">
+                </a>
+            </div> 
+        {% endif%}  #}    
+
+       
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'client.tb.titre'|trans({},'messages') }}</h2>
+
+        {#%if listeMail|length > 0 %#} 
+            <div class="dashboard marginBottom10p">
+		<div>
+			<h3 class="tbMesmessages titleStyleTB title3 bgHomeBleu"><a href="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}">{{'client.tb.lastMessage'|trans({},'messages') }}</a></h3>
+			<div class="icon-bgHbleu"></div>
+			<div class="clear"></div>
+		</div>
+                <table class="withTDborder bgHomeBleuTable">
+                        {%if listeMail|length > 0%} 
+                        <tr>
+                                <th>&nbsp; </th>
+                                <th>{{'client.tb.objet'|trans({},'messages') }}</th>
+                                <th>{{'client.tb.emetteur'|trans({},'messages') }} </th>
+                                <th>{{'client.tb.dateMessage'|trans({},'messages') }} </th>
+
+                        </tr>
+                        {%endif%} 
+                        {% for unmessage in listeMail %}
+                        <tr>
+                            <td style="width:30px"> <img src="{{ asset('img/client-img/puce-pencil-bleu.png')}}" alt="" title="" /> </td>
+                            <td style="width:350px"> 
+                                    {%if (unmessage is not null) and (unmessage.objetMessageClient is defined) %}
+                                    
+						 {% if unmessage.msgLu == 0 %}
+							<strong><a href="{{ path('utb_client_detailmsgutil',{'idenvoi':unmessage.idEnvoi,'locale':locale,'type':1})}}"> {{unmessage.objetMessageClient}} </a> </strong>
+						 {% elseif unmessage.msgLu == 1 %}
+							<a href="{{ path('utb_client_detailmsgutil',{'idenvoi':unmessage.idEnvoi,'locale':locale,'type':1})}}">{{unmessage.objetMessageClient}}</a>                                                                           
+						 {% endif %}                                    
+                                            
+                                    {% endif %}
+                            </td>
+                            <td style="width:150px">{{ unmessage.profil }}</td>
+                            <td style="width:150px">{{unmessage.dateEnvoiMsg|date("d/m/Y")}}</td>
+
+                        </tr>
+                        {% else %}
+                            {#%if listeMail|length == 0%#}
+                                <tr>
+                                        <div class="noMessage center "><h3 class="title3">{{'client.tb.noMessage'|trans({},'messages') }} </h3> </div>
+                                </tr>
+                            {#% endif %#}
+                        {% endfor %}    
+
+                </table>
+                    {%if listeMail|length > 1 %} 
+                         <div class="icon-all"><a href="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}"><img src="{{ asset('img/client-img/puce-all.png')}}" alt="Tous" title="{{'messagerie.tous'|trans({},'messagerie') }}" /></a></div>
+                    
+                    {% else %}
+                    <div class="icon-all" style="margin-bottom:30px;"></div> 
+                    {% endif %}
+
+            </div>	<!-- FIN div.marginBottom10p-->
+        {#%endif%#}        
+        
+	<div class="dashboard marginBottom10p">
+		<div>
+			<h3 class="tbMesconnexions titleStyleTB title3 bgHomeGris"><a href="{{ path("utb_client_historique_type",{'type':1 ,'idAbonne':app.request.get('id_abonne'), 'locale':locale}) }}">{{'client.tb.lastConnexion'|trans({},'messages') }}</a></h3>
+			<div class="icon-bgHgris"></div>
+			<div class="clear"></div>
+		</div>
+		<table class="withTDborder bgHomeGrisTable">
+			<tr>
+				<th>&nbsp; </th>
+				<th>{{'client.tb.deb'|trans({},'messages') }}</th>
+				<th>{{'client.tb.fin'|trans({},'messages') }}</th>
+				<th>{{'client.tb.duree'|trans({},'messages') }}</th>
+			</tr>                        
+                        {% for histo in listeHisto %}
+                            <tr>
+                                <td style="width:30px"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                                <td style="width:350px">{{histo.dateDeb|date('d/M/Y H:i:s')}}</td>
+                                <td style="width:150px">
+                                    {% if histo.dateFin != null %}   
+                                        {{histo.dateFin|date('d/M/Y H:i:s')}}                                
+                                    {% endif %}   
+                                </td>        
+                                <td style="width:150px">
+                                    {% if histo.duree != '' %}   
+                                        {{histo.duree}}                                
+                                    {% else %} 
+                                        {% if loop.index != 1 %}
+                                            {{ 'historique.tempsConnexion'|trans({}, 'messages')}}
+                                        {% else %}
+                                            Connexion en cours ...
+                                        {% endif %}
+                                    {% endif %} 
+                                </td>
+                            </tr>
+                        {% endfor %}                         
+		</table>
+		<div class="icon-all"><a href="{{ path("utb_client_historique_type",{'type':1 ,'idAbonne':app.request.get('id_abonne'), 'locale':locale}) }}"><img src="{{ asset('img/client-img/puce-all.png')}}" alt="Tous" title="{{'historique.voir'|trans({},'messages') }}" /></a></div>
+	</div>	<!-- FIN div.marginBottom10p-->
+</div>
+
+            <script language="javascript" >         
+
+              jQuery(document).ready(function() {
+                 $('#zoombox1').click(); 
+              });                 
+            </script> 
+
+{% endblock %}

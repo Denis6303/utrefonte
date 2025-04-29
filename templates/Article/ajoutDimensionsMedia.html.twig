@@ -1,0 +1,20 @@
+{# empty Twig template #}
+<form action=" {{ path("utb_admin_ajoutdimensionsmedia",{'id': id,'idmedia': idmedia,'locale':locale,'type': type}) }} " method="post" {{ form_enctype(form) }} >
+
+	<div class="FrmAjoutArt">
+		{{ form_errors(form.Largeur) }}
+		<label>{{ form_label(form.Largeur, 'admin.dimensions.largeur'|trans({}, 'messages')) }}</label>
+		{{ form_widget(form.Largeur) }}
+		<div class="clr"></div>
+	</div>
+	
+	<div class="FrmAjoutArt">
+		{{ form_errors(form.hauteur) }}
+		<label>{{ form_label(form.hauteur,  'admin.dimensions.hauteur'|trans({}, 'messages')) }}</label>
+		{{ form_widget(form.hauteur) }}
+		<div class="clr"></div>
+	</div>	  
+	
+	<input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op"  />
+	<div class="clr"></div>
+</form> 

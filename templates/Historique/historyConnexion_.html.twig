@@ -1,0 +1,102 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Historiques de connexion
+{% endblock %}
+  
+{% block client_centre_body %}
+{% set type_user = app.request.get('type_user') %}
+  <ul class="filariane bleuLink">
+                <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+                <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                {% if type_user =="utilisateur" %}
+                <li><a href="{{ path("utb_client_detail_utilisateur",{'locale':locale}) }}">{{'abonnes.perso'|trans({},'abonnes') }}</a></li>
+                {% else %}
+               <li><a href="{{ path("utb_client_detail_abonne",{'locale':locale}) }}">{{'abonnes.perso'|trans({},'abonnes') }}</a></li>                    
+                {% endif%}
+                <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                <li>{{ 'historique.titre'|trans({}, 'messages')}}</li>
+        </ul>
+
+        <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{ 'historique.titre'|trans({}, 'messages')}}</h2>
+        <div class="marginTop20p">
+                
+                <table class="withTDborder bgHomeGrisTable">                                    
+                    <tr>
+                        <th>&nbsp; </th>
+                        <th>{{ 'historique.dateDeb'|trans({}, 'messages')}}</th>
+                        <th>{{ 'historique.dateFin'|trans({}, 'messages')}}</th>
+                        <th> {{ 'historique.duree'|trans({}, 'messages')}} </th>
+                    </tr>                                    
+
+                {% for histo in listeHisto %}                   
+                    <tr>
+                        <td style="width:30px;"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                        <td style="width:300px;">{{histo.dateDeb|date('d/M/Y H:i:s')}}</td>                         
+                        <td style="width:250px">
+                                    {% if histo.dateFin != null %}   
+                                        {{histo.dateFin|date('d/M/Y H:i:s')}}                                
+                                    {% else %} 
+                                         -
+                                    {% endif %} 
+                        </td>                              
+                            
+                        <td style="width:200px;">
+                                    {% if histo.duree != '' %}   
+                                        {{histo.duree}}                                
+                                    {% else %} 
+                                        {% if loop.index != 1 %}
+                                            {{ 'historique.tempsConnexion'|trans({}, 'messages')}}
+                                        {% else %}
+                                           {{ 'historique.enCours'|trans({}, 'messages')}}
+                                        {% endif %}
+                                    {% endif %} 
+                        </td>
+                    </tr>
+                {% endfor %}  
+                </table> 
+            
+            <div class=" bleuLogo marginTop10p">
+            <div class="page center">
+                
+                {% if last_page > 1 %}
+                    <div class="paginationTry">
+
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': 1,'locale':locale }) }}"> <span> << </span> </a> 
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': previous_page,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans({}, 'messages')}} </span> </a>
+                          {% for page in 1..last_page %}
+                                {% if page == current_page %}
+                                <span class="pagination_active">{{ page }}</span>
+                                {% else %}
+                                <span><a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'),'idAbonne':app.request.get('id_abonne'), 'page': page }) }}">{{ page }}</a></span>
+                                {% endif %}
+                          {% endfor %}
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': next_page,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans({}, 'messages')}} </span> </a>
+                          <a href="{{ path('utb_client_historique_type', {'type':type ,'idAbonne':app.request.get('id_abonne'), 'page': last_page,'locale':locale }) }}"> <span> >> </span></a>
+
+                      </div>
+                 {% endif %}
+                  <br/>    
+                <div class="pagination_desc">
+                   <center>
+                       <strong>{{ total }}</strong> {{'client.historique.total'|trans({},'messages') }}
+                       {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                   </center>
+                </div>
+                
+            </div>
+           {#<div class="nav">
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_premier.png')}}" /></a></span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_precedent.png')}}" /></a></span>
+                <span>1</span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_suivant.png')}}" /></a></span>
+                <span><a href="#"><img src="{{ asset('img/client-img/puce_dernier.png')}}" /></a></span>
+            </div>#}
+            <div class="clear"></div>
+        </div>
+
+        </div>
+        <div class="clr"></div>
+
+	<!-- **************************************************** FIN DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+        
+{% endblock %}

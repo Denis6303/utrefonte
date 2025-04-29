@@ -1,0 +1,176 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'rubriques.liste.grandtitrepg'|trans({}, 'rubriques') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }}</a> > <a href="#">{{ 'admin.list'|trans}}</a>
+            </div>
+                                
+                                
+                               
+                                
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-10">
+               <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-newcategory.png')}}" alt="Rubrique" title="{{ 'admin.layout.menu.titrerub'|trans({},'messages')}}" /></div>
+              <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'rubriques.liste.titrepg'|trans({}, 'rubriques') }}<h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+
+
+                          <div class="span-14 last">
+
+                              <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="{{path('utb_admin_listerubrique')}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+                                  {{ 'admin.ajouter'|trans}}</a>
+                              </div>
+                              <div class="boutonGestion">
+                                  <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}" /></div>
+                                  {{ 'admin.modifier'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans}}" title="{{ 'admin.enligne'|trans}}" /></div>
+                                  {{ 'admin.activer'|trans}}</a>
+                              </div>
+                              <div class="boutonGestion btGestMoy">
+                                  <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.depublier'|trans}}" title="{{ 'admin.horsligne'|trans}}" /></div>
+                                  {{ 'admin.desactiver'|trans}}</a>
+                              </div>
+
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href=""><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.supprimgul'|trans}}" title="{{ 'admin.mettrecorbeille'|trans}}" /></div>
+                                  {{ 'admin.corbeille'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                      <div class="colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                              <div class="filtersArticles">
+                                                  <input type="text"> <input type="submit" value="OK">
+                                             
+                                                  
+
+                                                  <div class="clr"></div>
+                                              </div>						<!-- FIN filtersArticles-->
+
+                                                        <table class="listMenusCateg listArticlesRub">
+                                                            {% for rubrique in listerubrique %}
+                                                                <tr>
+                                                                    <td>              
+                                                                                   {{rubrique.nomRubrique }}
+                                                                        </td>     
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_modifrubrique', {'id': rubrique.id,'locale': locale}) }}">{{ 'admin.modifier'|trans}} fr</a> 
+                                                                        </td>            
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_supprrubrique', {'id': rubrique.id,'locale':locale}) }}">{{ 'admin.supprimer'|trans}}</a> 
+                                                                        </td>  
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_languerubrique', {'id': rubrique.id,'locale': 'en'}) }}">
+
+                                                                                {{ 'admin.modifier'|trans}} en
+                                                                            </a> 
+                                                                        </td>  
+
+
+                                                                   </tr>
+                                                             {% else %}
+                                                                        <tr>
+                                                                            <td>{{ 'rubriques.none'|trans({}, 'rubriques') }}</td>       
+                                                                        </tr>       
+                                                             {% endfor %}
+                                                         </table>
+
+
+
+                                                      </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                  </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                              </div>		<!--  FIN COL RIGHT -->
+                                          </div>			<!--  FIN  SPAN - 19 -->
+
+                                      </div>				<!--  FIN SPAN - 25 -->
+                                         <div id="form_a_container" style="display:none;">
+                                  <form id="form_addArticle">
+                                    <div class="clr"></div>
+                                     <p id="form_rubrique_container">
+                                         <span class="colorBleu"><label>{{ 'articles.selectRubrique'|trans({}, 'articles')}}<label></span> 
+                                                     <select id="rubrique" name="rubrique">
+                                                         {% for rb in listeRubrique %}
+                                                             <option value="{{rb.getId}}">{{rb.getNomRubrique}}</option>
+                                                         {% endfor %}    
+                                                     </select>          
+                                     </p> 
+                                  </form>   
+                        </div>                       
+ <script language="javascript" >
+     
+       function ajouterArticle(){
+           var args = {modal: true, autoOpen: false, title: ('Ajouter un article'), width:400,height:200};
+           $('#form_a_container').dialog(args);
+           var rubrique;
+           rubrique  = $("#rubrique").val();
+
+               $('#form_a_container').dialog({
+                   
+                   buttons: {
+                           "OK": function() {
+                               
+                                $.ajax({
+                                   type: "POST",
+                                   url: "{{ path('utb_admin_addArticle')}}",
+                                   data: {formdata:$("#form_addArticle").serialize()},
+                                   cache: false,
+                                   success: function(data){
+                                        var resJson = jQuery.parseJSON(data);
+                                        window.location = resJson.url;
+                                   }
+                               });                             
+                           },                   
+                           "{{ 'admin.annuler'|trans}}": function() {
+                               $(this).dialog("close");
+                           }
+                   }
+               })             
+              $('#form_a_container').dialog('open');          
+       }
+  </script>                                      
+  {% endblock %}

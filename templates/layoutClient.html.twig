@@ -1,0 +1,471 @@
+{# src/utb/ClientBundle/Resources/views/layoutClient.html.twig #}
+{% extends "::layoutClient.html.twig" %}
+{% block title %}
+{{ parent() }}
+{% endblock %}
+
+{% block body %}
+      
+{% block client_gauche_body %}
+
+{% set type_user = app.request.get('type_user') %}
+{% set actif = 0 %}
+{% set actif = app.request.get('actif') %}
+{% set subab = app.request.get('sousAbonne') %}
+
+
+<style>
+    
+</style>
+<div class="connect-menuTools">
+<ul class="menuTools">
+		{% set currentPath = app.request.attributes.get('_route') %}
+		
+                
+		{# Gestion abonnés #}                                                            
+		{% if (type_user == "utilisateur") and ( ('listeAction'|validAcess) or ('EditAction'|validAcess) or ('mesAbonnesAction'|validAcess)) %} 
+			<li class="groupMenuTools-lk toggleSubMenu">
+				<a class="groupLink" href="">
+					<div class="groupMenuTools bgUserConnect">
+						<div class="styleRetrait mComptes">
+                                                    <div>
+                                                        {% if actif==1 or currentPath == "utb_client_liste_abonne" or currentPath == "utb_client_mes_abonnes" or currentPath == "utb_client_ajout_abonne" or currentPath == "utb_client_detail_abonneadmin" or currentPath == "utb_client_detail_compte" or currentPath == "utb_client_corbeille_abonne" or currentPath == "utb_client_add_sub_abonne"  %}
+                                                        <div class="puce2">
+                                                            {% else %}
+                                                            <div class="puce">
+                                                                {% endif %}
+                                                        <h2 >{{'abonnes.gestion.titre'|trans({},'abonnes') }}</h2></div></div>
+                                                    <p></p>
+						</div> 
+					</div>
+				</a>	<!--FIN groupMenuTools-->
+                               {% if actif==1 or currentPath == "utb_client_liste_abonne" or currentPath == "utb_client_mes_abonnes" or currentPath == "utb_client_ajout_abonne" or currentPath == "utb_client_detail_abonneadmin" or currentPath == "utb_client_detail_compte" or currentPath == "utb_client_corbeille_abonne" or currentPath == "utb_client_add_sub_abonne"  %}
+				<ul class="subMenu2">
+                               {% else %}
+                                <ul class="subMenu">        
+                               {% endif %}
+                                    {% if('listeAction'|validAcess) %} 
+					<li class="tools-mescomptes"><a href="{{ path("utb_client_liste_abonne",{'locale':locale}) }}">{{'abonnes.gestion.liste'|trans({},'abonnes') }}</a></li>
+                                    {% endif %}
+                                    {% if('mesAbonnesAction'|validAcess) %} 
+					<li class="tools-mescomptes"><a href="{{ path("utb_client_mes_abonnes",{'locale':locale}) }}">{{'abonnes.gestion.mesabonnes'|trans({},'abonnes') }}</a></li>
+                                    {% endif %}
+                                    {% if('EditAction'|validAcess) %}     
+					<li class="tools-gestionnaire"><a href="{{ path("utb_client_ajout_abonne",{'locale':locale}) }}">{{'abonnes.ajout'|trans({},'abonnes') }}</a></li>
+                                    {% endif %}
+ {% if('addSousAbonneAction'|validAcess) %}     
+					<li class="tools-gestionnaire"><a href="{{ path("utb_client_add_sub_abonne",{'locale':locale}) }}">{{'abonnes.ajoutsa'|trans({},'abonnes') }}</a></li>
+                                    {% endif %} 										
+                                     {% if('corbeilleAbonneAction'|validAcess) %} 
+					<li class="tools-corbeille"><a href="{{ path("utb_client_corbeille_abonne",{'locale':locale}) }}">{{'abonnes.gestion.corbeille'|trans({},'abonnes') }}</a></li>
+                                    {% endif %}
+					{#<li class="tools-searchMv"><a href="{{ path("utb_client_ajout_abonne",{'locale':locale}) }}">Recherche</a></li>#}
+				</ul>
+			</li>                     
+			
+			
+		{% endif %}   
+		
+		{% if (type_user == "abonne") and
+                   ( ('showMesComptesAction'|validAcess) or ('rechercheOperationEspaceAbonneAction'|validAcess)
+                     or ('listeGestionnaireAction'|validAcess) or ('releveAbonneAction'|validAcess) )  %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools">
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if actif==1 or currentPath == "utb_client_mesComptes" or currentPath == "utb_client_recherche_operationabonne" or currentPath == "utb_client_liste_gestionnaire" or currentPath == "utb_client_releveabonne"  or currentPath == "utb_client_detail_compte_abonne" %}
+                                                                                <div class="puce2">
+                                                                                {% else %}
+                                                                               <div class="puce">
+                                                                                   {% endif %}
+                                                                                <h2>{{'compte.titre'|trans({},'compte') }}</h2></div></div>
+											<p></p>
+									</div> 
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+
+                                            {% if actif==1 or currentPath == "utb_client_mesComptes" or currentPath == "utb_client_recherche_operationabonne" or currentPath == "utb_client_liste_gestionnaire" or currentPath == "utb_client_releveabonne"  or currentPath == "utb_client_detail_compte_abonne" %}
+                                             <ul class="subMenu2">
+                                            {% else %}
+                                             <ul class="subMenu2">        
+                                            {% endif %}
+                                                     
+                                            {% if('showMesComptesAction'|validAcess) %} 
+							<li class="tools-mescomptes "><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre1'|trans({},'compte') }}</a></li>
+                                            {% endif %}             
+                                            {% if('rechercheOperationEspaceAbonneAction'|validAcess) %}             
+							<li class="tools-searchMv"><a href="{{ path("utb_client_recherche_operationabonne",{'locale':locale}) }}">{{'operation.titre'|trans({},'recherche') }}</a></li>                                                                            
+                                            {% endif %}             
+                                            {% if('listeGestionnaireAction'|validAcess) %}             
+							<li class="tools-gestionnaire"><a href="{{ path("utb_client_liste_gestionnaire",{'idAbonne':1, 'locale':locale}) }}">{{'gestionnaire.titre'|trans({},'abonnes') }}</a></li>
+                                            {% endif %}             
+                                            {% if('releveAbonneAction'|validAcess) %}             
+                                                        <li class="tools-releveCompte"><a href="{{ path("utb_client_releveabonne",{'locale':locale}) }}">{{'compte.menu'|trans({},'compte') }}</a></li>
+                                            {% endif %}           
+                                                        
+					</ul> 
+			</li>
+		{% endif %}
+			
+		<li class="groupMenuTools-lk toggleSubMenu">
+                    
+                                {% if ((type_user == "utilisateur") and ( ('envoiMessageUtilAbonnesAction'|validAcess) or 
+                                      ('envoiMessageUtilAction'|validAcess) or ('envoiMessageUtilAction'|validAcess) or 
+                                      ('boiteReceptionUtilAction'|validAcess) or ('listeMessageEnvoyeUtilAction'|validAcess)
+                                    )) or ( (type_user == "abonne") and ('messagerieAbonneAction'|validAcess) ) %}  
+                                        <a class="groupLink" href="#">                                                
+                                                        <div  {% if (type_user == "abonne") %} class="groupMenuTools" {% elseif type_user == "utilisateur" %}  class="groupMenuTools bgUserConnect" {% endif %}>
+                                                                        <div class="styleRetrait mBoxMails">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_envoimessagerieabonne" or currentPath == "utb_client_envoimessageutil" or currentPath == "utb_client_envoimessageutilabonne"  or currentPath == "utb_client_boitereceptionutil" or currentPath == "utb_client_messageenvoyeutil" 
+                                  or currentPath == "utb_client_detailmsgabonne" or currentPath == "utb_client_detailmsgabonneenv" or currentPath == "utb_client_detailmsgutil" or currentPath == "utb_client_repondremessageabonne"
+                                  or currentPath == "utb_client_repondremessageutil" or currentPath == "utb_client_transferermessageutilabonne" or currentPath == "utb_client_transferermessageutil" or currentPath == "utb_client_repondremessageabonne"%}
+                                                                                <div class="nopuce">
+                                                                                 {% else %}
+                                                                                 <div class="nopuce"> 
+                                                                                  {% endif %}   
+                                                                                    <h2 class="">{{'messagerie.titre'|trans({},'messagerie') }}</h2></div></div>
+                                                                                        <p></p>
+                                                                        </div> 
+                                                        </div>
+                                        </a>
+                                {% endif %}      <!--FIN groupMenuTools-->
+                               {% if currentPath == "utb_client_envoimessagerieabonne" or currentPath == "utb_client_envoimessageutil" or currentPath == "utb_client_envoimessageutilabonne"  or currentPath == "utb_client_boitereceptionutil" or currentPath == "utb_client_messageenvoyeutil" 
+                                  or currentPath == "utb_client_detailmsgabonne" or currentPath == "utb_client_detailmsgabonneenv" or currentPath == "utb_client_detailmsgutil" or currentPath == "utb_client_repondremessageabonne"
+                                  or currentPath == "utb_client_repondremessageutil" or currentPath == "utb_client_transferermessageutilabonne" or currentPath == "utb_client_transferermessageutil" or currentPath == "utb_client_repondremessageabonne"%}
+				<ul class="subMenu2">
+                               {% else %}
+                                <ul class="subMenu2">        
+                               {% endif %}
+                                                           
+				   {% if type_user == "abonne" %}      
+                                        {% if('messagerieAbonneAction'|validAcess) %} 
+					      <li class="tools-messages"><a href="{{ path("utb_client_envoimessagerieabonne",{'page':1, 'locale':locale}) }}">{{'messagerie.reception'|trans({},'messagerie') }} (<strong>{{ app.request.get('nbrelu') }}</strong>)</a></li>
+					{% endif %}	
+				   {% elseif type_user == "utilisateur" %}
+                                           {% if('envoiMessageUtilAbonnesAction'|validAcess) %}      
+                                              <li class="tools-newmail"><a href="{{ path("utb_client_envoimessageutilabonne",{'locale':locale}) }}">{{'messagerie.ecrire'|trans({},'messagerie') }}</a></li>
+                                           {% endif %}
+                                           {% if('envoiMessageUtilAction'|validAcess) %}                                                   
+                                              <li class="tools-newmail"><a href="{{ path("utb_client_envoimessageutil",{'locale':locale}) }}">{{'messagerie.ecrireUtil'|trans({},'messagerie') }}</a></li>
+                                           {% endif %}
+                                           {% if('boiteReceptionUtilAction'|validAcess) %}        
+                                              <li class="tools-messages"><a href="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}">{{'messagerie.reception'|trans({},'messagerie') }}(<strong>{{app.request.get('nbreluutil')}}</strong>)</a></li>
+                                           {% endif %}   
+                                           {% if('listeMessageEnvoyeUtilAction'|validAcess) %}        
+                                              <li class="tools-mailsend"><a href="{{ path("utb_client_messageenvoyeutil",{'locale':locale}) }}">{{'messagerie.envoye'|trans({},'messagerie') }}</a></li>
+                                           {% endif %}   
+				   {% endif %}
+				</ul>
+		</li>
+		
+		{% if (type_user == "abonne") and ( ('detailAbonneAdminAction'|validAcess) or 
+                      ('modifSuivantTypeAction'|validAcess) or ('historiqueTypeAbonneAction'|validAcess) ) %}
+		<li class="groupMenuTools-lk toggleSubMenu">
+				<a class="groupLink" href="">
+						<div class="groupMenuTools">
+								<div class="styleRetrait mInfoPerso">
+                                                                    <div>
+                                                                        {% if currentPath == "utb_client_detail_abonne" or currentPath == "utb_client_change_infosabonne" or currentPath == "utb_client_historique_type"  %}
+                                                                        <div class="nopuce">
+                                                                        {% else %}
+                                                                        <div class="nopuce">    
+                                                                         {% endif %}    
+                                                                            <h2>{{'abonnes.perso'|trans({},'abonnes') }}</h2></div></div>
+										<p></p>
+								</div> 
+						</div>
+				</a>	<!--FIN groupMenuTools-->
+                               {% if currentPath == "utb_client_detail_abonne" or currentPath == "utb_client_change_infosabonne" or currentPath == "utb_client_historique_type"  or currentPath == "utb_client_lookfor_log_files" %}
+				<ul class="subMenu2">
+                               {% else %}
+                                <ul class="subMenu2">        
+                               {% endif %}                                
+				   
+                                    {% if('detailAbonneAction'|validAcess) %} 
+										<li class="tools-accescode"><a href="{{ path("utb_client_detail_abonne",{'locale':locale}) }}">{{'abonnes.identifiant'|trans({},'abonnes') }}</a></li>
+                                       {% endif %}          
+                                    {% if('modifSuivantTypePwdAbonneAction'|validAcess) %}             
+										<li class="tools-lock"><a href="{{ path("utb_client_change_infosabonne",{'locale':locale,'type':1}) }}">{{'abonnes.form.modifPwd'|trans({},'abonnes') }}</a></li>
+                                       {% endif %}          
+                                    {% if('historiqueTypeAbonneAction'|validAcess) %} 
+										<li class="tools-history"><a href="{{ path("utb_client_historique_type",{'type':0 ,'idAbonne':0, 'locale':locale}) }}">{{'historique.titre'|trans({},'messages') }}</a></li>
+                                    {% endif %}    
+									
+                                    {#% if('lookForLogsAction'|validAcess) %#} 
+										{% if subab == 1 %}
+											<li class="tools-logs"><a href="{{ path("utb_client_lookfor_log_files",{'locale':locale, 'username':0,'deb':0 ,'fin':0, 'post':0}) }}">{{'historique.logs'|trans({},'messages') }}</a></li>
+										{% endif %}	
+                                    {#% endif %#}  
+									
+				</ul>
+		</li>
+		{% endif %}
+		
+		{# Gestion des utilisateurs #}
+		{% if (type_user == "utilisateur") and ( ('ajoutUtilisateurAction'|validAcess) or ('listeUtilisateurAction'|validAcess) or ('listeGestionnaireAdminAction'|validAcess) ) %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools bgUserConnect">
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_liste_utilisateur" or currentPath == "utb_client_ajout_utilisateur"  %}
+                                                                                <div class="puce2">
+                                                                                {% else %} 
+                                                                                <div class="puce">
+                                                                                {% endif %}
+                                                                                    <h2>{{'utilisateur.grandtitre'|trans({},'utilisateurs') }}</h2></div></div>
+											<p></p>
+									</div> 
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+                                        {% if currentPath == "utb_client_liste_utilisateur" or currentPath == "utb_client_ajout_utilisateur"  %}
+                                         <ul class="subMenu2">
+                                        {% else %}
+                                         <ul class="subMenu">        
+                                        {% endif %}                                        
+					
+                                            {% if('listeUtilisateurAction'|validAcess) %} 
+							<li class="tools-mescomptes"><a href="{{ path("utb_client_liste_utilisateur",{'locale':locale}) }}">{{'utilisateur.gestion.titre2'|trans({},'utilisateurs') }}</a></li>
+                                            {% endif %}               
+                                            {% if('ajoutUtilisateurAction'|validAcess) %}             
+							<li class="tools-gestionnaire"><a href="{{ path("utb_client_ajout_utilisateur",{'locale':locale}) }}">{{'utilisateur.ajout'|trans({},'utilisateurs') }}</a></li>
+                                            {% endif %}  
+                                            {% if('listeGestionnaireAdminAction'|validAcess) %}             
+							<li class="tools-gestionnaire"><a href="{{ path("utb_client_liste_utilisateur",{'locale':locale}) }}">{{'gestionnaire.titre'|trans({},'abonnes') }}</a></li>
+                                            {% endif %}                                                             
+					</ul>
+			</li>
+		{% endif %}
+		
+		{# Gestion profils #}
+		{% if (type_user == "utilisateur") and ('listeProfilAction'|validAcess) %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools bgUserConnect" >
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_listeprofil" %}
+                                                                                <div class="puce2">
+                                                                                {% else %}
+                                                                                 <div class="puce">
+                                                                                  {% endif %}   
+                                                                                    <h2>{{'profil.grandtitre'|trans({},'profils') }}</h2></div></div>
+											<p></p>
+									</div> 
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+                                        {% if currentPath == "utb_client_listeprofil" %}
+                                         <ul class="subMenu2">
+                                        {% else %}
+                                         <ul class="subMenu">        
+                                        {% endif %} 
+                                                 
+                                            {% if('listeProfilAction'|validAcess) %} 
+							<li class="tools-profil"><a href="{{ path("utb_client_listeprofil",{'locale':locale}) }}">{{'profil.titre2'|trans({},'profils') }}</a></li>
+                                            {% endif %}            
+						   {# <li class="tools-"><a href="{{ path("utb_client_ajoutprofil",{'locale':locale}) }}">Ajouter un profil</a></li>#}
+					</ul>
+			</li>
+		{% endif %}
+			
+		{# In#}    
+		{% if type_user == "utilisateur" and ( ('detailUtilisateurAction'|validAcess) or ('historiqueTypeUtilAction'|validAcess) ) %}
+		<li class="groupMenuTools-lk toggleSubMenu">
+				<a class="groupLink" href="">
+						<div class="groupMenuTools bgUserConnect">
+								<div class="styleRetrait mInfoPerso">
+                                                                    <div>
+                                                                        {% if currentPath == "utb_client_detail_utilisateur"  or currentPath == "utb_client_historique_type"%}
+                                                                        <div class="puce2">
+                                                                        {% else %}
+                                                                         <div class="puce">   
+                                                                         {% endif %}
+                                                                         <h2>{{'profil.infos'|trans({},'profils') }}</h2></div></div>
+										<p></p>
+								</div> 
+						</div>
+				</a>	<!--FIN groupMenuTools-->
+                                    {% if currentPath == "utb_client_detail_utilisateur"  or currentPath == "utb_client_historique_type"%}
+                                     <ul class="subMenu2">
+                                    {% else %}
+                                     <ul class="subMenu">        
+                                    {% endif %}    
+                                             
+                                    {% if('detailUtilisateurAction'|validAcess) %} 
+						<li class="tools-accescode"><a href="{{ path("utb_client_detail_utilisateur",{'id':app.request.get('id_abonne'),'cas':0, 'locale':locale}) }}">{{'abonnes.identifiant'|trans({},'abonnes') }} </a></li>
+				    {% endif %} 
+                                    {% if('historiqueTypeUtilAction'|validAcess) %} 		
+						<li class="tools-history"><a href="{{ path("utb_client_historique_type",{'type':1 ,'idAbonne':app.request.get('id_abonne'), 'locale':locale}) }}">{{'historique.titre'|trans({},'messages') }}</a></li>
+                                    {% endif %}             
+				</ul>
+		</li>
+		{% endif %}    			   		
+		{# Gestion controleurs-modules-actions #}
+		{% if (type_user == "utilisateur") and ('droitCltAction'|validAcess) %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+                                            <div class="groupMenuTools bgUserConnect">
+                                                <div class="styleRetrait mComptes">
+                                                    <div><div class="puce"><h2>{{'gerer.config'|trans({},'droit') }}</h2></div></div>
+                                                    <p></p>
+                                                </div> 
+                                            </div>
+					</a>	<!--FIN groupMenuTools-->
+                                    {% if currentPath == "utb_client_droit"  %}
+                                     <ul class="subMenu2">
+                                    {% else %}
+                                     <ul class="subMenu">        
+                                    {% endif %} 
+							{#<li class="tools-"><a href="{{ path("utb_client_listecontroleur",{'locale':locale}) }}">{{'gerer.droit'|trans({},'droit') }}</a></li>
+							<li class="tools-"><a href="{{ path("utb_client_listemodule",{'locale':locale}) }}">{{'gerer.module'|trans({},'droit') }}</a></li>
+							<li class="tools-"><a href="{{ path("utb_client_listeaction",{'locale':locale}) }}">{{'gerer.action'|trans({},'droit') }}</a></li> #}
+                                                {% if('droitCltAction'|validAcess) %} 
+							<li class="tools-param"><a href="{{ path("utb_client_droit",{'locale':locale}) }}">{{'gerer.liste'|trans({},'droit') }}</a></li>
+                                                {% endif %}        
+					</ul>
+			</li>
+		{% endif %}
+			
+		{#% if type_user == "utilisateur" %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+                            <a class="groupLink" href="">
+                                <div class="groupMenuTools bgUserConnect">
+                                                <div class="styleRetrait mComptes">
+                                                                <div><h2>Gestion de la facturation</h2></div>
+                                                                <p></p>
+                                                </div> 
+                                </div>
+                            </a>	<!--FIN groupMenuTools-->
+                            <ul class="subMenu">
+                                            <li class="tools-"><a href="{{ path("utb_client_definir_tarifs_facturation",{'locale':locale}) }}">Tarifs de facturation</a></li>
+
+                            </ul>
+			</li>
+		{% endif %#}
+		
+		{# Gestion Chargement #}
+		{% if (type_user == "utilisateur") and ( ('saveFileAction'|validAcess) or ('listeArchiveChargementAction'|validAcess) or ('listeDeviseAction'|validAcess)) %} 
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools bgUserConnect">
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_savefile" or currentPath == "utb_client_historiqueChargement" or currentPath == "utb_client_listeDevise" %}
+                                                                                <div class="puce2">
+                                                                                {% else %}
+                                                                                 <div class="puce">
+                                                                                      {% endif %}
+                                                                                    <h2>{{'chargement.titre'|trans({},'chargement') }}</h2></div></div>
+											<p></p>
+									</div>     
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+                                            {% if currentPath == "utb_client_savefile" or currentPath == "utb_client_historiqueChargement" or currentPath == "utb_client_listeDevise"%}
+                                             <ul class="subMenu2">
+                                            {% else %}
+                                             <ul class="subMenu">        
+                                            {% endif %} 
+                                                     
+          
+                                            {% if('listeArchiveChargementAction'|validAcess) %}         
+                                                        <li class="tools-mescomptes"><a href="{{ path("utb_client_savefile",{'type':0,'locale':locale}) }}">{{'chargement.historique'|trans({},'chargement') }}</a></li>
+                                            {% endif %}     
+											{% if('saveFileAction'|validAcess) %}
+							<li class="tools-charger"><a href="{{ path("utb_client_prerequisfile",{'type':0,'locale':locale}) }}">Prerequis de Chargement</a></li>
+                                            {% endif %}
+                                            {% if('saveFileAction'|validAcess) %}
+							<li class="tools-charger"><a href="{{ path("utb_client_envoiefile",{'type':0,'locale':locale}) }}">{{'chargement.charger'|trans({},'chargement') }}</a></li>
+                                            {% endif %}
+											 
+                                            {% if('listeArchiveChargementAction'|validAcess) %}
+                                                        <li class="tools-mescomptes"><a href="{{ path("utb_client_rapportchargement",{'locale':locale}) }}">Rapport journalier </a></li>                                            
+                                            {% endif %}
+                                            {% if('listeDeviseAction'|validAcess) %}                
+                                                        <li class="tools-mescomptes"><a href="{{ path("utb_client_listeDevise",{'locale':locale}) }}">Gestion des devises</a></li>
+                                             {% endif %}            
+					</ul>
+			</li>      
+		{% endif %}                                                               
+		
+		{# Recherche opérations #}                                                            
+		{#% if (type_user == "utilisateur" ) and (('rechercheOperationAdminAction'|validAcess) or ('tableauBordHistoriqueAction'|validAcess)) %} 
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools bgUserConnect">
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_recherche_operationadmin"  %}
+                                                                                <div class="puce2">
+                                                                                    {% else %}
+                                                                                     <div class="puce">
+                                                                                          {% endif %}
+                                                                                    <h2>{{'operation.titre2'|trans({},'recherche') }}</h2></div></div>
+											<p></p>
+									</div> 
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+                                            {% if currentPath == "utb_client_recherche_operationadmin" or currentPath == "utb_client_gethistor"  %}
+                                             <ul class="subMenu2">
+                                            {% else %}
+                                             <ul class="subMenu">        
+                                            {% endif %}
+                                            {% if('rechercheOperationAdminAction'|validAcess) %} 
+							<li class="tools-chercher"><a href="{{ path("utb_client_recherche_operationadmin",{'locale':locale,'imprimer':0,'page': 1,'afficher': 0}) }}">{{'operation.titre'|trans({},'recherche') }}</a></li>                                                                      
+                                            {% endif %}            
+                                            {% if('tableauBordHistoriqueAction'|validAcess) %} 
+							<li class="tools-mescomptes"><a href="{{ path("utb_client_gethistor",{'locale':locale}) }}">{{'operation.historique'|trans({},'recherche') }}</a></li>                                                                      
+                                            {% endif %}            
+					</ul>
+			</li>  
+		{% endif %#}
+                        
+		<!--Gestion des fonds-->	
+		{% if (type_user == "utilisateur") and ( ('listeFondsAction'|validAcess) or ('ajoutFondsAction'|validAcess) or ('listeFondsGestAction'|validAcess) ) %}
+			<li class="groupMenuTools-lk toggleSubMenu">
+					<a class="groupLink" href="">
+							<div class="groupMenuTools bgUserConnect">
+									<div class="styleRetrait mComptes">
+                                                                            <div>
+                                                                                {% if currentPath == "utb_client_listefonds" or currentPath == "utb_client_ajoutfonds" or currentPath == "utb_client_modiffonds" %}
+                                                                                <div class="puce2">
+                                                                                {% else %}
+                                                                                <div class="puce"> 
+                                                                                    {% endif %}
+                                                                                    <h2>{{'fond.titre'|trans({},'fond') }}</h2></div></div>
+											<p></p>
+									</div> 
+							</div>
+					</a>	<!--FIN groupMenuTools-->
+                                            {% if currentPath == "utb_client_listefonds" or currentPath == "utb_client_ajoutfonds" or currentPath == "utb_client_modiffonds" %}
+                                             <ul class="subMenu2">
+                                            {% else %}
+                                             <ul class="subMenu">        
+                                            {% endif %}
+                                            {% if('listeFondsAction'|validAcess) %}
+							<li class="tools-mescomptes"><a href="{{ path("utb_client_listefonds",{'locale':locale}) }}">{{'fond.titre2'|trans({},'fond') }}</a></li>
+                                            {% endif %}            
+                                            {% if('ajoutFondsAction'|validAcess) %}                
+							<li class="tools-fond"><a href="{{ path("utb_client_ajoutfonds",{'locale':locale}) }}">{{'fond.ajout'|trans({},'fond') }}</a></li>
+                                            {% endif %}
+                                            {% if('listeFondsGestAction'|validAcess) %}
+							<li class="tools-mescomptes"><a href="{{ path("utb_client_listefondsgest",{'locale':locale}) }}">{{'fond.mesFonds'|trans({},'fond') }}</a></li>
+                                            {% endif %}
+                                                      
+					</ul>
+			</li>
+		{% endif %}  
+                        
+               
+                                     
+</ul>
+</div>  
+{% endblock %}		
+	{% block public_centre_body %}		
+	{% endblock %}
+            {#N'apparait pas dans le cas d'un admin ou utilisateur#}
+	{% block public_droit_body %}		
+	{% endblock %}	
+            {#N'apparait pas dans le cas d'un admin ou utilisateur#}
+{% endblock %}

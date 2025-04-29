@@ -1,0 +1,72 @@
+{# empty Twig template #}
+{% extends "::layoutAuthClient.html.twig" %}
+{% block title %}
+{{ parent() }} - Login
+{% endblock %}
+
+{% block client_centre_body %}
+
+{% for message in app.session.flashbag.get('emptyData') %}
+	<div class="error leftSpace rightSpace center">{{ message|trans }}</div>
+{% endfor %}       
+<script type="text/javascript">            
+        $(document).ready(function() {
+            $( "#loginInput" ).focus();
+        });      
+</script>
+<div class="bgAuthClt"> 
+    <div class="langueIconsauth"> <!-- Langues -->
+        {% set currentPath = app.request.attributes.get('_route') %}
+        {% if locale=="fr" %}                        
+        <a  href="{{ path(currentPath, app.request.attributes.get('_route_params') | merge({ 'locale': 'en' })) }}"><img src="{{ asset('img/admin-img/icon-english.png') }}" title="English" alt="English"> <span style="font-weight:bold;">ENGLISH </span> </a> | <span style="color: #555;"><img src="{{ asset('img/admin-img/icon-french.png') }}" title="Français" alt="Français"> FRAN&Ccedil;AIS </span>{# Français en cours#}
+        {#Change in english#}
+        {% else %}
+       <img src="{{ asset('img/admin-img/icon-english.png') }}" title="English" alt="English">ENGLISH  | <a  href="{{ path(currentPath, app.request.attributes.get('_route_params') | merge({ 'locale': 'fr' }) ) }}"><img src="{{ asset('img/admin-img/icon-french.png') }}" title="Français" alt="Français"> <span style="font-weight:bold;"> FRAN&Ccedil;AIS </span></a>{#Changer en français#}
+        <span style="color: #555;"> </span>{#Currently English#}
+        {% endif  %}
+    </div>
+	<div class="box_authentif"><!-- ESPACE AUTHENTIFICATION -->
+		<div class="box_transparent"></div>
+		<div class="box_contenu_authentif paddingTop10p"> 
+			<h2 class="bleuBanniere title1 paddingBottom10p">{{'client.login.titre'|trans({},'messages') }}</h2>
+			<form class="paddingTop10p" id="login_form" method="post" action="{{ path('utb_client_LoginProcess',{'locale':locale}) }}">
+				{% if locale=='fr' %}
+                                <div class="marginBottom10p paddingTop10p">
+					<label>
+						{{'client.login.nom'|trans({},'messages') }} <img src="{{asset('img/client-img/user_icon.png')}}" alt="user icon" />
+					</label>
+					<input tabindex="1" type="text" name="login" title="{{'abonnes.form.username'|trans({},'abonnes') }}" maxlength="2048" id="loginInput"/>
+				</div>
+				<div class="marginBottom10p">					
+                                        <label class="passwrd">
+						{{'client.login.pass'|trans({},'messages') }} <img src="{{asset('img/client-img/key_icon.png')}}" alt="password icon" />
+					</label>                                        
+					<input tabindex="2" name="passwd" type="password" title="{{'abonnes.form.password'|trans({},'abonnes') }}" maxlength="2048" />
+				</div>
+                                {% else %}
+                                <div class="marginBottom10p paddingTop10p">
+					<label style="padding-left:61px;">
+						{{'client.login.nom'|trans({},'messages') }} <img src="{{asset('img/client-img/user_icon.png')}}" alt="user icon" />
+					</label>
+					<input tabindex="1" type="text" name="login" title="{{'abonnes.form.username'|trans({},'abonnes') }}" maxlength="2048" id="loginInput"/>
+				</div>
+				<div class="marginBottom10p">					
+                                        <label class="passwrd" style="padding-left:65px;">
+						{{'client.login.pass'|trans({},'messages') }} <img src="{{asset('img/client-img/key_icon.png')}}" alt="password icon" />
+					</label>                                        
+					<input tabindex="2" name="passwd" type="password" title="{{'abonnes.form.password'|trans({},'abonnes') }}" maxlength="2048" />
+				</div>        
+                                {% endif %}
+                                
+				<div class="paddingTop10p">
+					<span style="padding-right:10px;"><a class="retourpub" style="text-decoration:underline;" href="{{ path('utb_site_homepage',{'locale':locale}) }}">{{'client.login.public'|trans({},'messages') }}</a></span>{#  <a href="{{ path('utb_client_pwdoublie',{'locale':locale}) }}">{{'client.login.passoublie'|trans({},'messages') }}</a> #}
+					<input tabindex="3" type="submit" value="{{'client.acceder'|trans({},'messages') }}" />
+					<div class="clr"></div>					
+				</div>  
+			</form>
+		</div>
+                <div class="clr"></div><!-- FIN DIV.box_contenu_authentif-->
+	</div> 		<!-- FIN box_authentif -->
+	<div class="clr"></div><div class="ombre_sous_boxAuth"></div>
+</div>		<!-- FIN bgAuth -->
+{% endblock %}

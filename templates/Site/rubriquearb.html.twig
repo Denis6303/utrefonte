@@ -1,0 +1,168 @@
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+  
+{% block public_body %}
+  
+                            {% set arttitre= ""%}
+                            {% set artdescription= ""%}  
+
+	<div class="span-24 marginBottom20p paddingTopBot20p borderBotStyle bgBlanc">
+                    {% for article in listearticle %}
+                       {% if loop.last %}
+                            {% set arttitre= article.titreArticle%}
+                            {% set artdescription= article.descriptionArticle%}
+                       {% endif  %}
+                
+                 {#% if loop.last %#}
+                 {#% else  %#}
+                           
+                              {% if loop.index0 ==2    %}
+                                <div class="span-12 last" style="width:480px;">
+                                    <div class="leftSpace rightSpace">
+                                            <div class="boxPresentation Tjustify listeDirigeant">
+                                                    <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                                                    {% if article.urlMedia =="default_.png" %}
+                                                    {% else %}
+                                                        <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="{{ 'acceuil.image'|trans({}, 'site') }}" style="float:left; padding-bottom:10px;"/>
+                                                    {% endif %}
+                                                    {% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}     
+                                            </div>  
+                                    <div class="boxDocuments marginTop20p marginBottom20p">
+                                            <h1 class="titlePage title1 bleuLogo">{{ 'presentation.publi'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+                                            <div class="boxDocuments-cnt" >
+                                                    <div class="carousel-docs">
+                                                    {#{dump(listepublication)}#}
+                                                            <ul >
+                                                              {% for publication in listepublication  %} 
+                                                                 <a href="{{ asset('upload/articles/'~publication.urlMedia)}}">
+                                                                    <li>
+                                                                            <div class="oneDoc">	<!-- un document-->
+                                                                                    <img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+                                                                                    <p class="oneDoc-titre"><span class="oneDoc-date">{{publication.articleDateAjout|date("d/m/Y")}}</span><a class="" href="{{ asset('upload/articles/'~publication.urlMedia)}}">{{publication.titreArticle}}</a></p>
+                                                                                    <div class="clr"></div>
+                                                                                    {#<p class="oneDoc-descrp"></p>
+                                                                                   <p class="oneDoc-type bgGrisatr1"><span class="">Catégories:</span> <span class="bleuLogo">{{publication.libNatureDoc}}</span></p>#}
+                                                                            </div>
+                                                                    </li>                                                                
+                                                                  </a>  
+                                                               {% endfor  %}      
+
+                                                            </ul>
+                                                    </div>
+                                            </div><!-- div.content-brlastannonces-->
+                                            <div class="boxDocuments-foot">
+                                                    <div class="butNavigDocs">
+                                                            <span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="{{ 'presentation.prec'|trans({}, 'site') }}" title="{{ 'presentation.prec'|trans({}, 'site') }}" /></span>
+                                                            <span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="{{ 'presentation.prec'|trans({}, 'site') }}" title="{{ 'presentation.suiv'|trans({}, 'site') }}" /></span>
+                                                    </div>
+                                                   {# <div class="divButmoore">
+                                                            <a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 4, 'type':4,'typecate': 0, 'date':0})}}"><span>Voir toutes nos publications</span><span></span></a>
+                                                    </div> #}
+                                                    <div class="clr"></div>
+                                            </div>
+
+
+                                            <div class="clr"></div>
+                                    </div>	                                       
+                                        
+                              {% else %} 
+                                {% if (loop.index0 == 0)   %} 
+                                  <div class="span-12 last">
+                                      <div class="leftSpace ">
+                                                  <div class="boxPresentation Tjustify listeDirigeant marginBottom20p batimentutb">
+                                                          <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                                                          {% if article.urlMedia =="default_.png" %}
+                                                          {% else %}
+                                                              <img src="{{ asset('upload/articles/'~article.urlMedia)}}"   style="float:left; padding-bottom:10px;"/>
+                                                          {% endif %}
+                                                          {% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}     
+                                                  </div>
+                                           
+                                 {% endif %}                                        
+                                 {% if (loop.index0 ==1)   %} 
+
+                                    <div class="borderBotStyle  marginTop20p marginBottom20p"> 
+                                            <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                                            <div class="bgGrisatr2 boxAdress siege" >
+                                                <div class="left"> {% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}</div> 
+                                                {% if article.urlMedia =="default_.png" %}
+                                                          {% elseif article.urlMedia =="" %}
+														  {% else %}
+												<div class=""> <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="{{ 'acueuil.image'|trans({}, 'site') }}" style="float:right; padding-bottom:10px;  margin-top: 20px;"  /></div><div class="clr"></div>
+												{% endif %}
+											</div>
+                                            
+                                   
+                                    </div>
+
+                                    
+                                        
+                                 {% endif %}
+                              {% endif %}                                        
+
+                              {% if loop.index0 == 1 %}
+                                 </div> 
+                                 </div>        
+                              {% elseif loop.index0 == 2 %}
+                                 </div>
+                                 </div>        
+                              {% endif %}                                 
+                               
+                       
+
+                    {#% endif %#}
+                    {% endfor %}	
+					
+	{#<div class="span-24 marginBottom20p">
+		<div class="span-12">
+			<div class="leftSpace">
+				<div class="borderBotStyle">
+					<h1 class="titlePage title1 bleuLogo">{{arttitre}}</h1>
+					<div class="bgGrisatr2 boxAdress">
+                                            {{artdescription|raw}}
+					</div>
+				</div>
+			</div>
+		</div>		
+		<div class="span-12 last">
+			<div class="rightSpace">
+				<div class="boxDocuments">
+					<h1 class="titlePage title1 bleuLogo">Nos Publications</h1><div class="mhr"><hr></div><div class="clr"></div>
+					<div class="boxDocuments-cnt">
+						<div class="carousel-docs">
+						{#{dump(listepublication)}#}
+							{#<ul>
+                                                          {% for publication in listepublication  %} 
+                                                             <a href="{{ asset('upload/articles/'~publication.urlMedia)}}">
+								<li>
+									<div class="oneDoc">	<!-- un document-->
+										<img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+										<p class="oneDoc-titre"><span class="oneDoc-date">{{publication.articleDateAjout|date("d/m/Y")}}</span><a class="" href="{{ asset('upload/articles/'~publication.urlMedia)}}">{{publication.titreArticle}}</a></p>
+										<div class="clr"></div>
+									</div>
+								</li>                                                                
+                                                              </a>  
+                                                           {% endfor  %}      
+
+							</ul>
+						</div>
+					</div><!-- div.content-brlastannonces-->
+					<div class="boxDocuments-foot">
+						<div class="butNavigDocs">
+							<span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="Prevew" title="Document Précédent" /></span>
+							<span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="Next" title="Document Suivant" /></span>
+						</div>
+						
+						<div class="clr"></div>
+					</div>
+					
+					
+					<div class="clr"></div>
+				</div>		<!-- FIN boxDocuments -->
+			</div>		<!-- rightSpace -->
+		</div>		<!-- FIN Span-12 last-->
+	</div>	#}	<!-- FIn SPAN-24-->
+  {% endblock %}

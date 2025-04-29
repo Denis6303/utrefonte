@@ -1,0 +1,43 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+				
+{% block client_centre_body %}  
+
+    <ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'messagerie.titre'|trans({}, 'messagerie')}}</li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'messagerie.repondre'|trans({}, 'messagerie')}}</li>
+    </ul>
+	
+		<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'messagerie.interne'|trans({},'messagerie') }} </h2>
+    {#	 #}
+
+	<form action=" {{ path("utb_client_repondremessageabonne",{'idmessage':idmessage}) }} " method="post" {{form_enctype(form)}} id="ajoutProfil">
+		
+		<div class="FrmAbonne addperso2"> 
+			{{ form_errors(form.objetMessageClient) }}
+			<span class="requis">
+				{{ form_label(form.objetMessageClient, 'form.objet'|trans({}, 'messagerie')) }}
+				<span class="red-text">*</span>
+			</span>
+			{{ form_widget(form.objetMessageClient) }}
+			<div class="clr"></div>
+		</div>
+		
+		<div class="bleuBanniere addperso3" >
+			{{ form_errors(form.contenuMessageClient) }}
+				<span class="labelNoFloat">{{ form_label(form.contenuMessageClient, 'form.contenu'|trans({}, 'messagerie')) }}<span class="red-text">*</span></span>
+			{{ form_widget(form.contenuMessageClient) }}
+		</div>
+		
+		<input type="submit" value="{{'client.envoyer'|trans({},'messages') }}" class="boutonSubmit" name="op" id="j_bouton" ><a href=""></a>
+			<div class="clr"></div>
+			
+	</form>
+                                                                                                   
+{% endblock %}

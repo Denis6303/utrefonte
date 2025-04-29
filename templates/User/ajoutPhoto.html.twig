@@ -1,0 +1,19 @@
+
+                                                  
+<form action=" {{ path("modifier_utilisateur", {'id': id,'locale':locale,'genre':1}) }} " method="post" {{ form_enctype(form) }}>											
+
+    {{ form_widget(form.nameUser) }}
+
+    {{ form_widget(form.username) }}
+
+    {{ form_widget(form.email) }}
+    
+    {#{ form_widget(form.password) }#}
+
+    <div class="FrmAjoutArt"> 
+    {{ form_errors(form.photo) }}
+    {{ form_label(form.photo,  'admin.imgtitre'|trans({}, 'messages')) }}                
+    {{ form_widget(form.photo) }}
+    </div>
+    <input type="submit" value="Ajouter" name="op" id="j_bouton" >
+</form>

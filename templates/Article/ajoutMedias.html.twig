@@ -1,0 +1,47 @@
+
+
+<form action=" {{ path("utb_admin_ajoutmediasarticle", {'id': id,'locale':locale,'typemedia':typemedia,'type':type}) }} " method="post" {{ form_enctype(form) }} id="ajoutImage">
+
+	<div class="FrmAjoutArt">           
+		{{ form_errors(form.nomMedia) }}
+		
+		{% if typemedia == 2 %}
+		{{ form_label(form.nomMedia, 'admin.titredoc'|trans({}, 'messages')) }}
+		{% endif %}
+
+		{% if typemedia == 1 %}
+		{{ form_label(form.nomMedia, 'admin.titreimg'|trans({}, 'messages')) }}
+		{% endif %} 
+		
+		{{ form_widget(form.nomMedia) }}
+	<div class="clr"></div>
+	</div>
+
+	<div class="FrmAjoutArt"> 
+		{{ form_errors(form.file) }}
+
+		{% if typemedia == 2 %}
+		{{ form_label(form.file,  'admin.doctitre'|trans({}, 'messages')) }}
+		{% endif %}
+
+		{% if typemedia == 1 %}
+		{{ form_label(form.file,  'admin.imgtitre'|trans({}, 'messages')) }}                
+		{% endif %}                                                                                            
+
+		{{ form_widget(form.file) }}
+	</div>
+
+	{% if typemedia == 2 %}
+	<div class="FrmAjoutArt">           
+		{{ form_errors(form.natureDoc) }}
+		{{ form_label(form.natureDoc, 'admin.naturedoc'|trans({}, 'messages')) }}
+		{{ form_widget(form.natureDoc) }}
+		<div class="clr"></div>
+	</div>
+	{% endif %}
+
+	<input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" />    
+	<div class="clr"></div>
+</form>
+
+

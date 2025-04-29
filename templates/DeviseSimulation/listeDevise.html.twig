@@ -1,0 +1,460 @@
+
+{# src/utb/AdminBundle/Resources/views/ajoutDevise.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'abonnes.liste.grandtitrepg'|trans({},'abonnes') }}
+{% endblock %}
+
+  {% block client_centre_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+    <ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>Taux & Statistiques</li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{ 'devise.gestion'|trans({}, 'devise') }}</li>
+    </ul>
+    <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar"><span style="text-transform:uppercase">{{ 'devise.gestion'|trans({}, 'devise') }}</span></h2>
+	  {% for contenu in app.session.flashbag.get('notice') %}            
+		{% if contenu == "erruerdeviseexist" %}
+			<div class="error rightSpace leftSpace center">                        
+					{{ 'devise.erruerdeviseexist'|trans({}, 'devise') }}
+			</div>  
+		{% endif %}
+
+		{% if contenu == "successdevise" %}
+			<div class="success rightSpace leftSpace center">                        
+				{{ 'devise.addsuccess'|trans({}, 'devise') }}
+			</div>    
+		{% endif %}
+		{% if contenu == "modifsuccess" %}
+			<div class="success rightSpace leftSpace center">                        
+				{{ 'devise.modifsuccess'|trans({}, 'devise') }}
+			</div>    
+		{% endif %}
+  	
+	{% endfor %}
+    <div class="toolBoutons marginBottom20p">
+            <div>    
+                <a href="#" onClick="AjoutDevise(); return false;">
+                    <img src="{{ asset('img/client-img/icon-25-add.png')}}" />
+                    <span>{{'client.ajouter'|trans({},'messages') }}</span>
+		</a>
+            </div>
+            <!-- <div>    
+                <a href="">
+					<img src="{{ asset('img/client-img/icon-25-pen.png')}}" />
+					<span>Ecrire</span>
+				</a>
+            </div> -->
+            <div>    
+                <a href="javascript:void(0);" onclick="gererEtatAll(getDeviseID(),0); return false;">
+					<img src="{{ asset('img/client-img/icon-25-lock.png')}}" />
+					<span>{{'client.desactiver'|trans({},'messages') }}</span>
+				</a>
+            </div>
+            <div>    
+                <a href="javascript:void(0);" onclick="gererEtatAll(getDeviseID(),1); return false;">
+					<img src="{{ asset('img/client-img/icon-25-unlock.png')}}" />
+					<span>{{'client.activer'|trans({},'messages') }}</span>
+				</a>
+            </div>
+            <div>    
+                <a href="javascript:void(0);" onclick="deleteAll(getDeviseID()); return false;" >
+					<img src="{{ asset('img/client-img/icon-25-bin.png')}}" />
+					<span>{{'client.supprimer'|trans({},'messages') }}</span>
+				</a>
+            </div>
+            <div class="clr"></div>
+        </div>
+    
+    <div class="marginBottom20p" id="ajoutDevise_container" style="display:none;">
+          {{ render(controller('utbClientBundle:DeviseSimulation:ajoutDevise', {'locale':locale})) }}  
+                                        
+          <div class="clr"></div>     
+    </div>
+    
+    <table class="infoCompte noLeftBorder noGras">
+            <tr>
+                <th style="padding-left:10px;"><input type="checkbox" class="checkall" name="checkall"/></th>
+                <th>{{ 'devise.code'|trans({}, 'devise') }}</th>
+                <th>{{ 'devise.libelle2'|trans({}, 'devise') }}</th>
+                <th>{{ 'devise.valeur'|trans({}, 'devise') }}</th>
+                <th>{{ 'devise.etat'|trans({}, 'devise') }}</th>
+                <th>{{ 'client.modifier'|trans({}, 'messages') }}</th>
+                <th>{{ 'client.supprimer'|trans({}, 'messages') }}</th>
+                <th></th>
+            </tr>            
+            
+            {% for devise in listeDevise %}                                        
+                    <tr >
+                        <td><input type="checkbox" name="devise[]" value="{{devise.id}}" rel="devise_c"/></td>
+                        <td style="width:150px;">{{devise.codeDevise}}</td>									
+                        <td style="width:200px;">
+                            {{devise.libDevise}}
+                            <div class="FrmInTable" id="{{"modifDevise_container"~devise.id}}" style="display:none;">
+                                {{ render(controller('utbClientBundle:DeviseSimulation:modifierDevise', {'id':devise.id,'locale':locale})) }}  
+                                <a href="#" class="annulerBut" onClick="AnnulerModifDevise({{devise.id}}); return false;">{{'client.annuler'|trans}}</a>
+                                  <div class="clr marginBottom10p"></div>
+                            </div>
+                        </td>
+                        <td style="width:150px;">{{devise.valDeviseLocal}}</td>
+                        <td style="width:100px;">
+                                {% if devise.affiche ==1  %}
+                                             {{'admin.active'|trans}}
+                                {% elseif devise.affiche  ==0 %}
+                                             {{'admin.desactive'|trans}}
+                                {% endif %}                        
+                        </td>				
+                        <td style="width:60px;"><a href="#" onClick="ModifDevise({{devise.id}}); return false;"><img src="{{ asset('img/client-img/icon-16-pen.png')}}" alt="" title="" /></a></td>				
+                        <td style="width:60px;"><a href="javascript:void(0);" onclick="deleteAll({{devise.id}}); return false;" ><img src="{{ asset('img/client-img/icon-16-bin.png')}}" alt="" title=""/></a></td>
+                        <td style="width:60px;">
+                                {% if devise.siLocale ==1  %}
+                                    
+                                {% elseif devise.siLocale  ==0 %}
+                                    <a href="javascript:void(0);" onclick="definirLocaleDevise({{devise.id}}); return false;" > Locale</a>
+                                {% endif %}                             
+                           
+                        </td>
+                    </tr> 
+             {% endfor %}  
+                
+                    
+        </table>
+    
+    
+    <table class="infoCompte noLeftBorder noGras">
+        {% for ladevise in autreDevise %}
+            <tr>
+                <td>1 {{ladevise.codeDevise}}</td>
+                <td>{{ladevise.valDeviseLocal}}</td>
+            </tr> 
+        {% endfor %} 
+    </table>
+
+    <table class="infoCompte noLeftBorder noGras">
+            <tr>
+                <td>{{ 'devise.montant'|trans({}, 'devise') }}</td>
+                <td><input name="montant" value="0" id="montant"/></td>
+            </tr> 
+            <tr>
+                <td>{{ 'devise.devise'|trans({}, 'devise') }}</td>
+                <td>
+                    <select name="devise" id="devise">
+                        {% for ladevise in autreDevise %}
+                            <option  value="{{ladevise.valDeviseLocal}}">{{ladevise.codeDevise}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><div id="resultat">-</div></td>
+
+            </tr>
+    </table>    
+    
+<script language="javascript">
+    
+        $("#montant").on("input",function(e) { 
+         
+              resultat =  $("#montant").val()*parseFloat($("#devise").val());
+              $('#resultat').html(parseFloat(resultat)); 
+ 
+        });
+        $("#devise").on("change",function(e) { 
+         
+              resultat =  $("#montant").val()*parseFloat($("#devise").val());
+              $('#resultat').html(parseFloat(resultat)); 
+ 
+        });
+    
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });
+            function AjoutDevise(){
+             $("#modifDevise_container").hide();
+             $("#ajoutDevise_container").show(); 
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }       
+      function AnnulerAjoutDevise(){
+           
+           $("#ajoutDevise_container").hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierFicheUser( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/            
+       } 
+       
+       function ModifDevise(iddevise){
+             $("#modifDevise_container"+iddevise).show();
+             $("#ajoutDevise_container").hide();
+
+             var html = '';
+             $(".modif"+iddevise).html(html);             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerModifDevise(iddevise){
+           
+           $("#modifDevise_container"+iddevise).hide();   
+            var html = '<a href="#" onClick="ModifDevise('+iddevise+'); return false;"><img src="{{ asset('img/client-img/icon-16-pen.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/></a>';
+            $(".modif"+iddevise).html(html);            
+       } 
+       
+       function getDeviseID(){           
+            var id = "";            
+            $(":input[rel=devise_c]:checked").each(function(){
+		id = id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "Voulez vous vraiment Supprimer ces devises ?";       
+       
+    function gererEtatAll(deviseId,etat){
+         
+          if( deviseId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+              
+            if (etat == 0)   {
+                  var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+            }
+
+            if (etat == 1)   {
+                  var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+            }            
+            
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            }) ;   
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }   
+          
+          if (etat == 0)   {
+             $('#process_tpl').html($('#msgconfirmdesactivation').html()  );
+             var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          }
+          if (etat == 1)   {
+             $('#process_tpl').html($('#msgconfirmactivation').html() );
+             var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          }
+                    
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_gererEtatAlldevise')}}",
+                                data: {iddevise:deviseId, etatdevise:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationimpossible').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationimpossible').html());                                               
+                                            }                                          
+                                        
+                                    }else if( answer.result=="administrateur"){
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationimpossible').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationimpossible').html());                                               
+                                            }  
+
+                                    }
+                                    else{
+
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationreussie').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationreussie').html());                                               
+                                            }  
+
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+
+    function definirLocaleDevise(deviseId){
+         
+          if( deviseId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+                        
+            
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            }) ;   
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }   
+          
+             $('#process_tpl').html($('#msgconfirmdefinirLocale').html()  );
+             var args = {modal: true, autoOpen: false, title: ($('#titredefinirLocale').html())};
+
+                    
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_definirLocaledevises')}}",
+                                data: {iddevise:deviseId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+
+                                        
+                                               $('#process_tpl').html($('#definirLocaleimpossible').html());                                              
+                                                                                
+                                        
+                                    }else if( answer.result=="administrateur"){
+                                      
+                                               $('#process_tpl').html($('#definirLocaleimpossible').html());                                              
+                                    }
+                                    else{
+                                               $('#process_tpl').html($('#definirLocalereussie').html());                                              
+        
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+
+
+      var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "Voulez vous vraiment Supprimer ces devises ?";
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( d ){
+         //To do
+         if( d.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsuppression').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_deleteAlldevises')}}",
+                                data: {ds:d},
+                                cache: false,
+                                success: function(data){ 
+                                   var resJson = jQuery.parseJSON(data);
+                                   if( resJson.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#suppressionimpossible').html());
+                                        window.location.reload();
+                                    }
+                                   if( resJson.result == "success"){
+                                      $('#process_tpl').html($('#suppressionreussie').html()); 
+                                      window.location.reload();
+                                   }
+                                   //console.log(resJson);
+                                   
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       } 
+</script>
+
+
+<div id="process_tpl" style="display:none;"></div> 
+  <div id="sivide" style="display:none;"> {{ 'devise.confirmation.sivide'|trans({}, 'devise') }} </div> 
+
+    <div id="activationimpossible" style="display:none;"> {{ 'devise.confirmation.activationimpossible'|trans({}, 'devise') }}</div> 
+    <div id="activationreussie" style="display:none;"> {{ 'devise.confirmation.activationreussie'|trans({}, 'devise') }} </div>
+    <div id="titreactivation" style="display:none;">{{ 'devise.confirmation.titreactivation'|trans({}, 'devise') }} </div> 
+    <div id="msgconfirmactivation" style="display:none;">   {{ 'devise.confirmation.activation'|trans({}, 'devise') }}</div> 
+
+    <div id="desactivationimpossible" style="display:none;"> {{ 'devise.confirmation.desactivationimpossible'|trans({}, 'devise') }}</div> 
+    <div id="desactivationreussie" style="display:none;"> {{ 'devise.confirmation.desactivationreussie'|trans({}, 'devise') }} </div>                     
+    <div id="titredesactivation" style="display:none;">{{ 'devise.confirmation.titredesactivation'|trans({}, 'devise') }}</div> 
+    <div id="msgconfirmdesactivation" style="display:none;"> {{ 'devise.confirmation.desactivation'|trans({}, 'devise') }}</div>    
+   
+    <div id="definirLocaleimpossible" style="display:none;"> {{ 'devise.confirmation.definirlocaleimpossible'|trans({}, 'devise') }}</div> 
+    <div id="definirLocalereussie" style="display:none;"> {{ 'devise.confirmation.definirlocalereussie'|trans({}, 'devise') }} </div>                     
+    <div id="titredefinirLocale" style="display:none;">{{ 'devise.confirmation.titredefinirlocale'|trans({}, 'devise') }}</div> 
+    <div id="msgconfirmdefinirLocale" style="display:none;"> {{ 'devise.confirmation.definirlocale'|trans({}, 'devise') }}</div>  
+
+
+    <div id="suppressionimpossible" style="display:none;"> {{ 'devise.confirmation.supimpossible'|trans({}, 'devise') }}</div> 
+    <div id="suppressionreussie" style="display:none;"> {{ 'devise.confirmation.supreussie'|trans({}, 'devise') }} </div>
+    <div id="titresuppression" style="display:none;">{{ 'devise.confirmation.titresup'|trans({}, 'devise') }}</div> 
+    <div id="msgconfirmsuppression" style="display:none;"> {{ 'devise.confirmation.suppression'|trans({}, 'devise') }}</div>      
+
+    <div id="operationexiste" style="display:none;"> {{ 'devise.confirmation.operationexiste'|trans({}, 'devise') }} </div> 
+{% endblock %}
+
+

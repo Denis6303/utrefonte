@@ -1,0 +1,128 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'medias.liste.grandtitrepg-dim'|trans({}, 'medias') }}
+{% endblock %}
+
+  {% block administration_body %}
+  
+  			<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }}</a> > <a href="{{path('utb_admin_listedimension', {'locale': locale})}}">{{ 'admin.dimensions.dimensions'|trans({}, 'messages') }}</a> > <a href="#">{{ 'admin.list'|trans({}, 'messages') }}</a>
+</div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-17">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="{{ 'admin.layout.menu.articles'|trans({}, 'messages') }}" title="{{ 'admin.layout.menu.titreart'|trans({}, 'messages') }}" /></div>
+						<div class="titreModule titreModuleShort colorBleu"><h1>{{ 'medias.liste.titrepg-dim'|trans({}, 'medias') }}<h1></div>	
+						<div class="clr"></div>
+					</div>
+                                        
+                                        
+			      
+					<div class="span-7 last">
+						
+						<div class="ecartBoutonsFirst">&nbsp;</div>
+						
+						<div class="boutonGestion">
+							<div><a href="{{ path('utb_admin_ajoutdimension',{'locale':locale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans({}, 'messages') }}" title="{{ 'admin.ajouter'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.ajouter'|trans}}</a>
+						</div>
+						<div class="boutonGestion">
+							<div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.modifier'|trans}}</a>
+						</div>
+
+						<div class="ecartBoutons">&nbsp;</div>
+						
+					{#	<div class="boutonGestion">
+							<div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="" title="Mettre en Ligne" /></div>
+							{{ 'admin.activer'|trans}}</a>
+						</div>
+						<div class="boutonGestion btGestMoy">
+							<div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="Mettre Hors Ligne" /></div>
+							Désactiver</a>
+						</div> #}
+                                                <div class="boutonGestion">
+							<div><a href=""><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.corbeille'|trans}}" title="{{ 'admin.layout.sousmenu.mettrecorbeille'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.corbeille'|trans}}</a>
+						</div>
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+                                            {# STATISTIQUES #}    
+                                            {{ information.stats(listestat) }} 
+                                            
+                                        </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							{#<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+
+
+								<div class="clr"></div>
+							</div>	#}					<!-- FIN filtersArticles-->
+							
+                                                        <table class="listMenusCateg listArticlesRub">
+                                                            <tr>
+							<th><input type="checkbox" /></th>
+							<th colspan="2">Taille</th>
+                                                        <th colspan="2">Actions</th>
+                                                            </tr>
+                                                               {% for dimension in listedimension %}
+                                                                <tr>
+                                                                    <td><input type="checkbox" /></td>
+                                                                    <td colspan="2">              
+                                                                             {{dimension.libdimension }}
+                                                                        </td>     
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_modifdimension', {'id': dimension.id,'locale':locale}) }}">{{ 'admin.modifier'|trans}}</a>              
+                                                                            <a href="{{ path('utb_admin_supprdimension', {'id': dimension.id,'locale':locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> 
+                                                                        </td>             
+
+                                                                        <td>     
+                                                                          {#{controleur.description }#}
+                                                                        </td>                                 
+
+                                                                        </tr>
+    {% else %}
+                                                                        <tr>
+                                                                            <td colspan="4">{{ 'medias.none-dim'|trans({}, 'medias') }}</td>       
+                                                                        </tr>       
+    {% endfor %}
+                                                                    </table>
+							
+							
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>				<!--  FIN SPAN - 25 -->
+                        
+  {{ information.decochetoutbox() }}                      
+                        
+  {% endblock %}

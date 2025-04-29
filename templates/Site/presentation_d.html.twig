@@ -1,0 +1,111 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+  
+{% block public_body %}
+  
+  
+
+	<div class="span-24 marginBottom20p paddingTopBot20p borderBotStyle bgBlanc">
+                    {% for article in listearticle %}
+                       <div class="span-12">
+                              {% if (loop.index % 2) %}
+                                <div class="rightSpace">
+                              {% elseif %}    
+                                <div class="leftSpace">        
+                              {% endif %}
+                                        
+                                                <div class="boxPresentation Tjustify">
+                                                        <h1 class="blog-titre bleuLogo">{{article.titreArticle}}</h1>
+                                                        {{article.descriptionArticle|raw}}     
+                                                </div>
+                                        
+                                  {% if (loop.index % 2) and loop.last %}
+                                      <div>&nbsp</div>
+                                  {% endif %}
+                              {% if (loop.index0 % 2) or loop.last %}
+                                 </div>
+                              {% endif %}                
+                       </div>
+                    {% endfor %}
+	<!-- FIN Span-12 last-->
+                
+	</div>		<!-- FIn SPAN-24-->
+	
+	<div class="span-24 marginBottom20p">
+		<div class="span-12">
+			<div class="leftSpace">
+				<div class="borderBotStyle">
+					<h1 class="blog-titre bleuLogo">Siège</h1>
+					<div class="bgGrisatr1 boxAdress">
+					UTB Circulaire Boulevard du 13 janvier – Nyékonakpoè <br/>
+					BP 359 LOME<br/>
+					Tél : (228) 22 23 43 00 / 01, (228) 22 23 44 00, (228) 22 21 50 02<br/>
+					Fax: (228) 22 21 22 06<br/>
+					SWIFT: UNTBTGTG
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="span-12 last">
+			<div class="rightSpace">
+				<div class="boxDocuments">
+					<h1 class="blog-titre bleuLogo">Nos Publications</h1><div class="mhr"><hr></div><div class="clr"></div>
+					<div class="boxDocuments-cnt">
+						<div class="carousel-docs">
+							<ul>
+								<li>
+									<div class="oneDoc">	<!-- un document-->
+										<img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+										<p class="oneDoc-titre"><span class="oneDoc-date">21/12/2013</span><a class="" href="">Atelier régional 2013 sur la promotion et le financement des PME du secteur des énergies renouvelables dans les pays africains (141 KB)</a></p>
+										<div class="clr"></div>
+										<p class="oneDoc-descrp"></p>
+										<p class="oneDoc-type bgGrisatr1"><span class="">Catégories:</span> <span class="bleuLogo">Rapport d'activité</span></p>
+									</div>
+								</li>
+								<li>
+									<div class="oneDoc">	<!-- un document-->
+										<img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+										<p class="oneDoc-titre"><span class="oneDoc-date">21/12/2013</span><a class="" href="">Projet de réhabilitation d’urgence des systèmes d’alimentation en eau et d’assainissement - Aide d'urgence (802 KB)</a></p>
+										<div class="clr"></div>
+										<p class="oneDoc-descrp"></p>
+										<p class="oneDoc-type bgGrisatr1"><span class="">Catégories:</span> <span class="bleuLogo">Projet social et communautaire</span></p>
+									</div>
+								</li>
+								<li>
+									<div class="oneDoc">	<!-- un document-->
+										<img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+										<p class="oneDoc-titre"><span class="oneDoc-date">21/12/2013</span><a class="" href="">Rapport Annuel Bancaire - 2012 (2Mo)</a></p>
+										<div class="clr"></div>
+										<p class="oneDoc-descrp"></p>
+										<p class="oneDoc-type bgGrisatr1"><span class="">Catégories:</span> <span class="bleuLogo">Rapport d'activité</span></p>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div><!-- div.content-brlastannonces-->
+					<div class="boxDocuments-foot">
+						<div class="butNavigDocs">
+							<span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="Prevew" title="Document Précédent" /></span>
+							<span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="Next" title="Document Suivant" /></span>
+						</div>
+						<!-- <div class="divButmoore">
+							<a class="btmoore coinsArrondis " href=""><span>Voir toutes nos publications</span><span></span></a> 
+						</div> -->
+						<div class="clr"></div>
+					</div>
+					
+					
+					<div class="clr"></div>
+				</div>		<!-- FIN boxDocuments -->
+			</div>		<!-- rightSpace -->
+		</div>		<!-- FIN Span-12 last-->
+	</div>		<!-- FIn SPAN-24-->
+	
+	
+  {% endblock %}
+  

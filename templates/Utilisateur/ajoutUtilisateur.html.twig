@@ -1,0 +1,185 @@
+{# src/utb/ClientBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+	{% block client_centre_body %}  
+		<ul class="filariane bleuLink">
+			<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+			<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+			<li>{{'utilisateur.ajout'|trans({},'utilisateurs') }}</li>
+		</ul>
+
+	{% for contenu in app.session.flashbag.get('notice') %}            
+		{% if contenu == "emailerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'utilisateur.confirmation.emailExiste'|trans({}, 'utilisateurs') }}
+			</div>    
+		{% endif %}
+
+		{% if contenu == "loginerror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'utilisateur.confirmation.loginExist'|trans({}, 'utilisateurs') }}
+			</div>    
+		{% endif %}
+		{% if contenu == "emailformaterror" %}
+			<div class="error rightSpace leftSpace center">                        
+				{{ 'utilisateur.confirmation.emailNo'|trans({}, 'utilisateurs') }}
+			</div>    
+		{% endif %}
+		{% if contenu == "passworderror" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'utilisateur.confirmation.passNot'|trans({}, 'utilisateurs') }}
+		   </div>    
+		{% endif %}
+		{% if contenu == "passwordtropcourt" %}
+		   <div class="error rightSpace leftSpace center">                        
+			   {{ 'utilisateur.confirmation.passMoins'|trans({}, 'utilisateurs') }}
+		   </div>    
+		{% endif %}
+	
+                {% if contenu == "errorlogincaracint" %}
+		   <div class="error rightSpace leftSpace center">                        
+			  {{ 'utilisateur.confirmation.interdit'|trans({}, 'utilisateurs') }}
+		   </div>  
+		{% endif %} 
+                   
+                    {% if contenu == "errorsmalllogin" %}
+		   <div class="error errorMsg">                        
+			  {{ 'utilisateur.confirmation.loginMoins'|trans({}, 'utilisateurs') }}
+		   </div>  
+		{% endif %} 
+
+    {% endfor %}
+  
+		<!--Début du box compte-->
+		<style>
+                    .AjoutDUnAbonne label{width: 150px;}
+                    .AjoutDUnAbonne input{width: 200px;}
+                </style>
+                <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'utilisateur.ajout'|trans({},'utilisateurs') }}</h2>
+        <div class="marginBottom20p paddingBottom20p">
+			<h4 style="font-weight:normal;font-style: italic;text-align: right;"><span style="color: blue;"> * </span>{{'client.obligatoire'|trans({}, 'messages')}}</h4>
+			<form action="{{ path('utb_client_ajout_utilisateur',{'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUser" name="ajoutUser">
+
+			<div class="FrmAbonne AjoutDUnAbonne">
+			{{ form_errors(form.nomPrenom) }}
+			{{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.nomPrenom) }}
+			<div class="clr"></div>
+			</div>
+			
+			<div class="FrmAbonne AjoutDUnAbonne">
+			{{ form_errors(form.email) }}
+			{{ form_label(form.email, 'abonnes.form.email'|trans({}, 'abonnes')~' * ')}}
+			{{ form_widget(form.email) }}
+			<div class="clr"></div>
+			</div>
+
+			<div class="FrmAbonne champsGrp AjoutDUnAbonne">
+			{{ form_errors(form.telUtilisateur) }}
+			{{ form_errors(form.celUtilisateur) }}
+			{{ form_label(form.telUtilisateur, 'abonnes.form.tel'|trans({}, 'abonnes')) }}
+			{{ form_widget(form.telUtilisateur) }}
+			{{ form_label(form.celUtilisateur, 'abonnes.form.cel'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.celUtilisateur) }}
+			<div class="clr"></div>
+			</div> 
+
+			<div class="FrmAbonne AjoutDUnAbonne">
+			{{ form_errors(form.adresseUtilisateur) }}
+			{{ form_label(form.adresseUtilisateur, 'abonnes.form.adresse'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.adresseUtilisateur) }}
+			<div class="clr"></div>
+			</div> 
+			
+
+			<div class="FrmAbonne AjoutDUnAbonne">
+			{{ form_errors(form.username) }}
+			{{ form_label(form.username, 'abonnes.form.username'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.username) }}
+			<div class="clr"></div>
+			<span class="gris-comment"><em>{{'users.form.nbcaract2'|trans({},'users')}}</em></span>
+			</div>
+
+			<div class="FrmAbonne champsGrp AjoutDUnAbonne">
+			{{ form_errors(form.password) }}
+			{{ form_label(form.password, 'abonnes.form.password'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.password) }}			
+
+			{{ form_errors(form.cpassword) }}
+			<span class="label2lign">{{ form_label(form.cpassword, 'abonnes.form.cpassword'|trans({}, 'abonnes')~' * ')}}</span>
+			{{ form_widget(form.cpassword) }}
+			<div class="clr"></div>
+			<span class="gris-comment"><em>{{'users.form.nbcaract3'|trans({},'users')}}</em></span>
+			</div>
+
+			<div class="FrmAbonne selectType AjoutDUnAbonne">
+			{{ form_errors(form.profil) }}
+			{{ form_label(form.profil, 'abonnes.form.profil'|trans({}, 'abonnes')~' * ') }}
+			{{ form_widget(form.profil) }}
+			<div class="clr"></div>
+			</div>
+				
+			<input type="submit" class="boutonSubmit" value="{{ 'client.ajouter'|trans}}" name="op" id="j_bouton" style=""><a href=""></a>
+	              <a href="{{ path('utb_client_liste_utilisateur',{'locale':locale}) }}"><input type="button" class="annulerBut " value="{{ 'client.annuler'|trans({},'messages')}}" name="" id="" > </a>
+                        
+          </form>                                               
+                            
+		</div>
+		<!--Fin du box compte-->
+
+                
+     <script>
+         $("#utb_clientbundle_utilisateurtype_profil").change(function(){
+             var valeur = $(document.getElementById('utb_clientbundle_utilisateurtype_profil')).val();
+             //alert(valeur);
+             if(valeur == {{idgestionnaireTwig}} ){
+                $("#fonds_container").show();
+             }
+             else{
+                 $("#fonds_container").hide();
+             }
+         })
+	
+        $('#utb_clientbundle_utilisateur2type_username').blur(function() {
+                if(($('#utb_clientbundle_utilisateur2type_username').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_utilisateur2type_username').css("border-color","#F00");
+                      alert("Le nom d'utilisateur doit contenir au moins 5 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_utilisateur2type_username').css("border-color","#CCC");
+                }               
+          });     
+
+            $('#utb_clientbundle_utilisateur2type_password').blur(function() {
+                if(($('#utb_clientbundle_utilisateur2type_password').val()).length<5){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_utilisateur2type_password').css("border-color","#F00");
+                      alert("Le mot de passe doit contenir au moins 6 caratères !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_utilisateur2type_password').css("border-color","#CCC");
+                }               
+          });
+          
+            $('#utb_clientbundle_utilisateur2type_cpassword').blur(function() {
+                if($('#utb_clientbundle_utilisateur2type_cpassword').val()!= $('#utb_clientbundle_utilisateur2type_password').val()){
+                      $('#errorUtil').show();
+                      $('#utb_clientbundle_utilisateur2type_password').css("border-color","#F00");
+                      $('#utb_clientbundle_utilisateur2type_cpassword').css("border-color","#F00");
+                      alert("Les mots de passe  doivent être identiques !");
+                      return false;
+                }else{
+                    $('#utb_clientbundle_utilisateur2type_cpassword').css("border-color","#CCC");
+                    $('#utb_clientbundle_utilisateur2type_password').css("border-color","#CCC");
+                }               
+          });        
+        
+     </script>
+                
+{% endblock %}
+		

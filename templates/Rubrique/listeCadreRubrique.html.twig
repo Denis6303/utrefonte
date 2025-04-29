@@ -1,0 +1,390 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{'locale': locale})}}">{{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }}</a> > {#% for rubrique in larubrique%#}
+    <a href="{{path('utb_admin_detailrubrique',{'locale': locale,'id':larubrique.id})}}">{{larubrique.nomRubrique}}</a>{#% endfor %#} > 
+    {{ 'cadres.liste.grandtitrepg'|trans({}, 'cadres') }}
+</div>
+
+{% for contenu in app.session.flashbag.get('notice') %}             
+   {% if contenu == "errortypficart" %}
+                   <div class="span-25">
+                        <div class="error errorMsg">
+                       {{ 'notification.errortype'|trans({}, 'articles') }}
+                        </div>
+                   </div>
+  {% elseif contenu == "errorajtartdescvide" %}
+                   <div class="span-25">
+                        <div class="error errorMsg">
+       {{ 'notification.ajoutartdescvide'|trans({}, 'articles') }}
+                        </div>
+                   </div>                               
+  {% elseif contenu == "errorajtartexist" %}
+                   <div class="span-25">
+                        <div class="error errorMsg">
+       {{ 'notification.ajoutexistart'|trans({}, 'articles') }}
+                        </div>
+                   </div>                               
+   {% endif %}
+{% endfor %}
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-19">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'cadres.liste.titrepg'|trans({}, 'cadres') }}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-5 last">
+
+                            <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="{{path('utb_admin_ajoutcadrerubrique', {'id': larubrique.id})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                            </div>
+                            {#<div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></div>
+                            {{ 'admin.modifier'|trans}}</a>
+                            </div>#}
+                            
+                            <div class="ecartBoutons">&nbsp;</div>
+							
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll( getCadresID(),{{larubrique.id}} ); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.supprimer'|trans({}, 'messages') }}" title="{{ 'admin.supprimer'|trans({}, 'messages') }}" /></div>
+                                      {{ 'admin.supprimer'|trans({}, 'messages') }}</a>
+                            </div>
+                            
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                    <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                                        <h3 class="colorBleu titreStats"> {{ 'admin.stats'|trans}} </h3>
+                                        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                            <table class="tableStats">
+                                                          {% for stat in listestat %}                                                             
+                                                            
+                                                                <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+                                                                        <td>{{stat.libelle|raw}}</td>
+                                                                        <td class="valStats">{{stat.valeur}}</td>
+                                                                </tr>
+
+                                                          {% endfor %} 
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						{#	<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>{{ 'cadres.liste.statut'|trans({}, 'cadres') }} </option>
+									<option>{{ 'cadres.liste.actif'|trans({}, 'cadres') }}</option>
+									<option>{{ 'cadres.liste.inactif'|trans({}, 'cadres') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'cadres.liste.statut'|trans({}, 'cadres') }}</option>
+									<option>Administrateur</option>{#options cadres issus dune bd 
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>		#}				<!-- FIN filtersArticles-->
+
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall" /></th>
+                                                        <th>{{ 'cadres.form.nom'|trans({}, 'cadres') }}</th>
+                                                        <th>{{ 'cadres.form.type'|trans({}, 'cadres') }}</th>
+                                                        <th>{{ 'cadres.form.etat'|trans({}, 'cadres') }}</th>
+                                                        <th>{{ 'cadres.liste.actions'|trans({}, 'cadres') }}</th>
+                                                    </tr>	
+                                                               {% for cadre in listecadre %}                                                            
+
+                                                           
+                                                    <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgblanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="cadre[]" value="{{cadre.id}}" rel="cadre_c" /></td>
+                                                        <td>              
+                                                                {{cadre.libCadre }}
+                                                        </td>
+                                                        <td>              
+                                                                {{cadre.libtype }}
+                                                        </td>
+                                                        <td>              
+                                                            {% if cadre.etat==0 %}
+                                                                 {{ 'cadres.liste.inactif'|trans({}, 'cadres') }}
+                                                            {% else %}
+                                                               {{ 'cadres.liste.actif'|trans({}, 'cadres') }}
+                                                            {% endif %}
+                                                        </td>
+                                                            {#<td>              
+                                                                <a href="{{ path('utb_admin_supprcadre', {'id': cadre.id,'locale': locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> 
+                                                            </td>             
+
+                                                                
+                                                                        <td> % if cadre.etatCadre == 0 %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': cadre.id,'etat': 1,'locale': locale}) }}">{{ 'admin.activer'|trans}}</a> 
+                                                                        {% else %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': cadre.id,'etat': 0,'locale': locale}) }}">{{ 'admin.desactiver'|trans}}</a> 
+                                                                        {% endif %</td>#}   
+                                                                 
+
+ 
+                                                                
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_modifcadrerubrique', {'id':cadre.id ,'idrubrique': larubrique.id,'locale': locale}) }}">
+
+                                                                      <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" />
+                                                                    </a> 
+                                                                </td>
+
+                                                            </tr>
+
+    {% else %}
+                                                                    <tr>
+                                                                        <td colspan="4">{{ 'cadres.none'|trans({}, 'cadres') }} </td>       
+                                                                    </tr>       
+    {% endfor %}
+                                                                </table>
+
+
+
+                                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                                    </div>		<!--  FIN COL RIGHT -->
+                                                </div>			<!--  FIN  SPAN - 19 -->
+
+                                            </div>				<!--  FIN SPAN - 25 -->
+                                            
+ <script language="javascript">
+       
+       function getCadresID(){
+           
+            var cadre_id = "";
+            
+            $(":input[rel=cadre_c]:checked").each(function(){
+		cadre_id = cadre_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return cadre_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'cadres.confirmation.suppression'|trans({}, 'cadres') }}";
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( d,id ){
+         //To do
+         if( d.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsuppression').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_deleteAllcadresRubrique')}}",
+                                data: {ds:d,idrubrique:id},
+                                cache: false,
+                                success: function(data){ 
+                                   var resJson = jQuery.parseJSON(data);
+                                   if( resJson.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#suppressionimpossible').html());
+                                    }
+                                   else if( resJson.result == "success"){
+                                      $('#process_tpl').html($('#suppressionreussie').html()); 
+                                   }
+                                   else{
+                                        $('#process_tpl').html($('#accessdenied').html()); 
+                                    }
+                                    window.location.reload();
+                                   
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       } 
+   
+   
+    var htmldefault3 = "{{ 'cadres.modif.statut'|trans({}, 'cadres') }}";
+    
+    function gererEtatAll(cadresId,etat){
+    
+          if( cadresId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+              
+          if (etat == 0)   {
+                var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          }
+    
+          if (etat == 1)   {
+                var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          }            
+            
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }   
+          
+          if (etat == 0)   {
+             $('#process_tpl').html($('#msgconfirmdesactivation').html()  );
+             var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          }
+          if (etat == 1)   {
+             $('#process_tpl').html($('#msgconfirmactivation').html() );
+             var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          }
+          
+          
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gereretatallcadre')}}",
+                                data: {cadreIds:cadresId, etat:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        
+                                        if (etat == 0){
+                                              $('#process_tpl').html($('#desactivationimpossible').html());
+                                              window.location.reload();
+                                        }
+                                        if (etat == 1){
+                                              $('#process_tpl').html($('#activationimpossible').html());
+                                              window.location.reload();
+                                        } 
+                               
+                                    }
+                                    else if (answer.result == "success") {
+                                                                                
+                                        if (etat == 0){   
+                                              $('#process_tpl').html($('#desactivationreussie').html());
+                                              window.location.reload();
+                                        }                                        
+                                        if (etat == 1){
+                                              $('#process_tpl').html($('#activationreussie').html());
+                                              window.location.reload();
+                                        }                                    
+                                        
+                                    }
+                                    else if (answer.result == "erreurdata") {
+                                        
+                                              $('#process_tpl').html($('#nonedata').html());
+                                              window.location.reload();
+                                    }
+                                    else {
+                                       $('#process_tpl').html($('#accessdenied').html()); 
+                                       window.location.reload();  
+                                    }
+                                    
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+
+</script>
+
+<div id="process_tpl" style="display:none;"></div> 
+  <div id="sivide" style="display:none;"> {{ 'cadres.confirmation.sivide'|trans({}, 'cadres') }} </div> 
+
+    <div id="activationimpossible" style="display:none;"> {{ 'cadres.confirmation.activationimpossible'|trans({}, 'cadres') }}</div> 
+    <div id="activationreussie" style="display:none;"> {{ 'cadres.confirmation.activationreussie'|trans({}, 'cadres') }} </div>
+    <div id="titreactivation" style="display:none;">{{ 'cadres.confirmation.activation'|trans({}, 'cadres') }} </div> 
+    <div id="msgconfirmactivation" style="display:none;">   {{ 'cadres.confirmation.activation'|trans({}, 'cadres') }}</div> 
+
+    <div id="desactivationimpossible" style="display:none;"> {{ 'cadres.confirmation.desactivationimpossible'|trans({}, 'cadres') }}</div> 
+    <div id="desactivationreussie" style="display:none;"> {{ 'cadres.confirmation.desactivationreussie'|trans({}, 'cadres') }} </div>                     
+    <div id="titredesactivation" style="display:none;">{{ 'cadres.confirmation.titredesactivation'|trans({}, 'cadres') }}</div> 
+    <div id="msgconfirmdesactivation" style="display:none;"> {{ 'cadres.confirmation.desactivation'|trans({}, 'cadres') }}</div>      
+
+    <div id="suppressionimpossible" style="display:none;"> {{ 'cadres.confirmation.supimpossible'|trans({}, 'cadres') }}</div> 
+    <div id="suppressionreussie" style="display:none;"> {{ 'cadres.confirmation.supreussie'|trans({}, 'cadres') }} </div>
+    <div id="titresuppression" style="display:none;">{{ 'cadres.confirmation.titresup'|trans({}, 'cadres') }}</div> 
+    <div id="msgconfirmsuppression" style="display:none;"> {{ 'cadres.confirmation.suppression'|trans({}, 'cadres') }}</div>  
+    
+    <div id="nonedata" style="display:none;"> {{ 'cadres.confirmation.nonedata'|trans({}, 'cadres') }} </div> 
+
+    <div id="operationexiste" style="display:none;"> {{ 'cadres.confirmation.operationexiste'|trans({}, 'cadres') }} </div> 
+                      
+{{ information.decochetoutbox() }}
+
+  {% endblock %}
+
+                                            

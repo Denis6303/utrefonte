@@ -1,0 +1,521 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Chargement de fichiers
+{% endblock %}
+
+  {% block client_centre_body %} 
+  
+   				<!-- FIN MENU RAPIDE BARRE HORIZONTALE GRISE -->
+
+        {% for contenu in app.session.flashbag.get('notice') %}             
+            {% if contenu == "successaajoutfile" %}                                    
+                    <div class="success rightSpace leftSpace center">
+                    {{ 'notification.successaajoutfile'|trans({}, 'chargement') }}
+                    </div>                       
+            {% elseif contenu == "errorajoutfilevide" %}                     
+                    <div class="error rightSpace leftSpace center">
+                    {{ 'notification.errorfilevide'|trans({}, 'chargement') }}
+                    </div>                                                      
+            {% elseif contenu == "errortypeexist" %}                                    
+                    <div class="error rightSpace leftSpace center">
+                    {{ 'notification.errortypeexist'|trans({}, 'chargement') }}
+                    </div>                   
+            {% endif %}
+        {% endfor %}
+
+  			<!-- Contien les menus -->
+      	<!-- Barre de titre + bton Actions-->
+          
+<ul class="filariane bleuLink">
+          <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+          <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+          <li><a href="">{{'client.autre'|trans({},'messages') }}</a></li>
+          <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+          <li>{{'chargement.titre'|trans({},'chargement') }}</li>
+</ul>
+
+<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'chargement.titre'|trans({},'chargement') }}</h2>
+                          
+                          
+
+                          {#<div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton2').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+                          </div>#}					<!--  FIN allBoutonsGestion -->
+                          
+                            
+                          						<!--  FIN toulbar 3 -->
+                           <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+<form class="form_search paddingBottom10p" action=" {{ path("utb_client_savefile",{'locale': locale,'type': type }) }} " method="post" {{ form_enctype(form) }} id="ajoutChargement">
+
+    <div class="FrmAbonne">           
+         {{ form_errors(form.natureChargement) }}            
+         {{ form_label(form.natureChargement, 'chargement.form.natureChargement'|trans({},'chargement')) }}<span class="red-text">*</span> 
+         {{ form_widget(form.natureChargement) }}
+    </div>
+    
+    <div class="FrmAbonne">           
+         {{ form_errors(form.typeChargement) }}            
+         {{ form_label(form.typeChargement, 'chargement.form.typeChargement'|trans({},'chargement')) }}<span class="red-text">*</span> 
+         {{ form_widget(form.typeChargement) }}
+    </div>    
+    
+    <div class="FrmAbonne">           
+         {{ form_errors(form.typeCompte) }}            
+         {{ form_label(form.typeCompte, 'chargement.form.typeCompte'|trans({},'chargement')) }}<span class="red-text">*</span> 
+         {{ form_widget(form.typeCompte) }}
+    </div>
+	    
+    <div class="FrmAbonne inputMin">
+        <span class="requis" style="margin-right: 5px;"><label>Date </label><span class="red-text">*</span></span>
+        <input name="datedebut" type="text" id="from" />
+        <div class="clr"></div>
+    </div>     
+
+    <div class="FrmAbonne">                                                
+        {{ form_errors(form.file) }}
+        <span class="requis">{{ form_label(form.file,  'chargement.form.fichier'|trans({}, 'chargement')) }}<span class="red-text">*</span></span>                                                                                         
+        {{ form_widget(form.file) }}
+    </div>    
+    <div class="ecartLabel" ></div>
+    <div class="marginBottom10p" >
+        <input type="submit" value="{{'client.ajouter'|trans({},'messages') }}" name="op" id="j_bouton" class="boutonSubmit" {#style="display: none"#}><div class="clear"></div>
+    </div>    
+    
+    <table class="infoCompte noLeftBorder noGras">
+                
+                    <tr>
+                        <th style="padding-left:10px;"><input type="checkbox" class="checkall" name="checkall"/></th>
+                        <th class="">{{'chargement.liste.nom'|trans({}, 'chargement') }}</th>
+                        <th class="">{{'chargement.liste.statut'|trans({}, 'chargement') }}</th>
+                        <th class="">{{'chargement.liste.typeCompte'|trans({}, 'chargement') }}</th>
+                        <th class="">{{'chargement.liste.date'|trans({}, 'chargement') }}</th>
+                        <th class="">{{'chargement.liste.periodicite'|trans({}, 'chargement') }}</th>                        
+                        <th class="" colspan="3">{{'chargement.liste.action'|trans({}, 'chargement') }}</th>                       
+                    </tr>
+                
+         {% for file  in listefile %}	
+               {% if file != null%}
+                <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                    <td ><input type="checkbox" name="file[]" value="{{file.id}}" rel="file_c"/></td>
+                    <td class="rubArtList">{{file.getNomFile()}}</td>
+
+                    <td class="statutArtList ">
+                           {% if file.statut == 0 %}
+                            <img src="{{ asset('img/client-img/queue.gif')}}" alt="ok" title="fichier envoyé" />
+                               {#{'chargement.form.traite'|trans({}, 'chargement') }#}
+                           {% elseif file.statut == 1 %}   
+                            <img src="{{ asset('img/client-img/icon-16-upload.png')}}" alt="chargé" title="Chargé" />
+                               {#{'chargement.form.traite'|trans({}, 'chargement') }#}
+                           {% elseif file.statut == 2 %}   
+                            <img src="{{ asset('img/client-img/icon-ok.png')}}" alt="traité" title="traité" />
+                               {#{'chargement.form.traite'|trans({}, 'chargement') }#}    
+                           {% endif %}
+                    </td>
+
+                    <td class="statutArtList">
+                               {% if file.typeCompte.getId() == 1 %}
+                                   {{'chargement.form.afbw'|trans({}, 'chargement') }}                                                            
+                               {% elseif file.typeCompte.getId() == 2 %}   
+                                   {{'chargement.form.afbw2'|trans({}, 'chargement') }}
+                               {% elseif file.typeCompte.getId() == 3 %}   
+                                   {{'chargement.form.uweb'|trans({}, 'chargement') }}     
+                               {% endif %}
+                    </td>                                                       
+                    
+                    <td class="statutArtList">
+                               {{ file.getDateDeb()|date('d-m-Y') }}
+                    </td>
+                    
+                    <td  class="">  
+                        {% if file.typeChargement == 0 %}
+                           {{'chargement.periodicite.jour'|trans({}, 'chargement') }} 
+                        {% elseif file.typeChargement == 1 %} 
+                           {{'chargement.periodicite.hebdo'|trans({}, 'chargement') }}  
+                        {% elseif file.typeChargement == 2 %}
+                           {{'chargement.periodicite.mens'|trans({}, 'chargement') }}  
+                        {% elseif file.typeChargement == 3 %}
+                           {{'chargement.periodicite.bimens'|trans({}, 'chargement') }}  
+                        {% elseif file.typeChargement == 4 %}    
+                           {{'chargement.periodicite.trimes'|trans({}, 'chargement') }}  
+                        {% elseif file.typeChargement == 5 %}    
+                           {{'chargement.periodicite.annuel'|trans({}, 'chargement') }}  
+                        {% endif %}    
+                    </td> 
+                    <td  class="statutArtList"> 
+                    {% if file.natureChargement != 1 %}
+                        {% if file.statut in [0,1]  %}
+                          
+                                <a href="javascript:void(0);" onclick="SupprOneFile({{file.id}}); return false;">
+                                   {{'chargement.form.supprimer'|trans({}, 'chargement') }}  
+                                </a>        
+                            
+                        {% endif %}
+                    {% endif %}
+                      </td>
+
+                         <td>
+                             {% if file.natureChargement != 1 %}       
+                                {% if file.statut == 0  %}
+                                              <a href="javascript:void(0);" onclick="ChargeDansTmp({{file.id()}}); return false;"> 
+                                                {{'chargement.form.charger'|trans({}, 'chargement') }}
+                                              </a>
+                                {% elseif file.statut == 1 %}
+                                              <a href="javascript:void(0);" onclick="LoadOneFile({{file.id}}); return false;"> 
+                                                {{'chargement.form.trait'|trans({}, 'chargement') }}
+                                              </a>  
+                                {% endif %}      
+
+                                {% if file.statut == 2 %}  
+
+                                          <a href="{{ path("utb_client_Statload",{'idfile':file.id(),'locale':locale  }) }}" > 
+                                            {{'chargement.form.infosSurChargement'|trans({}, 'chargement') }}
+                                          </a>
+                                          &nbsp;&nbsp;
+                                {% endif %}           
+                                {% if file.statut == 2 %}            
+                                          <a href="javascript:void(0);" onclick="ArchiveFile({{file.id}}); return false;"> 
+                                            {{'chargement.form.archive'|trans({}, 'chargement') }}
+                                          </a>                              
+
+                                {% endif %}                            
+                            {% endif %} 
+                         </td> 
+
+                                                </tr>
+               {% endif %}
+         {% else %}
+                                                <tr class="center bgBlanc">
+                                                    <td colspan="9" class="titreArtList" align:center<a href=""> {{ 'chargement.none'|trans({}, 'chargement') }} </a></td>	
+                                                </tr>
+         {% endfor %}
+
+                                            </table>     
+      {#<input type="submit" value="traiter" name="optrait" id="j_bouton2" style="display: none"><a href=""></a>#}
+
+    {# <div class="paddingTopBot20p right">
+         <input type="submit" name="optrait" value="Charger le lot" class="chargement_submit" id="j_bouton2" />
+     </div> #}
+
+     </form>       
+
+
+  <script>       
+      
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });
+  
+       function getfilesID(){
+           
+            var file_id = "";
+            
+            $(":input[rel=file_c]:checked").each(function(){
+		file_id = file_id.concat( "|" + $(this).val() );
+            });   
+            
+            return file_id;
+       }     
+      
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>";   
+       //function pour envoyer à la corbeille plusieurs articles a la fois(edem)
+       function SupprOneFile( fileId ){
+    
+          if( fileId.length == 0 ){              
+          $('#process_tpl').html($('#vide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsupfile').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsupfile').html());          
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsupfile').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+
+                            $('#process_tpl').html(html);
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_deleteFile')}}",
+                                data: {fileIds:fileId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreursupfile"){
+                                        $('#process_tpl').html($('#errorsupfile').html());
+                                    }
+                                    else if (answer.result == "success"){
+                                        $('#process_tpl').html($('#reussitesupfile').html());                                        
+                                    } 
+                                    else {
+                                       $('#process_tpl').html($('#accessdenied').html()); 
+                                    }    
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       }
+       
+       function LoadOneFile( idFile){
+    
+          if( idFile.length == 0 ){              
+          $('#process_tpl').html($('#vide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titretrait').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmtrait').html());          
+          var args = {modal: true, autoOpen: false, title: ($('#titretrait').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+
+                            $('#process_tpl').html(html);
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_loadOneFile')}}",
+                                data: {idFile:idFile},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "errortrait"){
+                                        $('#process_tpl').html($('#errortrait').html());                                      
+                                    }
+                                    else if (answer.result == "success"){
+                                       $('#process_tpl').html($('#reussitetrait').html()); 
+                                      {# //window.location.href = "{{ path('utb_client_Statload',{'type': 0}) }}";#}
+                                    } 
+                                    else {
+                                       $('#process_tpl').html($('#accessdenied').html());                                        
+                                    }      
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       }      
+       
+       function ChargeDansTmp( idFile ){
+    
+          if( idFile.length == 0 ){              
+          $('#process_tpl').html($('#vide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titreload').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmload').html());          
+          var args = {modal: true, autoOpen: false, title: ($('#titreload').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+
+                            $('#process_tpl').html(html);
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_chargeDansTmp')}}",
+                                data: {idFile:idFile},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                   /**/ if( answer.result == "errorload"){
+                                        $('#process_tpl').html($('#errorload').html());                                      
+                                    }
+                                    else if (answer.result == "success"){
+                                       $('#process_tpl').html($('#reussiteload').html()); 
+                                      {# //window.location.href = "{{ path('utb_client_Statload',{'type': 0}) }}";#}
+                                    } 
+                                    else {
+                                       $('#process_tpl').html($('#accessdenied').html());                                        
+                                    }      
+                                    window.location.reload();/**/
+                                   //console.log(answer);
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       } 
+
+       function ArchiveFile( idFile){
+    
+          if( idFile.length == 0 ){              
+          $('#process_tpl').html($('#vide').html());
+          
+          var args = {modal: true, autoOpen: false, title: ($('#titrearch').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmarch').html());          
+          var args = {modal: true, autoOpen: false, title: ($('#titrearch').html())};
+          $('#process_tpl').dialog(args);
+          $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+
+                            $('#process_tpl').html(html);
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_client_archiveChargement')}}",
+                                data: {idFile:idFile},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "errorarch"){
+                                        $('#process_tpl').html($('#errorarch').html());                                      
+                                    }
+                                    else if (answer.result == "success"){
+                                       $('#process_tpl').html($('#reussitearch').html());                                       
+                                    } 
+                                    else {
+                                       $('#process_tpl').html($('#accessdenied').html());                                        
+                                    }      
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');          
+       }
+
+    </script>  
+    
+  
+  <div id="msgconfirmload" style="display:none;">
+    {{ 'chargement.confirmation.load'|trans({}, 'chargement') }}
+  </div>   
+
+  <div id="titreload" style="display:none;">{{ 'chargement.confirmation.titreload'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="errorload" style="display:none;"> 
+    {{ 'chargement.confirmation.impossibleload'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="reussiteload" style="display:none;"> 
+    {{ 'chargement.confirmation.succesload'|trans({}, 'chargement') }} 
+  </div> 
+    
+    
+
+  <div id="msgconfirmsupfile" style="display:none;">
+       {{ 'chargement.confirmation.suppressionfile'|trans({}, 'chargement') }}
+  </div>   
+
+  <div id="titreconfirmsupfile" style="display:none;">
+       {{ 'chargement.confirmation.titresupfile'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="impossiblesupfile" style="display:none;"> 
+       {{ 'chargement.confirmation.impossiblesupfile'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="reussitesupfile" style="display:none;"> 
+     {{ 'chargement.confirmation.successupfile'|trans({}, 'chargement') }} 
+  </div>     
+
+   <div id="msgconfirmtrait" style="display:none;">
+    {{ 'chargement.confirmation.trait'|trans({}, 'chargement') }}
+  </div>   
+
+  <div id="titretrait" style="display:none;">{{ 'chargement.confirmation.titretrait'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="errortrait" style="display:none;"> 
+    {{ 'chargement.confirmation.impossibletrait'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="reussitetrait" style="display:none;"> 
+    {{ 'chargement.confirmation.succestrait'|trans({}, 'chargement') }} 
+  </div>    
+    
+    
+  <div id="msgconfirmarch" style="display:none;">
+    {{ 'chargement.confirmation.archiveconf'|trans({}, 'chargement') }}
+  </div>   
+
+  <div id="titrearch" style="display:none;">{{ 'chargement.confirmation.titrearch'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="errorarch" style="display:none;"> 
+    {{ 'chargement.confirmation.impossiblearch'|trans({}, 'chargement') }}
+  </div> 
+
+  <div id="reussitearch" style="display:none;"> 
+    {{ 'chargement.confirmation.succesarch'|trans({}, 'chargement') }} 
+  </div>    
+    
+  <div id="process_tpl" style="display:none;"></div>      
+    
+  {% endblock %}

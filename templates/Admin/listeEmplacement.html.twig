@@ -1,0 +1,412 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'emplacements.liste.grandtitrepg'|trans({}, 'emplacements') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_listeEmplacement',{ 'locale': locale })}}">{{ 'emplacements.liste.titrepg'|trans({}, 'emplacements') }} </a>
+</div>
+{% for contenu in app.session.flashbag.get('notice') %}
+    {% if contenu == "success" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                   {{ 'emplacements.addsuccess'|trans({}, 'emplacements') }}
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "modifsuccess" %}
+        <div class="span-25">
+            <div class="success successMsg">                        
+                  {{ 'emplacements.modifsuccess'|trans({}, 'emplacements') }}  
+            </div>    
+        </div> 
+    {% endif %}
+    {% if contenu == "failure" %}
+        <div class="span-25">
+            <div class="error">                        
+                    {{ 'emplacements.addfailure'|trans({}, 'emplacements') }}
+            </div>    
+        </div> 
+    {% endif %} 
+    {% if contenu == "existedeja" %}
+        <div class="span-25">
+            <div class="error">                        
+                    {{ 'emplacements.existedeja'|trans({}, 'emplacements') }}
+            </div>    
+        </div>
+
+    {% endif %}
+{% endfor %}
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-14">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="" title="" /></div>
+            <div class="titreModule colorBleu"><h1>{{ 'emplacements.liste.titrepg'|trans({}, 'emplacements') }}</h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+                        <div class="span-10 last">
+
+                            <div class="ecartBoutonsFirst for3ButonsLg">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="#" onClick="AjoutEmplacement(); return false;"><img id="btn_ajout_emplacement" src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>
+                            
+                            <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll(getUsersID(),1); return false;"><img src="{{ asset('img/admin-img/valider.png')}}" alt="{{ 'admin.publier'|trans}}" title="{{ 'admin.enligne'|trans}}" /></div>
+                                    {{'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll(getUsersID(),0); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.depublier'|trans}}" title="{{ 'admin.horsligne'|trans}}" /></div>
+                                    {{'admin.desactiver'|trans}}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>
+							
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll(getUsersID()); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.supprimgul'|trans}}" title="{{ 'emplacement.supprimer'|trans}}" /></div>
+                                      {{ 'admin.supprimer'|trans({}, 'messages') }}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    
+                                        {# BOX INFOS #}    
+                                    {% if infos|length>0 and infos is not null %}
+                                        {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                    
+                                    {% else %}
+                                    <p>&nbsp;&nbsp;</p>                                           
+                                    {% endif %}
+   
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	
+                                                        
+						<div class="FrmAjoutArt FrmInArticleTop" id="ajoutEmplacement_container" style="display:none;">
+								<div style="float:left;">
+									{{ render(controller('utbAdminBundle:AdminAutre:ajoutEmplacement', {'locale':locale})) }}  
+								</div>
+								<a href="#" class="noSoulignHover" onClick="AnnulerAjoutEmplacement(); return false;">{{'admin.annuler'|trans}}</a>
+								<div class="clr"></div>
+						</div>                                                 
+						<table class="listMenusCateg listArticlesRub">
+							<tr>
+								<th class="numArtList"><input type="checkbox" class="checkall" name="checkall"/></th>
+								<th>{{'emplacements.nom'|trans({}, 'emplacements')}}</th>
+								<th style="width:40px;">{{'admin.statut'|trans({}, 'messages')}}</th>
+								<th style="width:40px;">{{'admin.action'|trans({}, 'messages')}}</th>
+							</tr>	
+									   {% for emplacement in listeEmplacement %}                                                            
+
+								   
+							<tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+								<td class="statutArtList"><input type="checkbox" name="user[]" value="{{emplacement.id}}" rel="user_c"/></td>
+								<td class="titreList">
+									
+								{{ emplacement.libEmplacement|raw }}    
+									
+								<div class="FrmInTable" id="{{"modifEmplacement_container"~emplacement.id}}" style="display:none;">
+									{{ render(controller('utbAdminBundle:AdminAutre:modifierEmplacement', {'id':emplacement.id,'locale':locale})) }}  
+									<a href="#" class="noSoulignHover" onClick="AnnulerModifEmplacement({{emplacement.id}}); return false;">{{'admin.annuler'|trans}}</a>
+										<div class="clr"></div>
+								</div>
+
+								</td>  
+									<td class="statutArtList">
+										   {% if emplacement.statutEmplacement ==1  %}
+										{# <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="" title="" />#}
+											{{'admin.active'|trans}}
+										   {% elseif emplacement.statutEmplacement  ==0 %}
+										{# <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="" title="" />#}
+											{{'admin.desactive'|trans}}
+										   {% endif %}
+									   </td>
+								
+										<td class="{{"modif"~emplacement.id}}">              
+											<a href="#" onClick="ModifEmplacement({{emplacement.id}}); return false;">
+
+											  <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}" />
+											</a> 
+										</td>
+									</tr>
+
+{% else %}
+									<tr>
+										<td colspan="4">{{ 'emplacements.none'|trans({}, 'emplacements') }} </td>       
+									</tr>       
+{% endfor %}
+						</table>
+                                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                                    </div>		<!--  FIN COL RIGHT -->
+                                                </div>			<!--  FIN  SPAN - 19 -->
+
+                                            </div
+                        <!--  FIN SPAN - 25 -->
+                        
+  <script language="javascript">
+      
+        function AjoutEmplacement(){
+             $("#modifEmplacement_container").hide();
+             $("#ajoutEmplacement_container").show();
+
+             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerAjoutEmplacement(){
+           
+           $("#ajoutEmplacement_container").hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierFicheUser( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/            
+       } 
+       
+       function ModifEmplacement(idemplacement){
+             $("#modifEmplacement_container"+idemplacement).show();
+             $("#ajoutEmplacement_container").hide();
+
+             var html = '';
+             $(".modif"+idemplacement).html(html);             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerModifEmplacement(idemplacement){
+           
+           $("#modifEmplacement_container"+idemplacement).hide();   
+            var html = '<a href="#" onClick="ModifEmplacement('+idemplacement+'); return false;"><img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/></a>';
+            $(".modif"+idemplacement).html(html);            
+       }          
+          
+          
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+      
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getUsersID(){
+           
+            var id = "";
+            
+            $(":input[rel=user_c]:checked").each(function(){
+		id = id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'emplacements.confirmation.titresuppression'|trans({}, 'emplacements') }}";
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( d ){
+         //To do
+         if( d.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsuppression').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titresuppression').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_deleteAllemplacements')}}",
+                                data: {ds:d},
+                                cache: false,
+                                success: function(data){ 
+                                   var resJson = jQuery.parseJSON(data);
+                                   if( resJson.result=="erreurstatut"){
+                                        $('#process_tpl').html($('#suppressionimpossible').html());
+                                        window.location.reload();
+                                    }
+                                   if( resJson.result == "success"){
+                                      $('#process_tpl').html($('#suppressionreussie').html()); 
+                                      window.location.reload();
+                                   }
+                                   
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       } 
+   
+   
+    var htmldefault3 = "{{ 'emplacements.confirmation.titremodification'|trans({}, 'emplacements') }}";
+    
+    function gererEtatAll(emplacementId,etat){
+    
+          if( emplacementId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+              
+          if (etat == 0)   {
+                var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          }
+    
+          if (etat == 1)   {
+                var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          }            
+            
+           $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }   
+          
+          if (etat == 0)   {
+             $('#process_tpl').html($('#msgconfirmdesactivation').html()  );
+             var args = {modal: true, autoOpen: false, title: ($('#titredesactivation').html())};
+          }
+          if (etat == 1)   {
+             $('#process_tpl').html($('#msgconfirmactivation').html() );
+             var args = {modal: true, autoOpen: false, title: ($('#titreactivation').html())};
+          }
+          
+          
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gereretatallemplacement')}}",
+                                data: {emplacementIds:emplacementId, etats:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationimpossible').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationimpossible').html());                                               
+                                            }                                          
+                                        
+                                    }else if( answer.result=="administrateur"){
+
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationimpossible').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationimpossible').html());                                               
+                                            }  
+
+                                    }
+                                    else{
+
+                                            if (etat == 0)   {
+                                               $('#process_tpl').html($('#desactivationreussie').html());                                              
+                                            }
+                                            if (etat == 1)   {
+                                               $('#process_tpl').html($('#activationreussie').html());                                               
+                                            }  
+
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+
+</script>
+
+{% if ajoutprof == 1 %}
+     <script>
+         $("#btn_ajout_emplacement").click();
+     </script>
+{% endif %} 
+
+<div id="process_tpl" style="display:none;"></div> 
+  <div id="sivide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+    <div id="activationimpossible" style="display:none;"> {{ 'confirmation.activationimpossible'|trans({}, 'emplacements') }}</div> 
+    <div id="activationreussie" style="display:none;"> {{ 'confirmation.activationreussie'|trans({}, 'emplacements') }} </div>
+    <div id="titreactivation" style="display:none;">{{ 'confirmation.activation'|trans({}, 'emplacements') }} </div> 
+    <div id="msgconfirmactivation" style="display:none;">   {{ 'confirmation.activation'|trans({}, 'emplacements') }}</div> 
+
+    <div id="desactivationimpossible" style="display:none;"> {{ 'confirmation.desactivationimpossible'|trans({}, 'emplacements') }}</div> 
+    <div id="desactivationreussie" style="display:none;"> {{ 'confirmation.desactivationreussie'|trans({}, 'emplacements') }} </div>                     
+    <div id="titredesactivation" style="display:none;">{{ 'confirmation.titredesactivation'|trans({}, 'emplacements') }}</div> 
+    <div id="msgconfirmdesactivation" style="display:none;"> {{ 'confirmation.desactivation'|trans({}, 'emplacements') }}</div>      
+
+    <div id="suppressionimpossible" style="display:none;"> {{ 'confirmation.supimpossible'|trans({}, 'emplacements') }}</div> 
+    <div id="suppressionreussie" style="display:none;"> {{ 'confirmation.supreussie'|trans({}, 'emplacements') }} </div>
+    <div id="titresuppression" style="display:none;">{{ 'confirmation.titresup'|trans({}, 'emplacements') }}</div> 
+    <div id="msgconfirmsuppression" style="display:none;"> {{ 'confirmation.suppression'|trans({}, 'emplacements') }}</div>      
+
+    <div id="operationexiste" style="display:none;"> {{ 'confirmation.operationexiste'|trans({}, 'emplacements') }} </div> 
+                      
+{{ information.decochetoutbox() }}                        
+                        
+                        
+{% endblock %}

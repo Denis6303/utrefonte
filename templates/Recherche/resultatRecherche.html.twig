@@ -1,0 +1,185 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+  
+     									<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > {{ 'recherches.titreariane'|trans({}, 'recherches') }}{#</a>#}
+            </div>
+                                        <!-- Contien les menus -->
+            {% for contenu in app.session.flashbag.get('notice') %}
+                
+                {% if contenu == "champvide" %}
+                    <div class="span-25">
+                        <div class="notice noticesMsg">                        
+                               {{ 'recherches.champvide'|trans({}, 'recherches') }}
+                        </div>    
+                    </div> 
+                {% endif %}
+                
+            {% endfor %}										<!--  FIN toulbar 3 -->
+	    				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">
+                                                {# STATISTIQUES #}  
+                                                {{ information.stats(listestat1) }}  
+                                            
+                                        </div>	
+                               
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+										<!-- COLONNE DROITE-->
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							{#<!--<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+									<option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+									<option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+									<option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+									<option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+									<option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+									<option>Présentation</option>
+									<option>Produits-Services</option>
+									<option>Actualités</option>
+									<option>FAQ</option>
+									<option>Brèves</option>
+								</select>
+								<select class="filterAutor">
+									<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+									<option>Armand K.</option>
+									<option>Benoit G.</option>
+									<option>Serges A.</option>
+								</select>
+								<select class="filterLanguage">
+									<option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+									<option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+									<option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+								</select>
+								<div class="clr"></div>
+							</div>	--> #}
+                                                        <!-- FIN filtersArticles-->	
+                                                        <div id="resultats_recherche">
+                                                            <table class="listMenusCateg listArticlesRub">
+                                                                    
+                                                                    {{ information.entete_recherche_avec_action() }} 
+                                                                    
+                                                                    <p>Recherche sur utb.tg ({{results[0]|length+results[1]|length}} resultat(s) trouvé(s))</p> 
+                                                                    <br/>
+                                                                    <p>
+                                                                    {% for element in results %}
+                                                                      {% for article in element %}      
+                                                                      {% if article.titreArticle is not null %}                                                                      
+                                                                        <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+
+                                                                                <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                                                <td class="titreArtList">
+                                                                                    {% if article.type == 0 %}                                                                                    
+                                                                                        <a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idRubrique}) }}" >
+                                                                                    {% elseif article.type == 1 %}
+                                                                                        <a href="{{ path('utb_admin_detailrubrique',{'id': article.id,'locale':locale}) }}">
+                                                                                    {% endif %}
+                                                                                        {{article.titreArticle}}
+                                                                                        </a>                                                                                
+                                                                                </td>
+                                                                                                                                                              
+                                                                                {# STATUTS Articles #}  
+                                                                                {{ information.statutlisteaccordeon(article) }} 
+                                                                                
+                                                                                <td class="dateArtList"> {{article.nomRubrique}}</td>
+                                                                                <td class="autorArtList">
+                                                                                    {% for user in listeuser %}
+                                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                                             {{user.NameUser}}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}                                                                                    
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                <td class="langArtList"> {{locale}}</td>
+                                                                                <td class="numArtList"> {{'N°'~article.id}}</td>
+                                                                                
+                                                                                <td class="statutArtList">
+                                                                                    {% if article.statutArticle in [1,2,5] %}
+                                                                                        {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':article.idRubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}
+                                                                                             <a href="{{path('utb_admin_modifarticle', {'id': article.id,'locale': locale,'type':article.idRubrique,'nomarticle':article.titreArticle})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>                                                                                       
+                                                                                        {% endif%}
+                                                                                    {% elseif article.statutArticle == 3 %} 
+                                                                                        
+                                                                                        {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':article.idRubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}                                                                                        
+                                                                                            <a href="{{path('utb_admin_modifarticlevalide', {'id': article.id,'locale': locale,'type':article.idRubrique,'nomarticle':article.titreArticle})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% endif%}
+                                                                                    {% elseif article.statutArticle == 4 %}  
+                                                                                        
+                                                                                         {% if locale=='en' %}
+                                                                                        
+                                                                                            <a href="{{path('utb_admin_languearticle', {'id': article.id,'locale': locale,'type':article.idRubrique})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% else%}                                                                                        
+                                                                                            <a href="{{path('utb_admin_modifarticlepublie', {'id': article.id,'locale': locale,'type':article.idRubrique,'nomarticle':article.titreArticle})}}" > 
+                                                                                                <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({}, 'messages') }}" title="{{ 'admin.modifier'|trans({}, 'messages') }}"/>
+                                                                                            </a>
+                                                                                        {% endif %}
+                                                                                    {% endif %} 
+                                                                                </td>        
+                                                                        </tr>  
+                                                                      {% endif %} 
+                                                                    {% endfor %}
+                                                                 {% endfor %}
+                                                                    </p>
+
+                                                             </table>
+                                                       </div>
+						<br/><br/>
+                                               	
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>
+                        
+{{ information.popupaddarticle(listeRubrique) }}  
+
+{{ information.msgjquerytranslate() }}
+
+{{ information.decochetoutbox() }}
+  
+<div id="process_tpl" style="display:none;"></div>  
+
+{% endblock %}

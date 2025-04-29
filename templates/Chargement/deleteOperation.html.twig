@@ -1,0 +1,62 @@
+{#------------    src/utb/ClientBundle/Resources/views/layoutSite.html.twig   ------------#}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+	<ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre'|trans({},'compte')}}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'compte.releve.imprim'|trans({},'compte')}}</li>
+	</ul>
+    
+        {% if  app.request.get('cpte')|trim == null   %}   
+                {% set cpte = '' %}       
+        {% else %}                       
+                {% set cpte = app.request.get('cpte') %} 
+        {% endif %}    
+                
+        {% if  app.request.get('per')|trim == null   %}   
+                {% set periode = '' %}              
+        {% else %}   
+               {% set periode = app.request.get('per') %}  
+        {% endif %}   
+  
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'compte.releve.imprim'|trans({},'compte')}}</h2>
+	
+	<div class="marginBottom20p">
+        <form class="form-search-operation bgGrisatr1 paddingBottom10p" action="{{path("utb_client_imprimeReleveAbonne",{'locale':locale})}} " method="post"  id="ajoutImage">
+			<div>
+				<label class="labelLong">{{'operation.select'|trans({},'recherche')}}<span class="red-text">*</span></label>
+                                <div class="FrmAbonne inputMin">
+                                    <span class="requis" style="margin-right: 5px;"><label>Date du </label><span class="red-text">*</span></span>
+                                    <input name="datedebut" type="text" id="from" />
+                                    <div class="clr"></div>
+                                </div>                                
+                                <div class="FrmAbonne inputMin">
+                                    <span class="requis" style="margin-right: 5px;"><label>Date du </label><span class="red-text">*</span></span>
+                                    <input name="datedebut" type="text" id="from" />
+                                    <div class="clr"></div>
+                                </div>                                
+                                <input class="boutonSubmit" type="submit" value="{{'compte.imprimer'|trans({},'compte') }}" style="float: none;"/>
+                                <div class="clr"></div>
+                        </div>                      
+                        
+		</form> 
+	</div>
+	<div class="error rightSpace leftSpace center">ffffffffffffffffff</div>
+ 
+        {#<form class="form-search-operation bgGrisatr1" style="border:none;" action="{{ path("utb_client_imprimeReleveabonne",{'locale':locale,'cpte':cpte,'per':periode}) }} " method="post"  id="ajoutImage">
+        </form>#}
+
+                
+	<script type="text/javascript">
+	$(".montant").numeric();
+	</script>                
+            
+{% endblock %}
+		

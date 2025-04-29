@@ -1,0 +1,405 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+{% for rubrique in larubrique %}
+    	<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+           <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> 
+                > 
+                <a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }}</a> 
+                {% if rubrique.nomRubrique !='' %}
+                > 
+                <a href="{{path('utb_admin_detailrubrique',{'id': rubrique.id,'page': 1,'locale': locale})}}">
+                {{rubrique.nomRubrique}}
+                </a>
+                {% endif%}
+                >                
+                {{ 'articles.liste.corbeille'|trans({}, 'articles') }}              
+                
+            </div>
+
+                                
+                {% for contenu in app.session.flashbag.get('notice') %}
+                    {% if contenu == "success" %}
+                        <div class="span-25">
+                            <div class="success successMsg">                        
+                                {{ 'rubriques.notification.ajoutbn'|trans({}, 'rubriques') }}
+                            </div>    
+                        </div> 
+                    {% else %}
+                
+                
+                    {% endif %}
+                {% endfor %}                                
+                                
+<div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-19">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.corbeille'|trans}}" title="{{ 'admin.corbeille'|trans}}" /></div>
+						<div class="titreModule colorBleu"><h1>{{ 'articles.liste.corbeille'|trans({}, 'articles') }} <span></span><h1></div>	
+						<div class="clr"></div>
+					</div>
+					
+					<div class="span-5 last">
+						<div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+						
+						<div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="deleteAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.supprimer'|trans({}, 'messages') }}" title="{{ 'admin.supprimer'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.supprimer'|trans({}, 'messages') }}</a>
+						</div>
+                                                
+                                                <div class="ecartBoutons">&nbsp;</div>
+                                                
+						<div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="restaureAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-restaurer.png')}}" alt="{{ 'admin.restaurer'|trans({}, 'messages') }}" title="{{ 'admin.restaurer'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.restaurer'|trans({}, 'messages') }}</a>
+						</div>
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+                                            
+                                        {# BOX INFOS #}    
+                                        {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                             
+                                            
+				
+                                        {# STATISTIQUES #}    
+                                        {{ information.stats(listestat) }}                        
+	
+				
+                    </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+						<h2 class="titleArticle colorBleu">
+                                                    {%set i=0 %}
+                                                    {% for unnom in nom %}
+                                                        {%set i=i+1 %}
+                                                        {% set fin =  unnom|length %}   
+                                                                {% if i>1 %}
+                                                                   &nbsp;<img src="{{ asset('img/admin-img/icon-position1.png')}}" alt="" title="" />&nbsp;
+                                                                {% endif %}                                                        
+                                                            {% if unnom[1]=="" %}
+
+                                                            {% else %}
+                                                               <a href="{{ path('utb_admin_detailrubrique', {'id': unnom[0]}) }}">    {{unnom[1]}}</a>
+                                                            {% endif %}
+                                                    {% endfor %}  
+							
+							
+						</h2>
+				
+					<div class="MarginBottomBox"></div>
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+					<div class="colRightContentPadding">		
+					
+					{# <div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+									<option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+									<option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+									<option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+									<option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+									<option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+									<option>Présentation</option>
+									<option>Produits-Services</option>
+									<option>Actualités</option>
+									<option>FAQ</option>
+									<option>Brèves</option>
+								</select>
+								<select class="filterAutor">
+									<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+									<option>Armand K.</option>
+									<option>Benoit G.</option>
+									<option>Serges A.</option>
+								</select>
+								<select class="filterLanguage">
+									<option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+									<option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+									<option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+								</select>
+								<div class="clr"></div>
+							</div> #}
+					
+					<table class="listMenusCateg listArticlesRub">
+                                                                    <tr>
+                                                                            <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                                            <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                                                            <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+
+                                                                    </tr>
+                                                                    {% for article in listearticle %}
+                                                                      {#% if article.titreArticle is not null %#}
+                                                                      
+                                                                        <tr {% if loop.index is divisibleby(2) %} class="bgGris"{% else %} class="bgBlanc" {% endif %} >
+
+                                                                                <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                                                <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                <td class="statutArtList">
+                                                                                                    {% if article.statutArticle ==1  %}
+                                                                                                        <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'admin.state.redact'|trans({}, 'articles') }}" title="{{ 'admin.state.redact'|trans({}, 'articles') }} " />
+                                                                                                    {% elseif article.statutArticle ==2 %}
+                                                                                                        <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{ 'admin.state.sub'|trans({}, 'articles') }}" title="{{ 'admin.state.sub'|trans({}, 'articles') }}" />
+                                                                                                    {% elseif article.statutArticle ==3 %}
+                                                                                                        <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{ 'admin.state.val'|trans({}, 'articles') }}" title="{{ 'admin.state.val'|trans({}, 'articles') }}" />
+                                                                                                    {% elseif article.statutArticle ==4  %}
+                                                                                                        <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{ 'admin.state.pub'|trans({}, 'articles') }}" title="{{ 'admin.state.pub'|trans({}, 'articles') }}" />
+                                                                                                    {% elseif article.statutArticle ==5 %}
+                                                                                                        <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{ 'admin.state.unpub'|trans({}, 'articles') }}" title="{{ 'admin.state.unpub'|trans({}, 'articles') }}" />
+                                                                                                    {% endif %}
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.nomRubrique}}</td>
+                                                                                <td class="autorArtList">
+                                                                                    {% for user in listeuser %}
+                                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                                             {{user.NameUser}}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}                                                                                    
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                <td class="langArtList"> {{locale}}</td>
+                                                                                <td class="numArtList"> {{'N°'~article.id}}</td>
+                                                                {#<td class="statutArtList"> <a href="javascript:void(0);" onclick="deleteAll( {{article.id}}); return false;{#{ path('utb_admin_supprarticle', {'id': article.id,'type': rubrique.id,'locale': locale}) }" onclick="return(confirm('Etes-vous sûr de vouloir supprimer cet article?'));" > <img src="{{ asset('img/admin-img/icon-16-trash.png')}}" id="{{article.id}}"  alt="Supprimer" title="Supprimer de la Corbeille" /></a></td>#}
+                                                        </tr>                                                        
+                                                      
+                                                {% endfor %}
+					 </table>
+                                        
+                                       <br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': 1 }) }}"> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': previous_page }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_listearticlecorbeille', { 'page': page }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': next_page }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_listearticlecorbeille', { 'page': last_page }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> {{ 'articles.liste.corbeille'|trans({}, 'articles') }}
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+                                                         
+                                        
+                                        </div> 	<!-- FIN colRightContentPadding-->
+					</div>		<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+				
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>				<!--  FIN SPAN - 25 -->
+{% endfor %} 
+                             
+  {{ information.popupaddarticle(listeRubrique) }}  
+                        
+ <script language="javascript" >
+            
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.natdoc.effectuer'|trans}}";
+       
+       
+       function gererAll( articlesId,etat){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.titrerestore2'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.changestatut'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gererAllarticles')}}",
+                                data: {articlesIds:articlesId,etat:etat},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+function restaureAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.titrerestore2'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.titrerestore2'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_restaureAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }       
+       
+       //function pour supprimer plusieurs elements a la fois
+       function deleteAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.titresupone2'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'confirmation.titresupone2'|trans({}, 'articles')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }       
+                  
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( actionsId ){
+         //To do
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function adesactiveAll( actionsId ){
+         //To do
+       }       
+</script>
+<div id="process_tpl" style="display:none;"></div> 
+
+  {{ information.decochetoutbox() }}
+
+  {% endblock %}

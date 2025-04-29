@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title>{% block title %}Union Togolaise de Banque{% endblock %}</title>
+        </head>    
+
+        <div class="coda-slider-wrapper">
+                <div>
+                   <a href="utb.tg">  
+                        <img src="{{ asset('img/admin-img/entetemail.png') }}"  alt="" title="" id="modify_profil">
+                   </a>                        
+
+                </div>
+        </div>
+          
+        <body>  
+                <div class="divBody2">
+                        <div class="container container2">	
+                                <div class="span-24 banSite borderBotStyle paddingBottom10p bgBlanc"> <!-- Début banniere -->
+                                        <div class="infosTool rightSpace leftSpace">
+                                            
+                                        </div>
+                                </div>
+
+                                {% block public_body %}
+                                        {{contenu}}
+                                {% endblock %}
+
+
+
+                        </div>
+                </div>  
+
+        </body>
+</html>       

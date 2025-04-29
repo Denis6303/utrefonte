@@ -1,0 +1,431 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+			<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_ajoutParams',{ 'locale': locale })}}"> {{ 'admin.layout.menu.maintenance'|trans}}</a> > 
+    <a href="{{path('utb_admin_listenaturedoc',{ 'locale': locale })}}">{{'admin.natdoc.naturedoctitre1'|trans}}</a> > 
+    {{ 'admin.natdoc.gerer'|trans({}, 'messages') }}
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-14">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-content.png')}}" alt="" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1> {{'admin.typedoc'|trans}}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-10 last">
+
+                           <div class="ecartBoutonsFirst for3ButonsLg">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="#" onClick="AjoutNatureDoc(); return false;"><img id="btn_ajout_nat_doc" src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{'admin.ajouter'|trans}}" title="{{'admin.ajouter'|trans}}" /></div>
+							{{ 'admin.ajouter'|trans}}</a>
+                            </div>
+							
+							<div class="ecartBoutons">&nbsp;</div>
+							
+                            <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="activeAll( getNatureDocsID()); return false;"><img src="{{ asset('img/admin-img/valider.png')}}" alt="{{'admin.activer'|trans}}" title="{{'admin.activer'|trans}}" /></div>
+                                    {{'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                    <div><a href="javascript:void(0);" onclick="desactiveAll( getNatureDocsID()); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{'admin.desactiver'|trans}}" title="{{'admin.desactiver'|trans}}" /></div>
+                                    {{'admin.desactiver'|trans}}</a>
+                            </div>
+							
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll( getNatureDocsID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{'admin.supprimer'|trans}}" title="{{'admin.supprimer'|trans}}" /></div>
+                                  {{ 'admin.supprimer'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                        {# STATISTIQUES #}    
+                                        {{ information.stats(listestat) }} 
+                                    
+                                    
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                            		<!-- FIN filtersArticles-->
+                                                        
+										<div class="FrmAjoutArt FrmTopDetailArt FrmInArticleTop" id="ajoutNatureDoc_container" style="display:none;">
+												<div style="float:left;">
+													{{ render(controller('utbAdminBundle:Admin:ajoutNatureDoc', {'locale':locale})) }}  
+												</div>
+												<a href="#" class="noSoulignHover" onClick="AnnulerAjoutNatureDoc(); return false;">{{'admin.annuler'|trans}}</a>
+												<div class="clr"></div>
+										</div>                                                         
+
+										<table class="listMenusCateg listArticlesRub">
+											<tr>
+												<th style="width:40px"><input type="checkbox" class="checkall" name="checkall"/></th>
+												<th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+												<th style="width:60px">{{'admin.statut'|trans}}</th>
+												<th style="width:60px">{{'admin.action'|trans}}</th>
+											</tr>
+													   {% for nature in listenaturedoc %}
+											<tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+												<td>
+													<input type="checkbox" name="nature[]" value="{{nature.id}}" rel="nature_c"/>
+												</td>
+												<td style="text-align:left; padding-left:10px;"> 
+													
+													
+													 {{nature.libNatureDoc }}
+													
+												<div class="FrmInTable" id="{{"modifNatureDoc_container"~nature.id}}" style="display:none;">
+												  {{ render(controller('utbAdminBundle:Admin:modifierNatureDoc', {'id':nature.id,'locale':locale})) }}  
+													 <a href="#" class="noSoulignHover" onClick="AnnulerModifNatureDoc({{nature.id}}); return false;">{{'admin.annuler'|trans}}</a>
+														<div class="clr"></div>
+												</div>                                                            
+													
+												</td>
+												<td class="statutArtList">
+													{% if nature.statutNatureDoc ==0  %}
+													   {#<img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="" title="" />#}
+													   {{'admin.desactive'|trans}}
+													{% elseif nature.statutNatureDoc ==1 %}
+														{#<img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="" title="" />#}
+														{{'admin.active'|trans}}
+													{% endif %}
+												</td>
+													
+												<td class="{{"modif"~nature.id}}">              
+													<a href="#" onClick="ModifNatureDoc({{nature.id}}); return false;"><img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/></a>    
+												   
+													{#<a href="{{ path('utb_admin_supprnaturedoc', {'id': nature.id}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a>#}
+												</td> 
+
+										   </tr>
+
+														{% else %}
+													<tr>
+														<td colspan="4">  {{'admin.nonenatdoc'|trans}} td>       
+													</tr>       
+														{% endfor %}
+												</table>
+                                             
+
+                                   </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                            </div>		<!--  FIN COL RIGHT -->
+                                        </div>			<!--  FIN  SPAN - 19 -->
+
+                                    </div>
+                        
+                        
+      <script language="javascript" >
+          
+          
+        function AjoutNatureDoc(){
+             $("#modifNatureDoc_container").hide();
+             $("#ajoutNatureDoc_container").show();
+
+             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerAjoutNatureDoc(){
+           
+           $("#ajoutNatureDoc_container").hide();   
+            /*var html = '<a class="updateLink" href="#" onClick="modifierFicheUser( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+            $(".updateImgInArt").html(html);*/
+            
+       } 
+       
+        function ModifNatureDoc(idnature){
+             $("#modifNatureDoc_container"+idnature).show();
+             $("#ajoutNatureDoc_container").hide();
+
+             var html = '';
+             $(".modif"+idnature).html(html);             
+             
+           /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheUser( ); return false;">Annuler Modification</a>';
+            $(".updateImgInArt").html(html);*/
+       }
+       
+      function AnnulerModifNatureDoc(idnature){
+           
+           $("#modifNatureDoc_container"+idnature).hide();   
+            var html = '<a href="#" onClick="ModifNatureDoc('+idnature+'); return false;"><img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{'admin.modifier'|trans}}" title="{{'admin.modifier'|trans}}"/></a>';
+            $(".modif"+idnature).html(html);            
+       }          
+          
+          
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getNatureDocsID(){
+           
+            var natures_id = "";
+            
+            $(":input[rel=nature_c]:checked").each(function(){
+		natures_id = natures_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return natures_id;
+       }
+       
+    
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.natdoc.effectuer'|trans({}, 'messages') }}";
+       var htmldefault2 = "{{ 'admin.natdoc.activer'|trans({}, 'messages') }}";
+       var htmldefault3 = "{{ 'admin.natdoc.desactiver'|trans({}, 'messages') }}";
+       
+       //function pour supprimer plusieurs elements a la fois
+       function deleteAll( naturesId ){
+          if( naturesId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans({}, 'messages') }}");
+          var args = {modal: true, autoOpen: false, title: ("{{ 'admin.natdoc.supprimer.titre'|trans({}, 'messages') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ("{{ 'admin.natdoc.supprimer.titre'|trans({}, 'messages') }}")};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_deleteAllnaturedocs')}}",
+                                data: {naturesIds:naturesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblerestore').html());
+                                    }
+                                    else if(answer.result == "success") {
+                                        $('#process_tpl').html($('#reussiterestore').html());
+                                    }
+                                    else {
+                                        $('#process_tpl').html($('#accessdenied').html());                                        
+                                    } 
+                                    
+                                    window.location.reload();                                    
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }                  
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( naturesId ){
+         //To do
+         if( naturesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html() );
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmact').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmact').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmact').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_activeAllnaturedocs')}}",
+                                data: {naturesIds:naturesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "success"){
+                                        $('#process_tpl').html($('#reussiteact').html());
+                                    }
+                                    if (answer.result == "erreur"){
+                                        $('#process_tpl').html($('#impossibleact').html());
+                                    }
+                                    if (answer.result == "accessdenied"){
+                                        $('#process_tpl').html($('#accessdenied').html());
+                                    }
+                                    window.location.reload();                                    
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function desactiveAll( naturesId ){
+         //To do
+         if( naturesId.length == 0 ){              
+              $('#process_tpl').html($('#sivide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesact').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmdesact').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_desactiveAllnaturedocs')}}",
+                                data: {naturesIds:naturesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "accessdenied"){
+                                        $('#process_tpl').html($('#accessdenied').html());
+                                    }
+                                    window.location.reload();                                    
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open');
+       }       
+</script>
+
+{% if ajoutnat == 1 %}
+     <script>
+         $("#btn_ajout_nat_doc").click();
+     </script>
+{% endif %} 
+
+<div id="process_tpl" style="display:none;"></div>  
+
+<div id="accessdenied" style="display:none;"> 
+{{ 'confirmation.accessdenied'|trans({}, 'articles') }} 
+</div>
+
+{# Test si rien n'est coché #}
+  <div id="vide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+                        <!--  FIN SPAN - 25 -->
+                
+  <div id="sivide" style="display:none;"> 
+    {{ 'admin.natdoc.sivide'|trans({}, 'messages') }} 
+  </div> 
+                        
+  {# activer une nature doc #}
+  <div id="msgconfirmact" style="display:none;">
+    {{ 'admin.natdoc.activer'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmact" style="display:none;">
+    {{ 'admin.natdoc.titreact'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibleact" style="display:none;"> 
+    {{ 'admin.natdoc.impossibleact'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussiteact" style="display:none;"> 
+    {{ 'admin.natdoc.succesact'|trans({}, 'messages') }} 
+  </div> 
+  
+   {# desactiver une nature doc #}
+  <div id="msgconfirmdesact" style="display:none;">
+    {{ 'admin.natdoc.desactiver'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmdesact" style="display:none;">
+    {{ 'admin.natdoc.titredesact'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibledesact" style="display:none;"> 
+    {{ 'admin.natdoc.impossibledesact'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussitedesact" style="display:none;"> 
+    {{ 'admin.natdoc.successdesact'|trans({}, 'messages') }} 
+  </div> 
+
+  <div id="accessdenied" style="display:none;"> 
+    {{ 'notification.accessdenied'|trans({}, 'articles') }} 
+  </div>                        
+  
+  {{ information.decochetoutbox() }}                        
+                        
+{% endblock %}

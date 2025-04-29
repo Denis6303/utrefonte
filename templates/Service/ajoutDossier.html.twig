@@ -1,0 +1,20 @@
+
+                                                      <form action=" {{ path("utb_admin_ajoutservice",{'locale':locale,'type':1}) }} " method="post" {{ form_enctype(form) }} id="ajoutService" class="ajoutdossierspec" >
+                                                           {{ form_errors(form.libService) }}
+                                                                <span class="colorBleu">{{ form_label(form.libService, 'services.form.nom'|trans({}, 'services')) }}</span> 
+								{{ form_widget(form.libService) }}
+                                                                
+
+                                                           {#{ form_errors(form.emailService) }}
+                                                                <span class="colorBleu">{{ form_label(form.emailService, "Email") }}</span> 
+								{{ form_widget(form.emailService) }}
+                                                                <div class="ecartLabel">&nbsp;</div> 
+                                                                
+                                                           {{ form_errors(form.descriptionService) }}
+                                                                <span class="colorBleu">{{ form_label(form.descriptionService, 'services.form.desc'|trans({}, 'services')) }}</span> 
+								{{ form_widget(form.descriptionService) }}
+                                                                <div class="ecartLabel">&nbsp;</div>#}
+                                                                
+                                                               <input type="submit" value="{{ 'admin.ajouter'|trans}}" name="op" id="j_bouton" class="ajoutdossierspec" >
+                                                             <div class="clr"></div>                                                                 
+                                                          </form>

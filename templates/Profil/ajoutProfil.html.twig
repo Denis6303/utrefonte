@@ -1,0 +1,13 @@
+	<form action=" {{ path("utb_client_ajoutprofil",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutProfil" class="">
+		<div class="FrmAbonne champsGrp">
+			{{ form_errors(form.libProfil) }}
+			{{ form_label(form.libProfil, 'profil.form.lib'|trans({}, 'profils')) }}
+			{{ form_widget(form.libProfil) }}
+			
+            {{ form_errors(form.typeProfil) }}
+			{{ form_label(form.typeProfil, 'profil.form.typeProfil'|trans({}, 'profils')) }}
+			{{ form_widget(form.typeProfil) }}
+			<div class="clr"></div>
+		</div>
+		<input type="submit" class="boutonSubmit" value="{{ 'client.ajouter'|trans({}, 'messages') }} " name="op" id="j_bouton">
+	</form>

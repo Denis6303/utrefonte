@@ -1,0 +1,144 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Paramétrages
+{% endblock %}
+  
+  {% block administration_body %}
+
+              <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+                <a href="{{path('utb_admin_ajoutParams',{'locale':locale})}}"> {{ 'admin.layout.menu.maintenance'|trans }}</a> >
+                {#{ 'parametres.maintenance.param'|trans({},'parametres')}#}
+                {{ 'admin.boxinfos'|trans({},'messages')}}
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-info.png')}}" alt="{{ 'admin.layout.menu.menus'|trans}}" title="{{ 'admin.layout.menu.titremenu'|trans}}" /></div>
+              <div class="titreModule colorBleu"><h1>
+                    {{ 'parametres.maintenance.boxinfos'|trans({},'parametres')}} 
+                    <span>:
+                    {% if type == 3 %} 
+                        {{ 'parametres.maintenance.infoscorb'|trans({},'parametres')}}
+                    {% elseif type == 4 %} 
+                        {{ 'parametres.maintenance.infosmenus'|trans({},'parametres')}}
+
+                    {% elseif type == 5 %} 
+                        {{ 'parametres.maintenance.infosarch'|trans({},'parametres')}}  
+
+                    {% elseif type == 6 %}   
+                        {{ 'parametres.maintenance.infosuser'|trans({},'parametres')}}  
+
+                    {% elseif type == 7 %} 
+                        {{ 'parametres.maintenance.infosrub'|trans({},'parametres')}}  
+                            
+                    {% elseif type == 8 %} 
+                        {{ 'parametres.maintenance.infosdetmenu'|trans({},'parametres')}}         
+                            
+                    {% elseif type == 11 %} 
+                        {{ 'parametres.maintenance.infosajoutrub'|trans({},'parametres')}}
+                    {% elseif type == 17 %} 
+                        {{ 'parametres.maintenance.infosartfaq'|trans({},'parametres')}}
+
+                    {% elseif type == 18 %} 
+                        {{ 'parametres.maintenance.infosartbreve'|trans({},'parametres')}}  
+
+                    {% elseif type == 19 %}   
+                        {{ 'parametres.maintenance.infosartactu'|trans({},'parametres')}}  
+
+                    {% elseif type == 20 %} 
+                        {{ 'parametres.maintenance.infosartpub'|trans({},'parametres')}}                             
+                      
+                    {% elseif type == 21 %} 
+                        {{ 'parametres.maintenance.infosartgral'|trans({},'parametres')}}  
+                            
+                    {% elseif type == 10 %} 
+                        {{ 'parametres.maintenance.infostbprofil'|trans({},'parametres')}}  
+                    {% elseif type == 22 %} 
+                        {{ 'parametres.maintenance.infosarbre'|trans({},'parametres')}}        
+                    {% endif %}                                  
+                                  
+                    </span>
+                              </h1></div>
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="Valider" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+
+                                  <div><a class="back" href="#"><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+ </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+ <div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+       <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                      {# STATISTIQUES #}    
+                                      {{ information.stats(listestat) }}   
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                            
+                                            <form action="{{ path("utb_admin_texteinfos",{'locale': locale,'type': type}) }}" method="post" {{ form_enctype(form) }} id="addBoxInfos">
+												<div class="FrmAjoutArt">
+												{{ form_widget(form.paramType) }}
+												
+												{{ form_label(form.TypeDescription, 'admin.titre'|trans({}, 'messages')) }}
+												
+												{{ form_errors(form.TypeDescription) }}
+												
+												{{ form_widget(form.TypeDescription) }}
+												
+												<div class="clr">&nbsp;</div>
+												
+												{{ form_errors(form.paramDescription) }}
+													<span class="colorBleu" style="display:block;margin-bottom:5px;">
+														<strong>
+															{{ 'parametres.maintenance.desc'|trans({}, 'parametres') }}
+														</strong>
+													</span>
+												{{ form_widget(form.paramDescription) }}						
+																	   
+												{{ form_widget(form.paramAjoutPar) }}
+                                                </div>         
+                                               <input type="submit" value="{{ 'admin.btnajouter'|trans({}, 'messages') }}" name="op" id="j_bouton" style="display: none"><a href=""></a>
+                                            </form>
+                                                
+                                              </div>			<!-- FIN colRightContentPadding-->
+                                          </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                      </div>		<!--  FIN COL RIGHT -->
+                                  </div>			<!--  FIN  SPAN - 1921 -->
+
+                              </div>	 <!--  FIN SPAN - 25 -->	
+                       
+{% endblock %}
+  

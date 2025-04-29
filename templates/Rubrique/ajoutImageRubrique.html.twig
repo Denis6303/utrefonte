@@ -1,0 +1,24 @@
+<form action=" {{ path("utb_admin_ajoutmediarubrique", {'id': id,'locale':locale, 'type':type}) }} " method="post" {{ form_enctype(form) }}>
+	<div class="FrmAjoutArt">           
+		{{ form_errors(form.nomMedia) }}
+		{{ form_label(form.nomMedia, 'admin.titreimg'|trans({}, 'messages')) }}
+		{{ form_widget(form.nomMedia) }}
+		<div class="clr"></div>
+	</div>
+
+	<div class="FrmAjoutArt"> 
+		{{ form_errors(form.file) }}
+		{{ form_label(form.file,  'admin.imgtitre'|trans({}, 'messages')) }}                
+		{{ form_widget(form.file) }}
+		<div class="clr"></div>
+	</div>
+        {% if type == 1%}
+            <div class="FrmAjoutArt"> 
+                    {{ form_errors(form.descriptionMedia) }}
+                    {{ form_label(form.descriptionMedia,  'rubriques.ajout.descrub'|trans({}, 'rubriques')) }}                
+                    {{ form_widget(form.descriptionMedia) }}
+                    <div class="clr"></div>
+            </div> 
+        {% endif %}
+	<input type="submit" value="{{ 'admin.ajouter'|trans}}" name="op" id="j_bouton" >
+</form>

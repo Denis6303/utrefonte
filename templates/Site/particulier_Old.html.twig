@@ -1,0 +1,92 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+  
+{% block public_body %}
+  {% if listecateg|length <= 5 %}
+       <div class="span-24 all-lookupCategorie marginBottom10p">
+                <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listecateg %}
+                                        {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id,locale)}}
+                                        {% else %}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}                        
+                                        {% endif %}
+                                 {% endfor %}
+                </div>
+        </div>
+ {% endif %}	
+
+  
+<div class="span-24 marginBottom20p borderBotStyle paddingBottom10p bgBlanc">
+	<div class="span-24">
+		<div class="leftSpace rightSpace contenTypPret contentAssur-dyn">	<!-- DEBUT COLONNE GAUCHE-->
+		<h1 class="boxSection-titre bleuLogo title-WithLeftBar">{{larubrique[0].nomRubrique}}</h1>  
+	<!--****************************  DONNEES NORMALEMENT DYNAMQUES, PROVENANT DE LA BD **************************** -->	
+	{% for article in listearticle  %}        
+            <div class="onePret">
+                    <div class="{{'titreContainer'~article.id}}">
+                            <div class="titredescr">
+                                    <h1 id="pretScolaire_title" class="listItem3 title1 bleuLogo">{{article.titreArticle}}</h1>
+                                    <div class="descrOffre">
+                                         {{article.introTexteArticle|raw}}  
+                                    </div>
+                                    <div class="mooreOffre"><a class="btmoore coinsArrondis" href="javascript:void(0);" id="{{'btsavoir'~article.id}}"  onClick="afficherDetails({{article.id}}); return false;"><span>{{ 'particulier.savoir'|trans({}, 'site') }}</span><span></span></a></div>
+                                    <div class="clr"></div>
+                            </div>
+                    </div>
+                    <div class="contentPretBox hide" id="{{'ptfermer'~article.id}}">
+                            <div class="contentPret-dyn">
+                                    <h1 class="boxSection-titre red-text title-WithTopBar"><div class="visibleTitre">{{article.titreArticle}}</div></h1>
+                                    <span class="close-contentPret-dyn"><a href="javascript:void(0);" id="{{'btfermer'~article.id}}" onClick="fermerDetails({{article.id}}); return false;">{{ 'particulier.fermer'|trans({}, 'site') }}</a></span>
+                                    <div class="clr"></div>
+                                    <div class="{{'detailContainer'~article.id}}">
+                                    </div>
+                            </div>
+                    </div>
+                    <div class="{{'descContainer'~article.id}} hide">
+                            <div class="ilustrPret">
+                                {% if article.urlMedia != "default_.png" %}
+                                       <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="" />
+                                {% endif %}                                                                
+                            </div>
+                            <div class="detailDynPret">
+                                   {{article.descriptionArticle|raw}}
+                            </div>
+                            <div class="clr"></div>
+                    </div>
+            </div>	               
+        
+        {% endfor %}
+      </div>
+    </div>
+ </div>
+{# ******************************************** #}        
+        <script>
+            function fermerDetails(idliste){            
+                                $(".titreContainer"+idliste).show();
+                                $("#ptfermer"+idliste).hide();
+            }
+            function closeTab(tab,idliste){					
+                $(".titreContainer"+idliste).hide();
+                $(tab).show();				
+            }
+            function afficherDetails(idliste){
+                var tab = "";			
+		$(".titreContainer"+idliste).hide();
+               // alert(".titreContainer"+idliste);
+		tab = "#ptfermer"+idliste;
+                closeTab(tab,idliste);
+                var html =  $(".descContainer"+idliste).html();
+                            $("#ptfermer"+idliste).show();
+                $(".detailContainer"+idliste).html(html); 
+                
+            }  
+        </script>
+        
+        
+{% endblock %}
+  

@@ -1,0 +1,40 @@
+<form  action="{{ path("utb_client_detail_compte", {'idCompte':idCompte,'idAbonne':idAbonne,'locale':locale}) }} " method="post"  id="ajoutImage">
+    <div class="filterPageBox coinsArrondis">
+       
+        {{'operation.du'|trans({},'recherche')}} <input name="datedebut" type="text" /> - {{'operation.au'|trans({},'recherche')}}  <input name="datefin" type="text" /> 
+        <br/>
+        {{'operation.montantMin'|trans({},'recherche')}} <input name="mttde" type="text" /> - 
+        {{'operation.montantMax'|trans({},'recherche')}}  <input name="mtta" type="text" /> - 
+        Sens <select name="type_compte" class="myselect">
+                <option value="D"  class="choix" >{{'operation.debit'|trans({},'recherche')}}</option>
+                <option value="C"  class="choix" >{{'operation.credit'|trans({},'recherche')}}</option>
+            </select>
+       
+        
+        
+        <input type="submit" value="{{'client.rechercher'|trans({},'messages') }}" />
+    </div>		<!-- FIN filterPageBox coinsArrondis -->
+</form> 
+
+{#<script language="javascript" >
+
+    function rechercher(){
+        /*document.getElementById('rechercher').submit();*/
+        javascript:document.getElementById('btn_rechercher').click()
+    }
+
+    
+    $("#form_recherche").submit(function(){
+    
+       var motcle = $("#motcle").val();
+       
+       if(motcle == "") {
+        alert("Aucune donnée saisie dans la recherche !");
+       }
+       else{
+            document.location.href = "{{ path('utb_admin_resultat',{'motcle': '%s','locale': locale}) | url_decode | format('"+motcle+"') | raw }}";
+       }   
+
+       return false;
+    });
+</script>#}

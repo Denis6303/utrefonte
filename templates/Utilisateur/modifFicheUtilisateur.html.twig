@@ -1,0 +1,64 @@
+
+<form action="{{ path('utb_client_change_utilisateur_eclate',{'id':unUtilisateur.id ,'cas':cas, 'type' : 2, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUtilisateur">
+
+
+    <div class="FrmAbonne champsGrp">
+    {{ form_errors(form.nomPrenom) }}
+	{{ form_errors(form.email) }}
+    {{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom'|trans({}, 'abonnes')) }}
+    {{ form_widget(form.nomPrenom) }}
+    {{ form_label(form.email, 'abonnes.form.email'|trans({}, 'abonnes'))}}
+    {{ form_widget(form.email) }}
+    <div class="clr"></div>
+    </div>
+
+    <div class="FrmAbonne champsGrp">
+    {{ form_errors(form.telUtilisateur) }}
+	 {{ form_errors(form.celUtilisateur) }}
+    {{ form_label(form.telUtilisateur, 'abonnes.form.tel'|trans({}, 'abonnes'))}}
+    {{ form_widget(form.telUtilisateur) }}
+    {{ form_label(form.celUtilisateur, 'abonnes.form.cel'|trans({}, 'abonnes'))}}
+    {{ form_widget(form.celUtilisateur) }}
+    <div class="clr"></div>
+    </div>       
+
+    <div class="FrmAbonne">
+    {{ form_errors(form.adresseUtilisateur) }}
+    {{ form_label(form.adresseUtilisateur, 'abonnes.form.adresse'|trans({}, 'abonnes')) }}
+    {{ form_widget(form.adresseUtilisateur) }}
+    <div class="clr"></div>
+    </div> 
+
+    <div class="FrmAbonne selectType champsGrp">
+    {{ form_errors(form.username) }}
+    {{ form_errors(form.profil) }}
+    {{ form_label(form.username, 'abonnes.form.username'|trans({}, 'abonnes')) }}
+    {{ form_widget(form.username) }}
+    {{ form_label(form.profil, 'abonnes.form.profil'|trans({}, 'abonnes')) }}
+    {{ form_widget(form.profil) }}
+    <div class="clr"></div>
+    <span class="gris-comment"><em>{{'utilisateur.form.nbcaract'|trans({},'utilisateurs')}}</em></span>
+    </div>
+
+    <div class="FrmAbonne selectType" id="fonds_container" style="display:none;">
+    {{ form_errors(form.fonds) }}
+    {{ form_label(form.fonds, 'utilisateur.form.fonds'|trans({}, 'utilisateurs')) }}
+    {{ form_widget(form.fonds) }}
+    <div class="clr"></div>
+    </div>                                                   
+            <input type="submit" class="boutonSubmit" value="{{'client.modifier'|trans({},'messages') }}" name="op" id="j_bouton" >
+</form>
+
+<script>
+    $("#utb_clientbundle_modifFicheUtilisateurtype_profil").change(function(){
+        var valeur = $(document.getElementById('utb_clientbundle_modifFicheUtilisateurtype_profil')).val();
+        //alert(valeur);
+        if(valeur == 2){
+           $("#fonds_container").show();
+        }
+        else{
+            $("#fonds_container").hide();
+        }
+    })
+</script>
+                                    

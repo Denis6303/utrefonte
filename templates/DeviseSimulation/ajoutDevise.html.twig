@@ -1,0 +1,54 @@
+
+	<form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_ajoutDevise",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutDevise">
+
+            
+                    <div class="FrmAbonne">
+                        {{ form_errors(form.codeDevise) }}
+                          <label>{{ 'devise.code'|trans({}, 'devise') }}</label>
+                           {{ form_widget(form.codeDevise) }}                      
+                        <div class="clr"></div>
+                    </div>
+            
+                  {% if lexistencedevice == 0 %}
+
+                       <div class="FrmAbonne">
+                                {{ form_errors(form.siLocale) }}
+                                <label>{{ 'devise.devlocal'|trans({}, 'devise') }} </label>
+                                {{ form_widget(form.siLocale) }}
+                                <div class="clr"></div>
+                       </div>           
+                   {% endif %}
+            
+                    <div class="FrmAbonne">
+                            {{ form_errors(form.libDevise) }}
+                            <label>{{ 'devise.libelle'|trans({}, 'devise') }} </label>
+                            {{ form_widget(form.libDevise) }}
+                            <div class="clr"></div>
+                   </div>    
+            
+                    <div class="FrmAbonne">
+                            {{ form_errors(form.icone) }}
+                            <label>{{ 'devise.icone'|trans({}, 'devise') }} </label>
+                            {{ form_widget(form.icone) }}
+                            <div class="clr"></div>
+                   </div>
+            
+                   <div class="FrmAbonne" id="devlocale">
+                            {{ form_errors(form.valDeviseLocal) }}
+                            <label>{{ 'devise.vente'|trans({}, 'devise') }}</label>
+                            {{ form_widget(form.valDeviseLocal) }}
+                            <div class="clr"></div>                                                        
+                   </div> 
+                   <div class="FrmAbonne" id="devlocale">
+                            {{ form_errors(form.valDeviseLocalAchat) }}
+                            <label>{{ 'devise.achat'|trans({}, 'devise') }} </label>
+                            {{ form_widget(form.valDeviseLocalAchat) }}
+                            <div class="clr"></div>                                                        
+                   </div>				   
+                   <div>
+                            <input type="submit" value="{{'client.ajouter'|trans({},'messages') }}" name="op" id="j_bouton" class="boutonSubmit">
+                            <a href="#" class="annulerBut" onClick="AnnulerAjoutDevise(); return false;"> {{'client.annuler'|trans}} </a>
+                            <div class="clr"></div>
+                   </div>            
+            
+	</form>

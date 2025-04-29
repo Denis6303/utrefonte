@@ -1,0 +1,120 @@
+{#------------    src/utb/ClientBundle/Resources/views/layoutSite.html.twig   ------------#}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+	<ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre'|trans({},'compte')}}</a></li>
+		<li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{'log.titre'|trans({},'recherche')}}</li>
+	</ul>
+
+        {% set tab = {'imprimer':1,'listesousab':listesousab} %}   
+                
+        {% if deb == 0 %}         
+            {% if  app.request.get('deb')|trim == null   %}   
+                    {% set deb = 0 %}              
+            {% else %}   
+                   {% set deb = app.request.get('deb')|replace('/','-') %}  
+            {% endif %}
+        {% endif %}
+        
+        {% if fin == 0 %}   
+            {% if  app.request.get('fin')|trim == null   %}   
+                    {% set fin = 0 %}              
+            {% else %}   
+                   {% set fin = app.request.get('fin')|replace('/','-') %}  
+            {% endif %} 
+        {% endif %}
+        
+        {% if username == '' %}        
+            {% if  app.request.get('username')|trim == null   %}   
+                    {% set username = 0 %}              
+            {% else %}                  
+                   {% set username = app.request.get('username') %}  
+            {% endif %} 
+        {% endif %}
+  
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'log.titre'|trans({},'recherche')}}</h2>
+	
+	<div class="marginBottom20p">
+                
+                <form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_lookfor_log_files",{'locale':locale, 'username':0,'deb':0 ,'fin':0, 'post':0}) }} " method="post"  id="ajoutImage">
+			<div>
+				<label class="labelLong">{{'abonnes.selectsubab'|trans({},'abonnes')}}<span class="red-text">*</span></label>
+				<select name="sousabonne" class="ncompte"> 
+					{% if listesousab is defined %}
+                                            <option value="0" >All/Tous</option>
+                                            {% for abonne in listesousab %}   
+                                                <option value="{{abonne.getUsername()}}" >{{abonne.getNomPrenom()}} -- {{abonne.getUsername()}}</option>
+                                            {% endfor %}
+					{% endif %}  
+				</select>
+			</div>
+			<div>
+				<label class="labelLong">{{'operation.du'|trans({},'recherche') }} <span class="red-text">*</span></label>
+				<input name="deb" type="text" class="montant" id="from" value="{{ deb }}" />
+				<label class="labelLong expLabel">{{'operation.au'|trans({},'recherche') }} <span class="red-text">*</span></label>
+				<input name="fin"type="text" class="montant" id="to" value="{{ fin }}" />
+                        </div>                      
+			<div>
+                                <input type="text" value="0" name="sidetailcpte" style="display: none">
+				<input class="boutonSubmit" type="submit" value="{{'client.rechercher'|trans({},'messages') }}"/>
+				<div class="clr"></div>
+			</div> 
+		</form> 
+	</div>        
+    
+        
+       {#% if afficher==1%#}
+    
+	<div class="result_recherch">
+		<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'operation.resultat'|trans({},'recherche')}} </h2>
+	</div>        
+
+                <table class="withTDborder tableBleuCiel">
+                    
+                            <tr>
+                                 <th><input type="checkbox" class="checkall" name="checkall" /></th>   
+                                 <th>{{'abonnes.subnom'|trans({}, 'abonnes')}}</th>
+                                 <th>{{'abonnes.logfile'|trans({}, 'abonnes')}}</th>
+                                 <th>{{'abonnes.liste.action'|trans({}, 'abonnes')}}</th>
+                            </tr>	
+
+                            {% for file in listefile %} 
+
+                                 <tr class="" %}  >
+                                        <td class="statutArtList"> <input type="checkbox" name="operation[]"  rel="operation_c" value="{{file.filename}}" /> </td>
+                                        <td class="titreList"> {{ file.subabonne }} </td> 
+                                        <td class="titreList"> {{ file.filename }} </td>
+                                        <td class="titreList"> 
+                                            <a href="{{ path("utb_client_download_log_files",{'nomFichier': file.filename }) }}" >
+                                                <img src="{{ asset('img/client-img/download.png')}}" alt="{{'log.download'|trans({},'recherche') }}" title="{{'log.download'|trans({},'recherche') }}" />
+                                            </a> 
+                                        
+                                        </td>
+                                 </tr>
+                            {% endfor %}
+                     
+
+                </table>
+		<!--Fin du box compte-->
+                
+	<script type="text/javascript">
+            
+            function ouvrirdetail(id){
+        
+		$('#basic-modal-content'+id).modal();
+		return false;	
+            }
+            
+            $(".montant").numeric();
+	</script>                
+            
+{% endblock %}
+		

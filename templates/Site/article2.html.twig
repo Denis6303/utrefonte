@@ -1,0 +1,109 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+  
+  {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" /> #}
+		
+{% block public_body %}  
+        {#<div class="span-24 all-lookupCategorie marginBottom20p">
+                <div class="leftSpace">
+                                {% for sousrubrique in listecateg %}
+          
+                                        {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent)}}
+
+                                 {% endfor %}
+                </div>
+        </div>   #} 
+{% for articleFrancais in larticleFrancais %}   
+      <!--   <div class="span-24 borderBotStyle bgBlanc marginBottom10p ">
+               <div class="oneBankCard leftSpace rightSpace paddingTopBot20p">
+                        <h1 class="boxSection-titre red-text center">{{articleFrancais.titreArticle}}</h1>
+                        {% if articleFrancais.urlMedia != "default_.png" %}
+                               <img  style="float:right; margin-top:25px;" src="{{asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="" title="" />
+                              {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" />#}
+                        {% endif %}                        
+                        
+                        {{articleFrancais.descriptionArticle|raw}}					
+                        {#<div class="leftSpace rightSpace">	<!-- -->
+                                <div class="otherCard">
+                                        <div class="otherCardHead"><h1 class="title2">Cartes de la même Gamme</h1></div>
+                                        <div class="otherCardCnt paddingTopBot20p">
+                                            {% for unarticle in memeRubrique %}
+                                                <div class="otherCardOne">
+                                                      
+                                                        <img src="{{asset('upload/articles/'~unarticle.urlMedia)}}" alt="{{unarticle.titreArticle}}" title="{{unarticle.titreArticle}}" />
+                                                </div>
+                                            {% endfor %}        
+                                                <div class="clr"></div>
+                                        </div>
+                                </div>
+                        </div>	#}
+               </div>	<!-- FIN SPAN 24 LES 2 CARTES 
+        </div>	 FIN SPAN 24 LES 2 CARTES -->    
+        
+            <!--ACTUALITE -->   
+            
+    
+    <div class="span-24 last borderBotStyle bgBlanc paddingBottom20p marginBottom10p">                                               
+                                                           
+        <div class="leftSpace rightSpace">
+            <h1 class="boxSection-titre bleuLogo title-WithLeftBar"> {{larubrique[0].nomRubrique}}</h1>
+			
+            
+            <div class="ligne1" style="padding:5px;">
+                {#<div class="dateBox" style="width: 130px; float: left;">
+                    <div class="uneDate"  >  {{articleFrancais.articleDatePublie|date("d")}}</div>
+                    <div class="moisAnnee"  > {{articleFrancais.articleDatePublie|date("M")}}<div class="mois"  ></div> <div class="annee"  >{{articleFrancais.articleDatePublie|date("Y")}}</div></div>
+                </div>#}
+               
+                <div class="dateBox bleuLogo marginBottom10p left " style="width: 700px; float: left; margin-left: 20px; font-weight: bold; font-size: 15px;">{{articleFrancais.titreArticle}} </div>
+                <div class="dateBox bleuLogo marginBottom10p right "><a href="javascript:history.back()" >{{ 'article.retour'|trans({}, 'site') }}</a></div>
+				<div class="clr"></div>
+                
+            </div>
+            <div class="ligne2" style="">
+                
+                <div class="dateBox" style="width: 130px; float: left; padding: 5px;">
+                    {% if articleFrancais.urlMedia != "default_.png" %}
+                    <img src="{{asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="" title="" style="width: 130px; " />
+                    {% endif %} 
+                </div> 
+                 
+                <div class="dateBox " style="width: 710px; float: left; margin-left: 20px;border:1px solid #0049ba; padding:5px;">
+                    {{articleFrancais.descriptionArticle|raw}}
+                </div>
+                <div class="clr"></div>
+                
+            </div>
+                    
+                                                                                         
+
+      
+        </div>
+    </div> 
+	<!-- Ligne Correspondants -->
+	<div class="span-24 marginBottom20p"> 
+		<div class="leftSpace rightSpace boxCorespdant">
+			<h1 class="boxSection-titre gris-text">{{ 'acceuil.cores'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+			<div class="slideCorespdant">
+                           {% for article in listecorrespondance%} 
+                                {% if article.urlMedia != "default_.png" %}
+                                       <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="{{article.titreArticle|raw}}" />
+
+                                {% endif %}                                
+				
+                           {% endfor %}     				
+			</div>
+			<div class="divButmoore rightPosition">
+                               
+				<a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>{{ 'acceuil.voir'|trans({}, 'site') }}</span><span></span></a>
+			</div>			
+		</div>
+	</div>		<!-- FIN Correspondants-->
+    <!-- FIN ACTUALITE -->  
+{% endfor %}  
+{% endblock %}
+		

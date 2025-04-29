@@ -1,0 +1,79 @@
+{# src/utb/ClientBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+		<ul class="filariane bleuLink">
+                        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+                        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li><a href="">{{'tarif.titre'|trans({},'autres')}}</a></li>
+                </ul>
+  
+                {% for contenu in app.session.flashbag.get('notice') %}
+                          {% if contenu == "errortypficart" %}
+                                           <div class="span-25">
+                                                <div class="notices noticesMsg">
+                                               {{ 'notification.errortype'|trans({}, 'articles') }}
+                                                </div>
+                                           </div>
+                          {% elseif contenu == "errorajtartdescvide" %}
+                                           <div class="span-25">
+                                                <div class="error errorMsg">
+                               {{ 'notification.ajoutartdescvidefaq'|trans({}, 'articles') }}
+                                                </div>
+                                           </div>                        
+
+                          {% elseif contenu == "addsuccess" %}
+                                           <div class="span-25">
+                                                <div class="success successMsg">
+                               {{'confirmation.ajout'|trans({},'autres')}}
+                                                </div>
+                                           </div> 
+                          {% elseif contenu == "modifsuccess" %}
+                                           <div class="span-25">
+                                                <div class="success successMsg">
+                               {{'confirmation.modif'|trans({},'autres')}}
+                                                </div>
+                                           </div>
+                          {% endif %}
+               {% endfor %}
+
+		<!--Début du box compte-->
+		<div class="marginBottom20p bordureBot2pGris">
+			<div>
+				<h3 class="titreSansMargeInt title2 titreMiddleVert">
+					<a href="#" class="bleuLink">{{'tarif.definir'|trans({},'autres')}}</a>
+				</h3>
+				<div class="titreAfterVert"></div>
+                                 <div>
+                                    
+                                </div>
+				<div class="clear"></div>
+			</div>
+			<form action="{{ path('utb_client_definir_tarifs_facturation',{'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutForfait" name="ajoutForfait">
+
+                                    <div class="FrmAjoutArt">
+                                    {{ form_errors(form.montantuweb) }}
+                                    {{ form_label(form.montantuweb, 'client.facturation.montantuweb'|trans({}, 'messages')) }} 
+                                    {{ form_widget(form.montantuweb) }}
+                                    <div class="clr"></div>
+                                    </div>
+
+                                    <div class="FrmAjoutArt">
+                                    {{ form_errors(form.montantafbw) }}
+                                    {{ form_label(form.montantafbw, 'client.facturation.montantuweb'|trans({}, 'messages')) }} 
+                                    {{ form_widget(form.montantafbw) }}
+                                    <div class="clr"></div>
+                                    </div>     
+
+                           <input type="submit" value="{{ 'client.valider'|trans}}" name="op" id="j_bouton" style=""><a href=""></a>
+                        </form>
+		</div>
+		<!--Fin du box compte-->
+
+                
+{% endblock %}
+		

@@ -1,0 +1,52 @@
+
+<form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_modifDevise",{'locale':locale,'id':id}) }} " method="post" {{ form_enctype(form) }} id="ajoutDevise">
+
+            <div class="FrmAbonne">
+                {{ form_errors(form.codeDevise) }}
+                  <label>{{ 'devise.code'|trans({}, 'devise') }}</label>
+                   {{ form_widget(form.codeDevise) }}                      
+                <div class="clr"></div>
+            </div>
+  
+            {% if lexistencedevice != 0 and  idlocale == id %}
+            <div class="FrmAbonne">
+                    {{ form_errors(form.siLocale) }}
+                    <label> {{ 'devise.devlocal'|trans({}, 'devise') }} </label>
+                    {{ form_widget(form.siLocale) }}
+                    <div class="clr"></div>
+            </div> 
+           {% endif %}                       
+            <div class="FrmAbonne">
+                    {{ form_errors(form.libDevise) }}
+                    <label>{{ 'devise.libelle'|trans({}, 'devise') }} </label>
+                    {{ form_widget(form.libDevise) }}
+                    <div class="clr"></div>
+           </div>    
+    
+            <div class="FrmAbonne">
+                    {{ form_errors(form.icone) }}
+                    <label>{{ 'devise.icone'|trans({}, 'devise') }} </label>
+                    {{ form_widget(form.icone) }}
+                    <div class="clr"></div>
+           </div>    
+			<fieldset>
+			<legend>{{ 'devise.vallocal'|trans({}, 'devise') }}</legend>
+           <div class="FrmAbonne" id="devlocale">
+                    {{ form_errors(form.valDeviseLocal) }}
+                    <label>{{ 'devise.vente'|trans({}, 'devise') }}</label>
+                    {{ form_widget(form.valDeviseLocal) }}
+                    <div class="clr"></div>                                                        
+           </div> 
+                   <div class="FrmAbonne" id="devlocale">
+                            {{ form_errors(form.valDeviseLocalAchat) }}
+                            <label> {{ 'devise.achat'|trans({}, 'devise') }}</label>
+                            {{ form_widget(form.valDeviseLocalAchat) }}
+                            <div class="clr"></div>                                                        
+                   </div>			   
+				   </fieldset>
+           <div>
+                    <input type="submit" value="{{'client.modifier'|trans({},'messages') }}" name="op" id="j_bouton" class="boutonSubmit">
+                    <div class="clr"></div>
+           </div>            
+
+</form>

@@ -1,0 +1,278 @@
+
+{# src/utb/AdminBundle/Resources/views/ajoutaction.html.twig #}
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'actions.ajout.grandtitrepg'|trans({}, 'actions') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   <div class="span-25" id="toolbar1" >			<!-- Première Barre HORIZONTALE NOIRE, Menu principal de l'admin   -->
+                <div class="logoHomePage">
+                    <a href="#" title=""> <img src="{{ asset('img/admin-img/home.png') }}" alt="{{ 'admin.layout.titrelogo'|trans}}" title="{{ 'admin.layout.titrelogo'|trans}}"></a>
+                </div>
+                <ul id="toolbarMenu">
+                   <li class=""><a href="{{path('utb_admin_accueil', {'locale': locale})}}" title="{{ 'admin.accueil'|trans}}">{{ 'admin.accueil'|trans}}</a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titreart'|trans}}">{{ 'admin.layout.menu.articles'|trans}}</a></li>
+                    <li class=""><a href="{{path('utb_admin_listerubrique',{'locale': locale})}}" title="{{ 'admin.layout.menu.titrerub'|trans}}">{{ 'admin.layout.menu.rubriques'|trans}} </a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titremenu'|trans}}">{{ 'admin.layout.menu.menus'|trans}}</a></li>					
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titremessag'|trans}}">{{ 'admin.layout.menu.messagerie'|trans}}</a></li>
+                    <li class=""><a href="{{path('utb_admin_listedimension', {'locale': locale})}}" title="{{ 'admin.layout.menu.titrecadre'|trans}}">{{ 'admin.layout.menu.cadre'|trans}} </a></li>
+                    <li class=""><a href="{{path('ajouter_utilisateur', {'locale': locale})}}" title="{{ 'admin.layout.menu.titreusers'|trans}}">{{ 'admin.layout.menu.users'|trans }} </a></li>
+                    <li class="actif"><a href="{{path('utb_admin_listeaction', {'locale': locale})}}" title="">{{ 'admin.layout.menu.titremaint'|trans }} </a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titreplan'|trans }}">{{ 'admin.layout.menu.plan'|trans }} </a></li>
+                </ul> 
+                <div class="clr"></div>				
+            </div>									<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            <div class="span-25" id="toolbar2">					<!-- Deuxième barre HORIZONTALE Grise, Menu d'accès rapide et recherche -->
+              <ul id="toolbarMenuRapid">
+                  <li class=""><a href="{{path('utb_admin_listeaction', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listeaction'|trans }}</a></li>
+                  <li class=""><a href="{{path('utb_admin_ajoutaction', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajouteraction'|trans }}</a></li>    
+                  <li class=""><a href="{{path('utb_admin_listecontroleur', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listecontroleur'|trans }}</a></li>
+                  <li class=""><a href="{{path('utb_admin_ajoutcontroleur', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajoutercontroleur'|trans }}</a></li>
+		  <li class=""><a href="{{path('utb_admin_ajoutmodule', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajoutermodule'|trans }} </a></li>
+                  <li class=""><a href="{{path('utb_admin_listemodule', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listemodule'|trans }}</a></li>
+                  <li class=""><a href="" title="">{{ 'admin.layout.sousmenu.archives'|trans }}</a></li>
+		  <li class=""><a href="" title="">{{ 'admin.layout.sousmenu.corbeille'|trans }}</a></li>
+              </ul>  
+                <div class="recherche">
+                    <input type="text" placeholder="{{ 'admin.layout.rechercher'|trans}}" />
+                    <a href="#"> <img src="{{ asset('img/admin-img/loupe.png') }}" alt="Go" title="{{ 'admin.layout.rechercher'|trans}}" /> </a>
+                    <div class="clr"></div>
+                    
+                    
+
+                    
+                </div>
+                <div class="clr"></div>
+            </div>				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listeaction', {'locale': locale})}}">{{ 'actions.ajout.titre1'|trans}}</a> > <a href="#">{{ 'actions.liste.grandtitrepg'|trans}}</a>
+            </div>
+    
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-10">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-banner-tracks.png')}}" alt="Articles" title="Gestion des Articles" /></div>
+              <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'actions.liste.titrepg'|trans({}, 'actions') }}<h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-14 last">
+
+                                  <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                                  <div class="boutonGestion">
+                                      <div><a href="{{ path('utb_admin_ajoutaction',{'locale':locale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+                                      {{ 'admin.ajouter'|trans}}</a>
+                                  </div>
+                                  <div class="boutonGestion">
+                                      <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}" /></div>
+                                      {{ 'admin.modifier'|trans}}</a>
+                                  </div>
+                                  <div class="ecartBoutons">&nbsp;</div>
+                                  <div class="boutonGestion">
+                                      <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans}}" title="{{ 'admin.enligne'|trans}}" /></div>
+                                      {{ 'admin.activer'|trans}}</a>
+                                  </div>
+                                  <div class="boutonGestion btGestMoy">
+                                      <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.depublier'|trans}}" title="{{ 'admin.horsligne'|trans}}" /></div>
+                                      {{ 'admin.desactiver'|trans}}</a>
+                                  </div>
+                                  <div class="ecartBoutons">&nbsp;</div>
+
+                                  <div class="boutonGestion">
+                                      <div><a href="javascript:void(0);" onclick="deleteAll( getActionsID() ); return false;" ><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.corbeille'|trans}}" title="{{ 'admin.mettrecorbeille'|trans}}" /></div>
+                                      {{ 'admin.corbeille'|trans}}</a>
+                                  </div>
+                                  <div class="clr"></div>
+                              </div>					<!--  FIN allBoutonsGestion -->
+                              <div class="clr"></div>
+                              </div>						<!--  FIN toulbar 3 -->
+                              </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                              <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                                  <div class="MarginBottomBox"></div>
+
+                                  <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                      <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                          <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                                              <h3 class="colorBleu titreStats">{{ 'admin.stats'|trans}} </h3>
+                                          <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                              <table class="tableStats">
+                                                  
+                                                        {% for stat in lesstatistiques %}
+							<tr class="">
+								<td>{{ stat.libstat }}</td>
+								<td class="valStats">{{stat.nbre}}</td>
+							</tr>
+                                                        {% endfor %} 
+							{#<tr class="bgGris">
+								<td>{{ 'admin.totalartligne'|trans({}, 'messages') }}</td>
+								<td class="valStats">41</td>
+							</tr>
+							<tr class="">
+								<td >{{ 'admin.totalarthorsligne'|trans({}, 'messages') }}</td>
+								<td class="valStats">25</td>
+							</tr>
+							<tr class="bgGris">
+								<td class="valDecalee">{{ 'admin.totalartsoumivalid'|trans({}, 'messages') }}</td>
+								<td class="valStats">25</td>
+							</tr>
+							<tr class="">
+								<td class="valDecalee">{{ 'admin.totalartattentevalid'|trans({}, 'messages') }}</td>
+								<td class="valStats">33</td>
+							</tr>
+							<tr class="bgGris">
+								<td class="valDecalee">{{ 'admin.totalartdepublie'|trans({}, 'messages') }}</td>
+								<td class="valStats">5</td>
+							</tr>
+							<tr class="">
+								<td>{{ 'admin.archivers'|trans}}</td>
+								<td class="valStats">14</td>
+							</tr>
+							<tr class="">
+								<td >{{ 'admin.supprimers'|trans}}</td>
+								<td class="valStats">17</td>
+							</tr>  #}
+							</table>
+                                              </div>
+                                          </div>
+                                      </div>			<!-- Fin COLONNE COLLEFT-->
+                                  </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                                  <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                      <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                          <div class="colorCadreArrondi coinsArrondis bgGris">
+                                              <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                 {# <div class="filtersArticles">
+                                                      <input type="text"> <input type="submit" value="OK">
+                                                      
+
+                                                      <div class="clr"></div>
+                                                  </div>		#}				<!-- FIN filtersArticles-->
+                                                  
+                                                 {% if app.session.hasFlash('notice') %}
+                                                     {{ app.session.flash('notice') }} 
+                                                 {% endif %}                                              
+                                                  
+
+                                                  <table class="listMenusCateg listArticlesRub">
+                                                      <tr>
+                                                          <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                          <th>{{ 'actions.form.nom'|trans({}, 'actions') }}</th>
+                                                          <th>{{ 'actions.controleur.description'|trans({}, 'actions') }}</th>
+                                                          <th colspan="2">{{ 'actions.operation'|trans({}, 'actions') }}</th>
+
+                                                      </tr>	
+                                                                  {% for statistik in listestatistique %}
+
+                                                      <tr class="bgBlanc">
+                                                          <td><input type="checkbox" name="action[]" value="{{statistik.id}}" rel="action_c"/></td>
+                                                              <td>              
+                                                                               {{statistik.libStat}}
+                                                              </td>  
+                                                              <td>              
+                                                                               {{statistik.typeStat}}
+                                                              </td>  
+                                                              
+                                                              <td>              
+                                                                               {{statistik.etatStat}}
+                                                              </td>                                                              
+                                                                  <td class=""> <a href="{{ path('utb_admin_modifaction', {'id': statistik.id,'locale':locale}) }}">{{ 'admin.modifier'|trans}}</a></td>
+                                                                  <td class=""> <a href="{{ path('utb_admin_suppraction', {'id': statistik.id,'locale':locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> </td>
+                                                              </tr>
+                                                                {% else %}
+                                                              <tr class=""> 
+                                                              <td colspan="4"> {{ 'actions.none'|trans({}, 'actions') }} </td>
+                                                              </tr>
+                                                                 {% endfor %}
+
+                                                          </table>
+                                                          <p class="paginationTry"><a href="">{{ 'admin.precedent'|trans}}</a> | <a href="">1</a> | <a href="">2</a> | <a href="">3</a> | <a href="">{{ 'admin.suivant'|trans}}</a> </p>
+
+
+                                                      </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                  </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                              </div>		<!--  FIN COL RIGHT -->
+                                          </div>			<!--  FIN  SPAN - 19 -->
+
+                                      </div>	
+<script language="javascript" >
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getActionsID(){
+           
+            var actions_id = "";
+            
+            $(":input[rel=action_c]:checked").each(function(){
+		actions_id = actions_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return actions_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.natdoc.effectuer'|trans}}";
+       
+       //function pour supprimer plusieurs elements a la fois
+       function deleteAll( actionsId ){
+          if( actionsId.length == 0 ){
+              alert("{{ 'admin.natdoc.cocher'|trans}}");
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'actions.supprimer'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllactions')}}",
+                                data: {actionsIds:actionsId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( actionsId ){
+         //To do
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function adesactiveAll( actionsId ){
+         //To do
+       }       
+</script>
+<div id="process_tpl" style="display:none;"></div>
+{% endblock %}
+
+
+    

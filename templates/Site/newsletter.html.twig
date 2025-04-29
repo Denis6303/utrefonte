@@ -1,0 +1,24 @@
+
+    <form action="{{ path('utb_site_contact',{'type': 1, 'locale':locale}) }}" method="post">
+       {#% if reponse == "oui"%} Votre mail existe {% endif %#}
+
+         {{ form_widget(form.mailInternaute) }}
+            
+        <div class="typeNewsletter">
+                <label class="labelLg">Revoir la newsletter pour :</label>
+
+                <select name ='listediffusion' class="">
+                    {% for nom in listedif %}                   
+                        <option value ="{{nom.id}}">{{nom.getNomListeDiffusion()}}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="clr"></div>
+        </div>            
+            
+
+        <button type="submit" id="j_bouton" style="display:none;">Ajouter</button>
+    </form>
+
+
+  

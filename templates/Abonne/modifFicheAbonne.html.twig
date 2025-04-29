@@ -1,0 +1,56 @@
+
+<form action="{{ path('utb_client_change_eclate',{'id':unabonne.id , 'type' : 2, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutAbonne">
+
+	<div class="FrmAbonne champsGrp">
+		{{ form_errors(form.nomPrenom) }}
+		{{ form_errors(form.email) }}
+		{{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.nomPrenom) }}
+		{{ form_label(form.email, 'abonnes.form.email'|trans({}, 'abonnes'))}}
+		{{ form_widget(form.email) }}
+		<div class="clr"></div>
+		</div> 																	
+	{#
+		<div class="FrmAbonne">
+		{{ form_errors(form.nomPrenom) }}
+		{{ form_label(form.nomPrenom, 'abonnes.form.nomPrenom'|trans({}, 'abonnes')) }} 
+		{{ form_widget(form.nomPrenom) }}
+		<div class="clr"></div>
+		</div>
+	#}
+ 
+		<div class="FrmAbonne champsGrp">
+		{{ form_errors(form.telAbonne) }}
+		{{ form_errors(form.celAbonne) }}
+		{{ form_label(form.telAbonne, 'abonnes.form.tel'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.telAbonne) }}
+		{{ form_label(form.celAbonne, 'abonnes.form.cel'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.celAbonne) }}
+		<div class="clr"></div>
+		</div>       
+
+		<div class="FrmAbonne">
+		{{ form_errors(form.adresseAbonne) }}
+		{{ form_label(form.adresseAbonne, 'abonnes.form.adresse'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.adresseAbonne) }}
+		<div class="clr"></div>
+		</div> 
+
+		  <div class="FrmAbonne">
+		{{ form_errors(form.username) }}
+		{{ form_label(form.username, 'abonnes.form.username'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.username) }}
+		<div class="clr"></div>
+		<span class="gris-comment"><em>{{'utilisateur.form.nbcaract'|trans({},'utilisateurs')}}</em></span>
+		</div> 
+
+		<div class="FrmAbonne">
+		{{ form_errors(form.radicalAbonne) }}
+		{{ form_label(form.radicalAbonne, 'abonnes.form.radical'|trans({}, 'abonnes')) }}
+		{{ form_widget(form.radicalAbonne) }}
+		<div class="clr"></div>
+		</div>                        
+				                                                   
+		<input type="submit" class="boutonSubmit" value="{{'client.modifier'|trans({},'messages') }}" name="op" id="j_bouton" >
+</form>
+                                    

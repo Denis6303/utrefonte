@@ -1,0 +1,15 @@
+	<form action=" {{ path("utb_client_ajoutcategorie",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutProfil" class="">
+		<div class="FrmAbonne champsGrp">
+			{{ form_errors(form.codecategorie) }}
+			{{ form_label(form.codecategorie, 'categorie.form.lib'|trans({}, 'categories')) }}
+			{{ form_widget(form.codecategorie) }}
+			
+		</div>		
+               <div class="FrmAbonne champsGrp">
+			{{ form_errors(form.libCategorie) }}
+			{{ form_label(form.libCategorie, 'categorie.form.lib'|trans({}, 'categories')) }}
+			{{ form_widget(form.libCategorie) }}
+			
+		</div>
+		<input type="submit" class="boutonSubmit" value="{{ 'client.ajouter'|trans({}, 'messages') }} " name="op" id="j_bouton">
+	</form>

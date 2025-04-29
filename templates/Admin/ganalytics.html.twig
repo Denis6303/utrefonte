@@ -1,0 +1,27 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }}
+{% endblock %}
+
+{% block administration_body %} 
+
+
+<div class="span-25 colorBleu" id="filAriane">	Page des statistiques Google Analytics </div>
+
+<div class="span-25">			
+   	
+    <div class="ganalytics">
+        
+        <p> {{ navigateurs }} </p> <br/>
+        <p> {{ countries }} </p> <br/>
+        <p> {{ visits }} </p> <br/>
+        <p> {{ unique_visits }} </p> <br/>
+        <p> {{ page_views }} </p> <br/>
+        
+    </div>
+              					<!--  FIN toulbar 3 -->
+</div>	           
+                        
+                        
+{% endblock %}

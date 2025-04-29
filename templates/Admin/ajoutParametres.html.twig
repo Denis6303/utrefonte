@@ -1,0 +1,203 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - 
+
+        {{ 'parametres.param'|trans({},'parametres')}}
+ 
+{% endblock %}
+  
+  {% block administration_body %}
+
+              <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                 
+                <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+                <a href="{{path('utb_admin_ajoutParams',{'locale':locale})}}"> {{ 'admin.layout.menu.maintenance'|trans }}</a> >
+                {{ 'parametres.maintenance.paramsaccueil'|trans({} , 'parametres') }}
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      
+      {% for message in app.session.flashbag.get('parametres') %}
+          <div class="error">{{ message }}</div>
+      {% endfor %}       
+          
+      {% for contenu in app.session.flashbag.get('notice') %}
+          <div class="error errorMsg">{{ contenu }}</div>
+            {% if loop.index == loop.length %}         
+                {% set contenu='' %}          
+            {% endif %}             
+      {% endfor %}           
+      
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-info.png')}}" alt="{{ 'parametres.maintenance.params'|trans({},'parametres')}}" title="{{'parametres.maintenance.params'|trans({},'parametres')}}" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'parametres.maintenance.boxinfos'|trans({},'parametres')}} <span>: {{ 'parametres.maintenance.ajoutaccueil'|trans({}, 'parametres') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="Valider" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a class="back" href="#" ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+ </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+ <div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+       <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                      {# STATISTIQUES #}    
+                                      {{ information.stats(listestat) }} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+								  <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+									<div class="colRightContentPadding">
+                                        
+										<form action="{{ path("utb_admin_ajoutParams",{'locale': locale})}}" method="post" {{ form_enctype(form) }} id="addParametres">                                             
+                                            <div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+                                            <div class="FrmAjoutArt selectParamBox">
+                                                <span class="labelLong">
+												{{ form_label(form.paramType, 'parametres.maintenance.typeparam'|trans({}, 'parametres')) }}
+												</span>
+												{{ form_widget(form.paramType) }}
+                                            <div class="clr"></div>  
+                                            </div></div>
+                                                                
+											<div id="second_step" class="FrmAjoutArt">  
+												{{ form_widget(form.paramAjoutPar) }}
+												
+												{#{dump(tab)}#}
+												{#% if tab[0] != 0 %#}
+												
+												<div id="form_titre_container">
+												{{ form_label(form.paramTitre,'parametres.maintenance.titre'|trans({}, 'parametres')) }}                                                                       
+												{{ form_widget(form.paramTitre) }}     
+												<div class="clr"></div> 
+												</div>                                                                     
+												
+												{#% if (tab[1] != 0) and (tab[1] == 0) %#}
+												<div id="form_valeur_container">
+												{{ form_label(form.paramValeur, 'parametres.maintenance.numarticle'|trans({}, 'parametres')) }}
+												{{ form_widget(form.paramValeur) }}
+												<div class="clr"></div>
+												</div>
+												{#% endif %#}
+											</div>
+                                                       
+                                                    
+                                                         
+											<div id="form_description_container" class="FrmAjoutArt">
+												{{ form_errors(form.paramDescription) }}
+												<span class="labelNoFloat">
+												{{ form_label(form.paramDescription, 'parametres.maintenance.desc'|trans({}, 'parametres')) }}
+												</span>
+												{{ form_widget(form.paramDescription) }}     
+											</div>  
+											
+											{#% endif %}
+											{#% endif %#}
+
+                                            <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none"><a href=""></a>               
+                                            </form>
+
+
+                                    </div>			<!-- FIN colRightContentPadding-->
+								  </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+							  </div>		<!--  FIN COL RIGHT -->
+						  </div>			<!--  FIN  SPAN - 19 -->
+
+					  </div>		<!--  FIN  SPAN - 25 -->
+ 
+
+   <script>
+       // ajouter par mathias
+       $(function(){
+           hideAll();
+       });
+       //
+       
+   // $( document ).ready(function() {
+
+       $("#form_paramType").change( function(){
+         //Par mathias  
+         if($(this).val()==0){
+             hideAll();
+         }
+         //
+         if ($("#form_paramTitre").val()!=''){
+             titre = $("#form_paramTitre").val();    
+         }else{
+            titre = 'None' ;
+         }
+         if ($("#form_paramDescription").val()!=''){
+            description = $("#form_paramDescription").val();
+         } else{
+            description = 'None'; 
+         }    
+         if ($("#form_paramValeur").val()!=''){
+            valeur = $("#form_paramValeur").val();
+         }else {
+            valeur = 0;
+         }
+        
+          
+           if( $(this).val()!=0 ){
+                $("#second_step").show();
+                
+                if( $(this).val()==1){
+                    //$("#form_paramValeur").val('');
+                    $("#form_titre_container").show();
+                    $("#form_description_container").show();
+                    $("#form_valeur_container").hide();
+
+                    $("#form_paramDescription").val(description);
+                    $("#form_paramTitre").val(titre);                     
+                    
+                }
+                else{
+                    $("#form_titre_container").hide();
+                    $("#form_description_container").hide();
+                    $("#form_valeur_container").show();
+                    $("#form_paramValeur").val(valeur);  
+                    
+                }                 
+           } else
+                $("#second_step").hide();
+       } );       
+        
+   // });   
+       
+      // par mathias 
+      function hideAll(){
+           $("#form_titre_container").hide();
+           $("#form_valeur_container").hide();
+           $("#form_description_container").hide();          
+      }
+   </script>                           
+  {% endblock %}
+  

@@ -1,0 +1,11 @@
+
+
+	<form action=" {{ path("utb_admin_ajoutprofil",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutProfil">
+		<div class="FrmAjoutArt">
+			{{ form_errors(form.libProfil) }}
+			{{ form_label(form.libProfil, 'profils.ajout.lib'|trans({}, 'profils')) }}
+			{{ form_widget(form.libProfil) }}
+			<div class="clr"></div>
+		</div>
+		<input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages') }} " name="op" id="j_bouton">
+	</form>

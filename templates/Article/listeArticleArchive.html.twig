@@ -1,0 +1,336 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+  
+     									<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                 <a href="{{path('utb_admin_accueil',{'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listetoutarticle')}}"> {{ 'admin.layout.menu.articles'|trans}}</a> > {#<a href="{{path('utb_admin_listearticlearchive',{'locale': locale})}}">#}{{'admin.layout.sousmenu.archivesart'|trans({}, 'messages')}}{#</a>#} {#> <a href="#">{{ 'admin.list'|trans({}, 'messages')}}</a>#}
+            </div>
+
+<div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-19">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/archiver.png')}}" alt="Articles" title="" /></div>
+						<div class="titreModule colorBleu"><h1>{{ 'articles.liste.archive'|trans({}, 'articles') }} <span></span><h1></div>	
+						<div class="clr"></div>
+					</div>
+					
+					<div class="span-5 last">
+						<div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+						
+						<div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="deleteAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="Supprimer" title="{{ 'admin.supprimer'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.supprimer'|trans({}, 'messages') }}</a>
+						</div>
+                                                
+                                                <div class="ecartBoutons">&nbsp;</div>
+                                                
+						<div class="boutonGestion">
+							<div><a href="javascript:void(0);" onclick="restaureAll( getArticlesID() ); return false;" ><img src="{{ asset('img/admin-img/icon-48-restaurer.png')}}" alt="Restaurer" title="{{ 'admin.restaurer'|trans({}, 'messages') }}" /></div>
+							{{ 'admin.restaurer'|trans({}, 'messages') }}</a>
+						</div>
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                            
+                                      {# Box d'Informations macrosinfos.html.twig #}    
+                                      {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                                                                   
+                                            
+                                      {# STATISTIQUES macrosinfos.html.twig #}    
+                                      {{ information.stats(listestat) }}           
+
+                    </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">	
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							{#<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option value='0'>{{ 'articles.liste.statut'|trans({}, 'articles') }} --- </option>
+									<option value='1'>{{ 'articles.liste.ecr'|trans({}, 'articles') }}</option>
+									<option value='2'>{{ 'articles.liste.spv'|trans({}, 'articles') }}</option>
+									<option value='3'>{{ 'articles.liste.eap'|trans({}, 'articles') }}</option>
+									<option value='4'>{{ 'articles.liste.publies'|trans({}, 'articles') }}</option>
+									<option value='5'>{{ 'articles.liste.depublies'|trans({}, 'articles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'admin.layout.menu.rubriques'|trans({}, 'messages') }} --- </option>
+									<option>Présentation</option>
+									<option>Produits-Services</option>
+									<option>Actualités</option>
+									<option>FAQ</option>
+									<option>Brèves</option>
+								</select>
+								<select class="filterAutor">
+									<option>{{ 'articles.liste.auteur'|trans({}, 'articles') }} --- </option>
+									<option>Armand K.</option>
+									<option>Benoit G.</option>
+									<option>Serges A.</option>
+								</select>
+								<select class="filterLanguage">
+									<option>{{ 'articles.liste.langue'|trans({}, 'articles') }} ---</option>
+									<option>{{ 'articles.liste.fr'|trans({}, 'articles') }}</option>
+									<option>{{ 'articles.liste.en'|trans({}, 'articles') }}</option>
+								</select>
+								<div class="clr"></div>
+							</div>		#}				<!-- FIN filtersArticles-->												
+                                                            <table class="listMenusCateg listArticlesRub">
+                                                                                                                                        
+                                                                    {{ information.entete_article_sans_action() }} 
+                                                                    
+                                                                    {% for article in listearticle %}
+                                                                      {#% if article.titreArticle is not null %#}
+                                                                      
+                                                                        <tr {% if loop.index is divisibleby(2) %} class="bgGris"{% else %} class="bgBlanc" {% endif %} >
+
+                                                                                <td><input type="checkbox" name="article[]" value="{{article.id}}" rel="article_c"/></td>
+                                                                                <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                                                                                               
+                                                                                {# STATUTS Articles #}  
+                                                                                {{ information.statutlisteaccordeon(article) }} 
+                                                                                
+                                                                                <td class="dateArtList"> {{article.nomRubrique}}</td>
+                                                                                <td class="autorArtList">
+                                                                                    {% for user in listeuser %}
+                                                                                        {% if user.id == article.articleAjoutPar  %}
+                                                                                             {{user.NameUser}}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}                                                                                    
+                                                                                </td>
+                                                                                <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                <td class="langArtList"> {{locale}}</td>
+                                                                                <td class="numArtList"> {{'N°'~article.id}}</td>
+
+                                                                        </tr>
+                                                                      {#% endif %#} 
+                                                                    {% endfor %}
+
+                                                             </table>
+						<br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{{ path('utb_admin_listearticlearchive', { 'page': 1 }) }}"> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_listearticlearchive', { 'page': previous_page }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_listearticlearchive', { 'page': page,'locale':locale }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_listearticlearchive', { 'page': next_page }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_listearticlearchive', { 'page': last_page }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> {{ 'articles.liste.archive'|trans({}, 'articles') }}
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+							
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>	
+
+                     
+                        {{ information.popupaddarticle(listeRubrique) }}                        
+ <script language="javascript" >
+       
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+           
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'confirmation.restoration'|trans({}, 'articles') }}";
+       var htmldefault2 = "{{ 'articles.onearticle.confirmation3'|trans({}, 'articles') }}";
+       
+       //function pour restaurer plusieurs elements a la fois
+       function restaureAll( articlesId ){
+          if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmrestore').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmrestore').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmrestore').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_restaureAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreurstatut"){
+                                        $('#process_tpl').html($('#impossiblerestore').html());
+                                    }
+                                    else if(answer.result == "success") {
+                                        $('#process_tpl').html($('#reussiterestore').html());
+                                    }
+                                    else {
+                                        $('#process_tpl').html($('#accessdenied').html());                                        
+                                    } 
+                                    
+                                    window.location.reload();                                    
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+     
+       //function pour  supprimer definitivement plusieurs elements a la fois 
+       function deleteAll( articlesId ){
+         //To do
+         if( articlesId.length == 0 ){              
+              $('#process_tpl').html($('#vide').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html($('#msgconfirmsup').html());
+          var args = {modal: true, autoOpen: false, title: ($('#titreconfirmsup').html())};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllarticles')}}",
+                                data: {articlesIds:articlesId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result == "erreur"){
+                                        $('#process_tpl').html($('#impossiblesup').html());
+                                    }
+                                    else if(answer.result == "success") {
+                                        $('#process_tpl').html($('#reussitesup').html());
+                                    }
+                                    else {
+                                        $('#process_tpl').html($('#accessdenied').html());                                        
+                                    } 
+                                    
+                                    window.location.reload();                                    
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+       }       
+</script>
+
+  {{ information.decochetoutbox() }}
+
+<div id="process_tpl" style="display:none;"></div> 
+
+<div id="accessdenied" style="display:none;"> 
+{{ 'confirmation.accessdenied'|trans({}, 'articles') }} 
+</div>
+  
+
+    
+  {# Test si rien n'est coché #}
+  <div id="vide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+  {# Restauration des articles #}
+  <div id="msgconfirmrestore" style="display:none;">{{ 'confirmation.restoration'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmrestore" style="display:none;">{{ 'confirmation.titrerestore'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblerestore" style="display:none;"> {{ 'confirmation.impossiblerestore'|trans({}, 'articles') }}</div> 
+
+  <div id="reussiterestore" style="display:none;"> {{ 'confirmation.succesrestore'|trans({}, 'articles') }} </div> 
+  
+  {# suppression des articles #}
+  <div id="msgconfirmsup" style="display:none;">{{ 'confirmation.suppression'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmsup" style="display:none;">{{ 'confirmation.titresup'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesup" style="display:none;"> {{ 'confirmation.impossiblesup'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesup" style="display:none;"> {{ 'confirmation.successup'|trans({}, 'articles') }} </div>   
+
+  {% endblock %}

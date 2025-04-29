@@ -1,0 +1,18 @@
+
+                                              
+                                                      <form action=" {{ path("utb_admin_modifmediarubrique", {'id': id,'idmedia': idmedia,'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="modif">
+                                            <div class="FrmAjoutArt">           
+											{{ form_errors(form.nomMedia) }}
+											{{ form_label(form.nomMedia, 'admin.nom'|trans({}, 'messages')) }}
+											{{ form_widget(form.nomMedia) }}
+											<div class="clr"></div>
+											</div>
+											
+                                            <div class="FrmAjoutArt"> 
+											{{ form_errors(form.file) }}
+                                                                                        {{ form_label(form.file,  'admin.imgtitre'|trans({}, 'messages')) }}                
+											{{ form_widget(form.file) }}
+											</div>
+                                                           <input type="submit" value="{{ 'admin.ajouter'|trans}}" name="op" id="j_bouton" >   
+                                                          </form>
+ 

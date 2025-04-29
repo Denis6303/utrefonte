@@ -1,0 +1,175 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'unarticles.liste.grandtitrepg'|trans({}, 'unarticles') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil', {'locale': locale})}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listearticle', {'locale': locale})}}">{{ 'rubriques.ajout.titre1'|trans({}, 'rubriques') }}</a> > <a href="#">{{ 'admin.liste'|trans({}, 'messages')}}</a>
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+            <div class="span-10">
+                    <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Profils" title="" /></div>
+                    <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'articles.liste.titrepg.listepublication'|trans({}, 'articles') }}<h1></div>	
+                    <div class="clr"></div>
+            </div>
+
+
+
+            <div class="span-14 last">
+
+                    <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                    <div class="boutonGestion">
+                            <div><a href="{{path('utb_admin_ajoutarticle',{'type':3})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="Ajouter" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                    </div>
+                    <div class="boutonGestion">
+                            <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></div>
+                            {{ 'admin.modifier'|trans}}</a>
+                    </div>
+
+                    <div class="ecartBoutons">&nbsp;</div>
+
+                    <div class="boutonGestion">
+                            <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="{{ 'admin.activer'|trans}}" /></div>
+                            {{ 'admin.activer'|trans}}</a>
+                    </div>
+                    <div class="boutonGestion btGestMoy">
+                            <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="D�-Publier" title="{{ 'admin.desactiver'|trans}}" /></div>
+                            {{ 'admin.desactiver'|trans}}</a>
+                    </div>
+
+
+                    <div class="ecartBoutons">&nbsp;</div>
+
+                    <div class="boutonGestion">
+                            <div><a href=""><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="Corbeille" title=" {{ 'admin.corbeille'|trans}}" /></div>
+                             {{ 'admin.corbeille'|trans}}</a>
+                    </div>
+                    <div class="clr"></div>
+            </div>					<!--  FIN allBoutonsGestion -->
+            <div class="clr"></div>
+    </div>						<!--  FIN toulbar 3 -->
+</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+						<div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+							<h3 class="colorBleu titreStats"> {{ 'admin.stats'|trans}} </h3>
+							<div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<table class="tableStats">
+                                                          {% for stat in listestat1 %}                                                             
+                                                            
+                                                                <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+                                                                        <td>{{stat.libelle|raw}}</td>
+                                                                        <td class="valStats">{{stat.valeur}}</td>
+                                                                </tr>
+
+                                                          {% endfor %} 
+							</table>
+							</div>
+						</div>
+                    </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						{#	<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>{{ 'unarticles.liste.statut'|trans({}, 'unarticles') }} </option>
+									<option>{{ 'unarticles.liste.actif'|trans({}, 'unarticles') }}</option>
+									<option>{{ 'unarticles.liste.inactif'|trans({}, 'unarticles') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'unarticles.liste.statut'|trans({}, 'unarticles') }}</option>
+									<option>Administrateur</option>{#options unarticles issus dune bd 
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>		#}				<!-- FIN filtersArticles-->
+							
+                                                        <table class="listMenusCateg listArticlesRub">
+                                                            <tr>
+                                                            <th><input type="checkbox" /></th>
+                                                            <th colspan="2">{{ 'actions.controleur.nom'|trans({}, 'actions')}}</th>
+                                                            <th colspan="2">{{ 'actions.controleur.actions'|trans({}, 'actions')}}</th>
+                                                              <th colspan="2">{{ 'actions.controleur.actions'|trans({}, 'actions')}}</th>
+                                                                <th colspan="2">{{ 'actions.controleur.actions'|trans({}, 'actions')}}</th>
+                                                            </tr>	
+                                                               {% for unarticle in listearticle %}
+                                                                <tr>
+                                                                     <td><input type="checkbox" /></td>
+                                                                    <td colspan="2">              
+                                                                     {{unarticle.titreArticle }}
+                                                                        </td>                                                  
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_supprarticle', {'id': unarticle.id,'locale': locale,'type': 3}) }}" onclick="return confirm('{{ 'admin.confirmsuppression'|trans({}, 'messages')}}');">{{ 'admin.supprimer'|trans}}</a> 
+                                                                        </td>             
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_modifarticle', {'id': unarticle.id,'locale': locale,'type': 3}) }}" >{{ 'admin.modifier'|trans}}</a> 
+                                                                        </td> 
+                                                                        
+                                                                        <td colspan="2">     
+                                                                        {% if unarticle.statutArticle == 0 %}
+                                                                                <a href="{{ path('utb_admin_gererProfil', {'id': unarticle.id,'etat': 1,'locale': locale, 'type': 3}) }}">{{ 'admin.activer'|trans}}</a> 
+                                                                        {% elseif unarticle.statutArticle == 1 %}
+                                                                                <a href="{{ path('utb_admin_gererProfil', {'id': unarticle.id,'etat': 0,'locale': locale,'type': 3}) }}">{{ 'admin.desactiver'|trans}}</a> 
+                                                                        {% elseif unarticle.statutArticle == 2 %}
+                                                                                <a href="{{ path('utb_admin_gererProfil', {'id': unarticle.id,'etat': 0,'locale': locale,'type': 3}) }}">{{ 'admin.desactiver'|trans}}</a> 
+                                                                        {% elseif unarticle.statutArticle == 3 %}
+                                                                                <a href="{{ path('utb_admin_gererProfil', {'id': unarticle.id,'etat': 0,'locale': locale,'type': 3}) }}">{{ 'admin.desactiver'|trans}}</a> 
+                                                        
+
+                                                                           {% endif %}   
+                                                                            </td> 
+                                                                            
+                                                              <td>              
+                                                                  <a href="{{ path('utb_admin_languearticle', {'id': unarticle.id,'locale': 'en'}) }}">
+                                                                      
+                                                                      {{ 'admin.modifier'|trans}} en
+                                                                  </a> 
+                                                              </td> 
+
+                                                                        </tr>
+    {% else %}
+                                                                        <tr>
+                                                                            <td colspan="4">{{ 'unarticles.none'|trans({}, 'unarticles') }} </td>       
+                                                                        </tr>       
+    {% endfor %}
+                                                                    </table>
+							
+							
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>				<!--  FIN SPAN - 25 --> 
+                        
+                        {{ information.popupaddarticle(listeRubrique) }}                        
+                       
+  {% endblock %}

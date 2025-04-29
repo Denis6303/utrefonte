@@ -1,0 +1,105 @@
+
+<page backtop="60mm" backbottom="12mm" >
+        <page_header>
+                <div id="entete">
+                        <div class="" style="width: 750px;border-top: 1px solid #0049ba;border-bottom: 1px solid #0049ba;padding-top: 5px; padding-bottom: 5px;margin-top:10px;">
+                            <h1 style="padding: 0px; margin: 0px;font-family:helvetica;color: #0049ba;font-size: 28px;">                                
+                                
+                                <img src="{{lien}}{{asset('img/client-img/logo_utb_mini.jpg')}}" alt="">
+                            </h1>   
+                        </div><!-- Fin bande 1 -->
+
+                        <div class="" style="width: 750px;border-bottom: 1px solid #0049ba;padding-top: 5px; padding-bottom: 5px;margin-top:0px;text-align: center;">
+                            <p style="padding: 0px; margin: 0px;">S.A. AU CAPITAL DE 5 000 000 000 F CFA - RCCM B 157 - B.P. 359</p>
+                               
+                             <p style="padding: 0px; margin: 0px;">    Boulevard du 13 Janvier - Tél.(228) 22 21 64 11 /22 23 43 00 / 01 - Télex: 5215 & 5270 UT BANK - Fax:(228) 22 21 22 06 </p>
+                        </div>
+                </div>
+            
+                <div style="margin-top:10px;margin-bottom:10px;"> 
+                 <h3><strong> LISTE DES OPERATIONS DU COMPTE N° {{numeroCompte}}  ( Page [[page_cu]]/[[page_nb]] )</strong> </h3> 
+                </div> <!-- Fin bande 2 -->              
+            
+	</page_header>
+    
+	<page_footer>
+
+
+            <div style="border-top: 2px solid #555;width:750px;margin-top: 20px;">
+                <h5 style="text-align: center;margin: 5px 0px;padding: 0px;font-size: 8px;font-weight: normal;">
+                {{'compte.texte'|trans({},'compte') }}
+                </h5>
+                <span style="clear:both;"></span>
+            </div>
+            
+	</page_footer>   
+    
+        <style>
+	 
+        .boxRIB{margin: auto;border: 1px dotted #ddd;padding: 10px;width: 450px;font-family: helvetica,serif;font-size: 11px;}
+        h2{text-align: center;margin-right: 10px;color: #555;}
+        table{margin: 10px auto;border-collapse: collapse;}
+        table td{border: 1px solid #ccc;border-collapse: collapse;padding: 3px;text-align: center;}
+        .noBorder{border: none;font-weight: bold;}
+        .bic, .iban{text-align: left;}
+        .nonCentree .ibantd{width: 37px;}
+        .titulaireRib{text-align: left;margin: 10px;border: 1px solid #ddd; background: #ddd;padding:3px;width: 350px;/*width: 410px;*/margin: auto;}
+        .logoUtb{margin: 5px auto;text-align: center;}
+        .logoUtb .socialName{position: relative; top: 10px;}
+        .clr{clear:both;}
+        </style>  
+
+        <div class="clr"></div>
+       
+            <table class="" style="width:750px;margin: auto;border-collapse: collapse;">
+              <thead>
+                  <tr>
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:2px;width: 50px;">
+                            {{'compte.date'|trans({},'compte') }}
+                        </th>
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:2px;width: 50px;">
+                            {{'compte.valeur'|trans({},'compte') }}
+                        </th>
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:5px;width: 50px;">
+                            N° Mvt
+                        </th> 
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:2px;width: 200px;">
+                            {{'compte.nature'|trans({},'compte') }}
+                        </th>
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:2px;width: 100px;">
+                            {{'compte.debit'|trans({},'compte') }}
+                        </th>
+                        <th style="text-align: center;border: 1px solid #ccc;padding-left: 5px;padding:2px;width: 100px;">
+                            {{'compte.credit'|trans({},'compte') }}
+                        </th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for operation in listeOperation%}
+                    <tr>
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; "> {{operation.dateOperation|date("d/m/Y")|datelangue(locale) }} </td> 
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; "> 
+                            {% if operation.dateValeur|date("d/m/Y")|slice(6,1) != '-' %}
+                                {{operation.dateValeur|date("d/m/Y")|datelangue(locale) }} 
+                            {% endif %}
+                        </td> 
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; "> {{operation.numeroMvt|raw }} </td> 
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px;text-align: left; "> {{operation.libOperation|raw }} </td> 
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; text-align: right; ">
+                         {% if operation.sensOperation|upper  == 'C' %}
+                            {{(operation.montant)|number_format(0, '', ' ') }}
+                         {% else %}                        
+                         {% endif %}
+                        </td>
+                        <td style="border: 1px solid #ccc;padding-left: 5px;padding:5px; text-align: right;">
+                         {% if operation.sensOperation|upper == 'D' %}
+                            {{(operation.montant)|number_format(0, '', ' ') }}
+                         {% else %}                        
+                         {% endif %}
+                        </td>
+                   </tr>
+                   {% endfor %}
+                </tbody>   
+            </table> 
+        
+</page><!-- Fin body -->

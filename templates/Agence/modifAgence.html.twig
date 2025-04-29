@@ -1,0 +1,10 @@
+  
+	<form action=" {{ path( "utb_client_modifAgence", {'id': codeAgence,'locale':locale} ) }} " method="post" {{ form_enctype(form) }} id="ajoutLangueAgence" class="">
+		<div class="FrmAbonne">
+			{{ form_widget(form) }}
+		</div>
+		<input type="submit" class="boutonSubmit" value="{{ 'client.modifier'|trans({}, 'messages') }}" name="op" id="j_bouton" >       
+	</form>
+
+
+

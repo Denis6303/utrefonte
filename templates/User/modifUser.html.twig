@@ -1,0 +1,32 @@
+
+                                                <form action="{{ path('modifier_utilisateur',{'id':id, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUser">
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.nameUser) }}
+													{{ form_label(form.nameUser, 'users.form.nom'|trans({}, 'users')) }}
+													{{ form_widget(form.nameUser) }}
+													<div class="clr"></div>
+													</div>
+													
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.email) }}
+													{{ form_label(form.email, "E-mail") }}
+													{{ form_widget(form.email) }}
+													<div class="clr"></div>
+													</div>
+													
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.username) }}
+													{{ form_label(form.username, 'users.form.login'|trans({}, 'users')) }}
+													{{ form_widget(form.username) }}
+													<div class="clr"></div>
+													</div>
+
+													<div class="FrmAjoutArt selectTypProfil">
+													{{ form_errors(form.profil) }}
+													{{ form_label(form.profil, "Profil ") }}
+													{{ form_widget(form.profil) }}
+													<div class="clr"></div>
+													</div>
+													
+												<input type="submit" value="Ajouter" name="op" id="j_bouton" >
+                                               </form>

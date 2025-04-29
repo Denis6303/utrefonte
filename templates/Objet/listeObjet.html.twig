@@ -1,0 +1,295 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'objets.liste.grandtitrepg'|trans({}, 'objets') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listeobjet', {'locale': locale})}}">{{ 'admin.layout.contact'|trans}} </a> > <a href="{{path('utb_admin_listeobjet', {'locale': locale})}}">{{'objets.ajout.titre1'|trans({}, 'objets')}}</a>  > {{'admin.list'|trans()}}
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-10">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Objets" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'objets.liste.titrepg'|trans({}, 'objets') }}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-14 last">
+
+                            <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="{{path('utb_admin_ajoutobjet')}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="Ajouter" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                            </div>
+                            {#<div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></div>
+                            {{ 'admin.modifier'|trans}}</a>
+                            </div>#}
+
+                            <div class="ecartBoutons">&nbsp;</div>
+{#
+                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="{{ 'admin.activer'|trans}}" /></div>
+                            {{ 'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="{{ 'admin.desactiver'|trans}}" /></div>
+                            {{ 'admin.desactiver'|trans}}</a>
+                            </div>
+
+
+                            <div class="ecartBoutons">&nbsp;</div>#}
+                             <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll(getObjetsID(),1); return false;"><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.publier'|trans}}" title="{{ 'admin.enligne'|trans}}" /></div>
+                                    {{'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll(getObjetsID(),0); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.depublier'|trans}}" title="{{ 'admin.horsligne'|trans}}" /></div>
+                                    {{'admin.desactiver'|trans}}</a>
+                            </div>
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="corbeilleAll(getObjetsID()); return false;"><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.supprimgul'|trans}}" title=" {{ 'admin.corbeille'|trans}}" /></div>
+                             {{ 'admin.supprimer'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                        {# STATISTIQUES #}    
+                                        {{ information.stats(listestat) }} 
+                                    
+                                </div>	<!-- Fin COLONNE COLLEFT-->
+                            </div>	<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						{#	<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>{{ 'objets.liste.statut'|trans({}, 'objets') }} </option>
+									<option>{{ 'objets.liste.actif'|trans({}, 'objets') }}</option>
+									<option>{{ 'objets.liste.inactif'|trans({}, 'objets') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'objets.liste.statut'|trans({}, 'objets') }}</option>
+									<option>Administrateur</option>{#options objets issus dune bd 
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>		#}				<!-- FIN filtersArticles-->  
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall" /></th>
+                                                        <th>{{'objets.form.nom'|trans({}, 'objets')}} </th>
+                                                        <th colspan="3"></th>
+                                                    </tr>	
+                                                                                                                        
+                                     {% for objet in listeobjet %} 
+                                                           
+                                                    <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgblanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="objet[]"  rel="objet_c" value="{{objet.id}}" /></td>
+                                                        <td>              
+                                                                     {{objet.libObjet }}
+                                                            </td>                                                  
+                                                            {#<td>              
+                                                                <a href="{{ path('utb_admin_supprobjet', {'id': objet.id,'locale': locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> 
+                                                            </td>             
+
+                                                                
+                                                                        <td> % if objet.etatCadre == 0 %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': objet.id,'etat': 1,'locale': locale}) }}">{{ 'admin.activer'|trans}}</a> 
+                                                                        {% else %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': objet.id,'etat': 0,'locale': locale}) }}">{{ 'admin.desactiver'|trans}}</a>                                                                         {% endif %</td>#}                                                                    
+                                                         <td class="statutArtList">
+                                                            {#% if objet.EtatObjet ==1  %}
+                                                                <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'articles.liste.ecr'|trans({},'articles')}} " title="{{ 'articles.liste.ecr'|trans({},'articles')}}" />
+                                                            {% elseif objet.EtatObjet  ==0 %}
+                                                                <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'articles.state.sub'|trans({},'articles')}}" title="{{ 'articles.state.sub'|trans({},'articles')}}" />
+                                  
+                                                            {% endif %#}
+                                                        </td>
+ 
+                                                                
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_modifobjet', {'id': objet.id,'locale': locale}) }}">
+
+                                                                      <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="{{ 'admin.modifier'|trans({},'messages')}}" title="{{ 'admin.modifier'|trans({},'messages')}}" />
+                                                                    </a> 
+                                                                </td>  
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_ajoutlangueobjet', {'id': objet.id,'locale': 'en'}) }}">
+                                                                     L
+                                                                    </a> 
+                                                                </td>                                                                 
+                                                            </tr>
+
+    {% else %}
+                                                                    <tr>
+                                                                        <td colspan="4">{{ 'objets.none'|trans({}, 'objets') }} </td>       
+                                                                    </tr>       
+   {% endfor %} 
+                                                                </table>
+
+
+
+                                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                                    </div>		<!--  FIN COL RIGHT -->
+                                                </div>			<!--  FIN  SPAN - 19 -->
+
+                                            </div>				<!--  FIN SPAN - 25 -->
+                                            
+ <script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getObjetsID(){
+           
+            var objet_id = "";
+            
+            $(":input[rel=objet_c]:checked").each(function(){
+		objet_id = objet_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return objet_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'objets.supprimer.confirmation'|trans({}, 'objets') }}"; 
+ 
+    
+       function corbeilleAll(objetId){
+          if( objetId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans({},'messages')}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'objets.supprimer.titre'|trans({},'objets')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            });    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'objets.supprimer.titre'|trans({},'objets')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeilleobjet')}}",
+                                data: {objetIds:objetId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'objets.supprimer.impossible'|trans({},'objets')}}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'objets.supprimer.reussie'|trans({},'objets')}}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            });    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+       function gererEtatAll(objetId,etat){
+          if( objetId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans({}, 'messages') }}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'objets.statut.titre'|trans({}, 'objets') }}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            }) ;   
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'objets.statut.titre'|trans({}, 'objets') }}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_gereretatobjet')}}",
+                                data: {objetIds:objetId,etat:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'objets.statut.impossible'|trans({}, 'objets') }}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'objets.statut.reussie'|trans({}, 'objets') }}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            });    
+            $("#process_tpl").dialog('open');           
+       }       
+       
+</script>                                            
+     <div id="process_tpl" style="display:none;"></div>                                       
+  {% endblock %}
+
+                                            

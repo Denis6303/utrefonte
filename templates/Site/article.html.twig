@@ -1,0 +1,106 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+  
+  {# <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" /> #}
+		
+{% block public_body %}  
+        <div class="span-24 all-lookupCategorie marginBottom20p">
+                <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listecateg %}
+          
+                                        {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent)}}
+
+                                 {% endfor %}
+                </div>
+        </div>   
+    
+  {% for articleFrancais in larticleFrancais %}   
+  
+ <div class="span-24">		<!-- borderBotStyle bgBlanc -->
+ 	<div class="span-17">		<!-- borderBotStyle bgBlanc -->
+		<div class="span-17 borderBotStyle paddingBottom20p marginBottom10p bgBlanc">
+			<div class="leftSpace">
+				<h1 class="boxSection-titre bleuLogo"> {{articleFrancais.titreArticle|raw}} </h1>
+				 
+				 <div style="width:200px; float:left; border:1px solid #ccc;">
+                                     {% if articleFrancais.urlMedia != "default_.png" %}
+                                            <img src="{{ asset('upload/articles/'~articleFrancais.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" />
+                                     {% endif %}
+                                 </div>
+				 <div style="width:350px; float:left;">
+                                     <h1>
+                                         {{articleFrancais.introTexteArticle|raw}}
+                                     </h1>
+                                 </div>				
+			</div>
+		</div>
+	
+		<div class="span-17 marginBottom20p">	<!-- DESCRIPTION ARTICLE-->
+			<div class="leftSpace rightSpace paddingBottom20p span-12">	<!-- DEBUT COLONNE GAUCHE-->				
+				{{articleFrancais.descriptionArticle|raw}}					
+			</div>	
+		</div>
+	
+	</div> 	<!-- FIN SPAN 17 DE LA COLONNE GAUCHE-->
+	
+	<div class="span-7 last">		<!-- DEVUT COLONNE DROITE -->
+		<div class="rightSpace"> <!-- PHP / A NE PAS BOUCLER-->
+			
+			<div class="rightBox actus-rightBox marginBottom20p">	<!-- AVIS ET ACTUs-->
+				<h2 class="title-WithTopBar bar-bordeau">Avis et Actus.</h2>
+				<div class="carousel-actus">
+					<ul>
+                                            {% for actualite in listeactualite %}                                                    
+                                                <li>
+                                                        <div class="one-actusavis">	<!-- une actualité/avis-->
+                                                                <img src="{{asset('upload/articles/'~actualite.urlMedia)}}" alt="" title="" />
+                                                                <p class="actusavis-descrp">
+                                                                        <span class="actusavis-date">{{actualite.articleDateAjout|date("d/m/Y")}}</span><br/>
+                                                                        <a class="actusavis-titre bleuLogo LkUnderline" href="">{{actualite.titreArticle}}</a>
+                                                                        <!-- S'ilm y a description, mettre ca ici-->
+                                                                </p>	<!-- FIN p.actusavis-descrp-->
+                                                        </div>
+                                                </li>
+                                           {% endfor  %}
+	
+					</ul>
+				</div>
+				<div class="butNavigDocs butNavigActusAvis">
+					<span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="Prevew" title="Document Précédent" /></span>
+					<span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="Next" title="Document Suivant" /></span>
+				</div>
+				<a class="blueLink" href="{{ path("utb_site_rubrique",{'locale': locale,'id': 2, 'type':7})}}">Voir tous les avis et actualités </a>
+			</div>		<!-- FIN right Box-->
+			
+			<div class="rightBox newsletterBox">	<!-- NEWSLETTER-->
+				{#<div class="rightBox-cnt butValideBordeau">
+					<h2 class="title-WithTopBar bar-bordeau">Newsletter</h2>
+					<p>Abonnez-vous et recevez la newsletter par e-mail</p>
+					{#<input type="text" />
+					<div class="typeNewsletter">
+						<label class="labelLg">Revoir la newsletter pour :</label>
+						<select class="">
+							<option>Particuliers</option>
+							<option>Entreprises</option>
+							<option>Professionnels</option>
+						</select>
+						<div class="clr"></div>
+					</div>
+					<input type="submit" />
+				</div>#}
+                                
+                                {{ allmacro.Newsletter('Newsletter','Abonnez-vous et recevez la newsletter par e-mail') }} 
+                                
+			</div>
+			
+		</div>		<!-- FIN div.rightSpace-->
+	</div> 		<!-- FIN SPAN 7 DE LA COLONNE DROITE-->
+</div>
+		
+{% endfor %}  
+{% endblock %}
+		

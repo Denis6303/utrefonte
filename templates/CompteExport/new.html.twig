@@ -1,0 +1,29 @@
+{#appelé dans la liste des comptes efacture#}
+
+<form action="{{ path('efacture_export_compte_create') }}" method="post" {{ form_enctype(form) }}>
+    <div class="FrmAbonne champsGrp">
+        {#        {{ form_widget(form) }}#}
+        <div class="FrmAbonne">
+            {{ form_errors(form.compte) }}
+            <label>Compte </label>
+            {{ form_widget(form.compte) }}
+            {{ form_errors(form.lib) }}
+            <label>Auteur</label>
+            {{ form_widget(form.lib) }}
+            <div class="clr"></div>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <input type="submit" class="boutonSubmit" value="{{ 'client.ajouter'|trans({}, 'messages') }} " name="op" >
+    <a href="#" ><input type="button" class="annulerBut " value="{{ 'client.annuler'|trans({},'messages')}}" name="" id="fermer_ajoutCompte_container" > </a>
+    <div class="clr"></div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#fermer_ajoutCompte_container").click(function () {
+            $("#ajoutCompte_container").hide("fast");
+        });
+        $('.numeric').numeric();
+    });
+</script>

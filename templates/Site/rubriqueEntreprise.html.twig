@@ -1,0 +1,201 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig -----------------#}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+
+{% block public_body %}
+<script type="text/javascript" src="{{ asset('js/site-js/tabulous.js') }}"></script>
+{% if larubrique[0].id != 7 %}       
+<div class="span-24 borderBotStyle marginBottom20p paddingBottom20p bgBlanc positionRelative" style="">		<!-- borderBotStyle bgBlanc -->
+    <img src="{{ asset('img/site-img/ombreVertical1Gauche.png')}}" class="ombreGEtrprise" />
+    <div class="leftSpace rightSpace marginBottom20p">
+        <h1 class="boxSection-titre bleuLogo titreCorpsEntreprise capitaLetter" style="">{{larubrique[0].nomRubrique}}</h1>
+        <div class="welcomeBox fond_entreprise">
+            <div class="iconeWelcome"> <!-- Image de Bienvenue Particulier / Professionel -->
+                                {% for uneimage in image %}
+                <img src="{{ asset('upload/rubriques/'~uneimage.urlMedia)}}" alt="" title="">
+                                {% endfor %}
+            </div>
+            <div class="texteWelcome2">
+                <h2>
+                                        {% if larubrique[0].descriptionRubrique != "- default text -" %}
+                                             {{larubrique[0].descriptionRubrique|raw}}
+                                        {% endif %}                                
+                </h2>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="leftSpace rightSpace marginBottom20p">
+        <div class="boxProduitEntreprise">
+            <div class="decouvrezProduits center capitaLetter"><p style=""><img src="{{ asset('img/site-img/icon-entreprise.png')}}" />{{ 'entreprise.decouvrez'|trans({}, 'site') }}</p></div>
+            <div class="listeproduits" >
+                <ul class="produitEntreprise" style="margin-top: 17px;">
+                                    {% for sousrubrique in listesousrub %}
+                                          {{allmacro.AfficherSousRubLi(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.descriptionRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,locale)}}
+                                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="innerbanEntreprise"  style="position: relative;">
+        {% for unarticlepub in  articlepub %}
+            <div class=" jcarousel">
+                <img src="{{ asset('upload/articles/'~unarticlepub.urlMedia)}}" alt="" title=""/>                                    
+                <h2>{{ unarticlepub.titreArticle|raw}}</h2>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="clear"></div>
+    </div>
+
+         {#{dump(solutiongenerale)}#} 
+    <div class="leftSpace rightSpace marginBottom20p">
+
+        <div id="wrapper" class="ServiceAgenceActu">
+
+            <div id="tabs">
+                <ul>
+                    <li><a href="#services" title="">{{ 'entreprise.services'|trans({}, 'site') }}</a></li>
+                    <li><a href="#agences" title="">{{ 'entreprise.agences'|trans({}, 'site') }}</a></li>
+                  {% if not( (listeBreve|length < 1) and (listeactualite|length < 1) ) %}  <li><a href="#actualites" title="">{{ 'entreprise.avis'|trans({}, 'site') }}</a></li> {% endif %}
+                </ul>
+                <div id="tabs_container">
+                    <div id="services"  class="tableProdServActu carousel_service">
+                        <ul>                                          
+                                            {% for lasolution in solutiongenerale %}                                                
+                                              {{allmacro.AfficherSolutionGralEntr(lasolution.nomRubrique,lasolution.descriptionRubrique,lasolution.urlMedia)}}
+
+
+                                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div id="agences"  class="tableProdServActu carousel_agence">
+                        <ul>
+                                            {% for lagence in listecorrespondance %}
+                                                {{allmacro. AfficherAgenceEntr(lagence.titreArticle,lagence.descriptionArticle,lagence.urlMedia)}} 
+                                            {% endfor %}
+                        </ul>
+                    </div>
+
+					{% if (listeBreve|length < 1) and (listeactualite|length < 1) %}
+					
+					{% else %}
+                    <div id="actualites" class="tableProdServActu carousel_actualite">
+                        <ul>
+											{% for breve in listeBreve %}
+															<li>
+															<a href="{{path('utb_site_article',{'id': breve.id,'locale':locale})}}"  style="font-size: 11px; font-weight: bold;">
+																<table >
+																	<tr>
+																		<td >
+																			<h2 class="capitaLetter">                          
+																						{{breve.titreArticle}}                         
+																			</h2>
+																		</td>
+																	</tr>
+																	<tr>
+																		
+																		<td class="">{{breve.descriptionArticle|raw}}</td>
+																	</tr>
+																</table>  
+																</a>
+															</li>         
+                                                    {% endfor  %}
+													
+                                            {% for lactualite in listeactualite %}
+                                                {{allmacro. AfficherActualiteEntr(lactualite.titreArticle,lactualite.descriptionArticle,lactualite.urlMedia)}} 
+                                            {% endfor %}
+                        </ul>
+                    </div>
+					
+					{% endif %}
+
+                </div><!--End tabs container-->
+                <!--<script>
+
+                    var queryall = document.querySelectorAll(" table.tabPresent ");
+                    var queryall2 = document.querySelectorAll(" .tabPresDescription ");
+
+
+
+                    for (var i = 0; i < queryall.length; i++) {
+                        regs = new RegExp("</p>", "g");
+                        queryall2[i].innerHTML = queryall2[i].innerHTML.substring(0, 130);
+                        queryall2[i].innerHTML = queryall2[i].innerHTML.replace(regs, "...</p>");
+
+                    }
+</script>-->
+                <div class="">
+
+                </div>
+
+            </div>
+        </div><!-- fin du service agence actu -->
+        <div class="presentationEntreprise ">
+            <div class="rightSpace">
+                <h1>{{ 'entreprise.equipe'|trans({}, 'site') }}</h1>
+                <div class="clear"></div>
+                <p>
+                    {{ 'entreprise.prestation'|trans({}, 'site') }}:
+                </p>
+                <p>
+                    <strong>{{ 'entreprise.soutien'|trans({}, 'site') }}</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+    </div><!-- fin du box contenant les services les agences; les actu et le texte pour les entreprises -->
+
+    <!-- Ligne Correspondants -->
+    <div class="span-24 marginBottom20p"> 
+        <div class="leftSpace rightSpace boxCorespdant">
+            <h1 class="boxSection-titre bleuLogo capitaLetter titreCorpsEntreprise" style="width: auto;">{{ 'acceuil.cores'|trans({}, 'site') }}</h1><div class="clr"></div>
+            <div class="slideCorespdant">
+                                   {% for article in listecorrespondanceEtranger%} 
+                                        {% if article.urlMedia != "default_.png" %}
+                <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="{{article.titreArticle|raw}}" />
+                                        {% endif %}                                
+
+                                   {% endfor %}     				
+            </div>
+            <div class="divButmoore rightPosition">
+                <a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>{{ 'acceuil.voir'|trans({}, 'site') }}</span><span></span></a>
+            </div>			
+        </div>
+    </div>		<!-- FIN Correspondants-->
+    <img src="{{ asset('img/site-img/ombreVertical1Droit.png')}}" class="ombreDEtrprise" />
+</div>       
+       {% endif%}
+<script type="text/javascript">
+
+    $('.actualiteTest').truncate({
+        width: '300px',
+        token: '...',
+        side: 'right',
+        addclass: false,
+        addtitle: true
+    });
+
+    $('.partieDesc').truncate({
+        width: '1000px',
+        token: '...',
+        side: 'right',
+        addclass: false,
+        addtitle: true
+    });
+
+    $(function() {
+        $('.truncate').succinct({
+            size: 120
+        });
+    });
+    $("#tabs_container li").each(function(){
+        $(this).width(390);
+    });
+
+</script>
+{% endblock %}

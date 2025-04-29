@@ -1,0 +1,113 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+  
+{% block public_body %}
+        <div class="span-24 all-lookupCategorie marginBottom20p">
+                <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listecateg %}
+          
+                                        {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}
+
+                                 {% endfor %}
+                </div>
+         <div class="clr"></div>       
+        <h1 class="boxSection-titre bleuLogo title-WithLeftBar">    
+         {% for rubrique in larubrique  %}
+              {{rubrique.nomRubrique}}
+         {% endfor %}
+        </h1>               
+        {% for article in listearticle  %}
+			{% if loop.index > 2 %}
+                          {% if loop.index % 2  %}                               
+                            <div class="span-24 borderBotStyle bgBlanc marginBottom10p">                              
+                              <div class="span-12">  
+                                <div class="leftSpace paddingTopBot20p">
+                                       
+                                           <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                           <h2 class="listItem3 title1"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq listItem1">
+                                                   <div class="boxilustrC">
+                                                        {% if article.urlMedia != "default_.png" %}
+                                                               <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px; float:left;"/> 
+                                                        {% endif %}                                                        
+                                                      
+                                                   </div>
+                                                   <div class="boxdescrptC">
+                                                       {% if article.introTexteArticle|trim|length > 0 %}
+                                                            {{article.introTexteArticle|raw}}
+                                                       {% else %}     
+                                                            {{article.descriptionArticle|raw}}
+                                                       {% endif %}    
+                                                   </div>
+                                                   <div class="clr"></div>
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div> 
+                              </div>
+                               {% else  %}
+                                  <div class="span-12 last">
+                                      <div class="leftSpace paddingTopBot20p">
+                                       
+                                           <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                           <h2 class="listItem3 title1"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq listItem1">
+                                                   <div class="boxilustrC">
+                                                        {% if article.urlMedia != "default_.png" %}
+                                                               <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px; float:left;"/> 
+                                                        {% endif %}                                                         
+                                                     
+                                                   </div>
+                                                   <div class="boxdescrptC">
+                                                        {% if article.introTexteArticle|trim|length > 0 %}
+                                                           {{article.introTexteArticle|raw}}
+                                                        {% else %}  
+                                                           {{article.descriptionArticle|raw}}
+                                                        {% endif %}   
+                                                   </div>
+                                                   <div class="clr"></div>
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>
+                               </div>
+                            </div>
+                          {% endif  %}<!-- CARTE A GAUCHE-->
+                        {% endif  %}     
+              
+                {% endfor %} 
+    </div>                          
+
+            {#% for article in listearticle  %}
+
+                          {% if loop.index % 2  %}                               
+                            <div class="span-24 borderBotStyle bgBlanc marginBottom10p">                              
+                              <div class="span-12">                           
+                          {% else  %}    
+                                      
+                              <div class="span-12 last">
+                          {% endif  %}<!-- CARTE A GAUCHE-->
+                          
+                                   <div class="leftSpace paddingTopBot20p">
+                                       {{loop.index }}
+                                           <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                           <h2 class="listItem3 title1"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq listItem1">
+                                                   <div class="boxilustrC">
+                                                      <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px;"/> 
+                                                   </div>
+                                                   <div class="boxdescrptC">
+                                                        {{article.descriptionArticle|raw}}
+                                                   </div>
+                                                   <div class="clr"></div>
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>	<!-- FIN leftSpace rightSpace paddingTopBot20p -->
+                           </div>	<!-- FIN SPAN 12-->
+                           {% if (loop.index % 2) !=0  %}   
+                            
+                              </div >        
+                           {% endif  %}    
+              
+                {% endfor %#}      
+{% endblock %}
+  

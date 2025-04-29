@@ -1,0 +1,250 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'rubriques.liste.grandtitrepg'|trans({}, 'rubriques') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil',{'locale': locale})}}" > {{ 'admin.accueil'|trans}}</a> > {#<a href="{{path('utb_admin_listerubrique',{'locale': locale})}}">#} {{ 'rubriques.liste.grandtitrepgs'|trans({}, 'rubriques') }}</a> {# > <a href="#">{{ 'rubriques.rubrique'|trans({}, 'rubriques') }}</a>#}
+            </div>            
+                                           
+                                
+            	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                {% for contenu in app.session.flashbag.get('notice') %}
+                    {% if contenu == "successajtrub" %}
+                                    <div class="span-25">
+                                        <div class="success successMsg">
+                    {{ 'notification.ajoutbn'|trans({}, 'rubriques') }}
+                                        </div>
+                                    </div>
+                    {% elseif contenu == "errorajtrub" %}
+                                    <div class="span-25">
+                                        <div class="error errorMsg">
+                    {{ 'notification.ajoutbad'|trans({}, 'rubriques') }}
+                                        </div>
+                                    </div>
+                    {% elseif contenu == "successsuprub" %}
+                                    <div class="span-25">
+                                         <div class="success successMsg">
+                    {{ 'notification.supbn'|trans({}, 'rubriques') }}
+                                         </div>
+                                    </div>
+                    {% elseif contenu == "errorsuprub" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+
+                    {{ 'notification.supbad'|trans({}, 'rubriques') }}
+                                         </div>
+                                    </div>              
+                
+                    {% elseif contenu == "successmodrub" %}
+                                    <div class="span-25">
+                                         <div class="success successMsg">
+                    {{ 'notification.modifbn'|trans({}, 'rubriques') }}
+                                         </div>
+                                    </div>
+                    {% elseif contenu == "errormodrub" %}
+                                    <div class="span-25">
+                                         <div class="error errorMsg">
+                    {{ 'notification.modifbad'|trans({}, 'rubriques') }}
+                                         </div>
+                                    </div>
+                    {% endif %}
+                {% endfor %}
+           
+     
+            <div class="span-25">				<!-- TOUTE LA PAGE CENTRALE : MODULES + DETAILS -->
+			
+				<div id="tableauBord" class="coinsArrondis colorCadreArrondi bgGris">
+					<div class="boxAllRubriquesBOX"> 	<!-- span-13 -->
+                                            <div class="boxAllRubriques">
+                                            {% for rubrique in listerubrique %} 
+                                                {% if rubrique.nomRubrique|trim !='' %}    
+						<div class="ilustreModule bgBlanc coinsArrondisMin">
+							<a class="defaultColor hoverBleu" href="{{ path('utb_admin_detailrubrique',{'id': rubrique.id,'locale':locale}) }}">
+								{#<div class="logoModule"><img src="{{ asset('upload/250x200/'~rubrique.nomRubrique~".jpg")}}" alt="{{rubrique.nomRubrique}}" title="{{rubrique.nomRubrique}}" /></div> #}
+                                                                <div class="logoModule"><img src="{{ asset('upload/icones/'~rubrique.urlIcone)}}" alt="{{rubrique.nomRubrique}}" title="{{rubrique.nomRubrique}}" /></div>
+                                                                
+								<span class="nomModule">{{rubrique.nomRubrique}}</span>
+							</a>                                                                                                                 
+						</div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div>
+                                                    {{ 'rubriques.none'|trans({}, 'rubriques') }}     
+                                                </div>                                       
+                                            {% endfor %}                              
+                                                <div class="clr"></div>
+                                            </div>
+					</div>
+					<div class="boxVisualRubriqBOX"> 	<!-- span-11 last -->	
+					<div class="boxVisualRubriq">
+
+						
+						<div id="accordion">
+                                                    
+							{% if infos is not null %}
+							<h3>{{ 'rubriques.liste.apropos'|trans({}, 'rubriques') }}</h3>
+							<div class="conteuTextJustify">
+                                                            
+                                                            <p>{{ infos.paramDescription|raw }}</p>    
+                                                            
+                                                        </div>
+                                                        {% endif %}                                                    
+                                                    
+							<h3>{{ 'admin.index.artrecentpub'|trans}}</h3>
+							<div>
+								<table class="listMenusCateg listArticlesRub">
+                                                                        
+                                                                        {{ information.titreslistearcordeon() }}
+                                                                        
+									{% for article in listearticlerecent %}
+                                                                            {% if article.titreArticle is not null %}
+                                                                            <tr {% if loop.index is divisibleby(2) %} class="bgGris"{% else %} class="bgBlanc" {% endif %}>
+                                                                                    <td class="numArtList" style="width:80px"> {{'N°'~article.id}}</td>
+                                                                                    <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                    
+                                                                                            
+                                                                                    {{ information.statutlisteaccordeon(article) }}        
+                                                                                            
+                                                                                  
+                                                                                    <td class="autorArtList">
+                                                                                        {% for user in listeuser %}
+                                                                                            {% if user.id == article.articleAjoutPar  %}
+                                                                                                 {{user.NameUser}}
+                                                                                            {% endif %}
+                                                                                        {% endfor %}                                                                                    
+                                                                                    </td>
+                                                                                    <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                    <td class="langArtList"> {{locale}}</td>
+                                                                            </tr>
+                                                                            {% endif %} 
+                                                                        {% endfor %}
+								</table>
+                                                                {% if (listearticlerecent is not null) and (listearticlerecent|length>0) %}
+                                                                    <div class="listecomplete">
+                                                                        <a href="
+                                                                                {{ path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 4,'locale': locale}) }}                                                                       
+                                                                                " >
+                                                                            {{ 'admin.voirtout'|trans}}
+                                                                        </a>
+                                                                    </div>
+                                                                {% endif %}    
+							</div>
+    
+							<h3>{{ 'admin.index.artattentepub'|trans}}</h3>
+							<div>
+								<table class="listMenusCateg listArticlesRub">
+                                                                    
+									{{ information.titreslistearcordeon() }}
+                                                                        
+									{% for article in listearticleattente %}
+                                                                            {% if article.titreArticle is not null %}
+                                                                            <tr {% if loop.index is divisibleby(2) %} class="bgGris"{% else %} class="bgBlanc" {% endif %}>
+                                                                                    <td class="numArtList" style="width:80px"> {{'N°'~article.id}}</td>
+                                                                                    <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                    
+                                                                                    {{ information.statutlisteaccordeon(article) }}
+                                                                                    
+                                                                                    <td class="autorArtList">
+                                                                                        {% for user in listeuser %}
+                                                                                            {% if user.id == article.articleAjoutPar  %}
+                                                                                                 {{user.NameUser}}
+                                                                                            {% endif %}
+                                                                                        {% endfor %}                                                                                    
+                                                                                    </td>
+                                                                                    <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                    <td class="langArtList"> {{locale}}</td>
+                                                                            </tr>
+                                                                            {% endif %} 
+                                                                        {% endfor %}
+								</table>
+                                                                {% if (listearticleattente is not null) and (listearticleattente|length>0) %}
+                                                                    <div class="listecomplete"><a href="
+                                                                        {#{ path('utb_admin_listearticleattente', {'locale': locale}) }#}
+                                                                        {{ path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 3,'locale': locale}) }} " >
+                                                                        {{ 'admin.voirtout'|trans}}
+                                                                    </a></div>
+                                                                {% endif %}     
+							</div>                                                        
+                                                        
+							<h3>{{ 'admin.index.artsoumis'|trans}}</h3>
+							<div>
+								<table class="listMenusCateg listArticlesRub">
+                                                                    
+									{{ information.titreslistearcordeon() }}
+                                                                        
+									{% for article in listearticlesoumis %}
+                                                                            {% if article.titreArticle is not null %}
+                                                                            <tr {% if loop.index is divisibleby(2) %} class="bgGris"{% else %} class="bgBlanc" {% endif %}>
+                                                                                    <td class="numArtList" style="width:80px"> {{'N°'~article.id}}</td>
+                                                                                    <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                    
+                                                                                    {{ information.statutlisteaccordeon(article) }}
+                                                                                    
+                                                                                    <td class="autorArtList">
+                                                                                        {% for user in listeuser %}
+                                                                                            {% if user.id == article.articleAjoutPar  %}
+                                                                                                 {{user.NameUser}}
+                                                                                            {% endif %}
+                                                                                        {% endfor %}                                                                                    
+                                                                                    </td>
+                                                                                    <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                                                    <td class="langArtList"> {{locale}}</td>
+                                                                            </tr>
+                                                                            {% endif %} 
+                                                                        {% endfor %}
+								</table>
+                                                                
+                                                                {% if (listearticlesoumis is not null) and (listearticlesoumis|length>0) %}
+                                                                    <div class="listecomplete"><a href="
+                                                                            {#{ path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 2,'locale': locale}) }#}
+                                                                            {{ path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 2,'locale': locale}) }}                      
+                                                                                                  " >{{ 'admin.voirtout'|trans}}</a></div>
+                                                                {% endif %}     
+							</div>      
+                                                        
+                                                        
+                                                        
+                                                        
+							<h3>{{ 'rubriques.liste.titrestats'|trans({}, 'rubriques') }}</h3>
+							<div>
+                                                            <div class="sommerStatRub">
+                                                                <table style="text-align:center;">
+
+                                                                        <tr class="colorBleu"> 
+                                                                            {% for stat in listestat %}
+                                                                                <td>{{stat.libelle}}</td>
+                                                                            {%  endfor%}    
+                                                                        </tr>                                                            
+
+                                                                        <tr>
+                                                                            {% for stat in listestat %} 
+                                                                                <td class="">{{stat.valeur}}</td>
+                                                                            {%  endfor%}     
+                                                                        </tr>
+
+                                                                </table>
+                                                            </div>
+                                                                
+							</div>                                                       
+                                                        
+
+						</div>		<!-- FIN des accordéons -->
+					</div>			<!-- FIN boxVisualRubriq APercus -->
+					</div>			<!-- FIN SPAN 11 LAST-->
+					<div class="clr"></div>
+					
+				</div> <!-- FIN tableauBord -->
+			</div> 	<!-- FIN SPAN - 25 -->
+
+  {# On définit un nouveau block, que les vues du bundle pourront remplir #}
+               
+  {{ information.popupaddarticle(listeRubrique) }}                    
+                        
+  {% endblock %} 

@@ -1,0 +1,129 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'modules.liste.grandtitrepg'|trans({}, 'modules') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   			<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listemodule', {'locale': locale})}}">Modules</a> > <a href="{{path('utb_admin_ajoutmodule', {'locale': locale})}}">{{ 'admin.layout.sousmenu.ajoutermodule'|trans }}</a>
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+				<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+					<div class="span-10">
+						<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-article.png')}}" alt="Articles" title="Gestion des Articles" /></div>
+						<div class="titreModule titreModuleShort colorBleu"><h1>{{ 'modules.liste.titrepg'|trans({}, 'modules') }}<h1></div>	
+						<div class="clr"></div>
+					</div>
+			      
+					<div class="span-14 last">
+						
+						<div class="ecartBoutonsFirst">&nbsp;</div>
+						
+						<div class="boutonGestion">
+							<div><a href="{{ path('utb_admin_ajoutmodule',{'locale':locale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="Ajouter" title="{{ 'admin.ajouter'|trans}}" /></div>
+							{{ 'admin.ajouter'|trans}}</a>
+						</div>
+						<div class="boutonGestion">
+							<div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}" /></div>
+							{{ 'admin.modifier'|trans}}</a>
+						</div>
+
+                                              <div class="ecartBoutons">&nbsp;</div>
+
+                                              <div class="boutonGestion">
+                                                      <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="" title="{{ 'admin.activer'|trans}}" /></div>
+                                                      {{ 'admin.activer'|trans}}</a>
+                                              </div>
+                                              <div class="boutonGestion btGestMoy">
+                                                      <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="" title="{{ 'admin.desactiver'|trans}}" /></div>
+                                                      {{ 'admin.desactiver'|trans}}</a>
+                                              </div>
+                            <div class="ecartBoutons">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                    <div><a href=""><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="" title=" {{ 'admin.corbeille'|trans}}" /></div>
+                                     {{ 'admin.corbeille'|trans}}</a>
+                            </div>
+						<div class="clr"></div>
+					</div>					<!--  FIN allBoutonsGestion -->
+					<div class="clr"></div>
+				</div>						<!--  FIN toulbar 3 -->
+			</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+			
+			
+			
+			<div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+			<div class="MarginBottomBox"></div>
+			
+				<div class="span-6">						<!-- COLONNE GAUCHE-->
+					<div class="colLeft">					<!-- COLONNE GAUCHE-->
+					
+                                        {# STATISTIQUES #}    
+                                        {{ information.stats(listestat) }} 
+                                            
+                                            
+                                        </div>			<!-- Fin COLONNE COLLEFT-->
+				</div>				<!-- Fin COLONNE GAUCHE span 6-->
+				
+				<div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">						<!-- COLONNE DROITE-->
+
+					
+					<div class="colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+							<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+
+
+								<div class="clr"></div>
+							</div>						<!-- FIN filtersArticles-->
+							
+                                                        <table class="listMenusCateg listArticlesRub">
+                                                            <tr>
+							<th><input type="checkbox" /></th>
+							<th>Nom</th>
+							<th>Action1</th>
+							<th>Action2</th>
+                                                            </tr>
+                                                               {% for module in listemodule %}
+                                                                <tr>
+                                                                     <td><input type="checkbox" /></td>
+                                                                    <td>              
+                                                                         {{module.libModule }}
+                                                                        </td>     
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_modifmodule', {'id': module.id,'locale':locale}) }}">{{ 'admin.modifier'|trans}}</a> 
+                                                                        </td>            
+
+                                                                        <td>              
+                                                                            <a href="{{ path('utb_admin_supprmodule', {'id': module.id,'locale':locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> 
+                                                                        </td>                                            
+
+                                                                        </tr>
+    {% else %}
+                                                                        <tr>
+                                                                            <td colspan="4">{{ 'modules.none'|trans({}, 'modules') }}</td>       
+                                                                        </tr>       
+    {% endfor %}
+                                                                    </table>
+							
+							
+							
+						</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+					</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+					
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+				
+			</div>				<!--  FIN SPAN - 25 -->
+                        
+      {{ information.decochetoutbox() }}                    
+                        
+  {% endblock %}

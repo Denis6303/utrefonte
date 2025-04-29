@@ -1,0 +1,134 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil 
+{% endblock %}
+  
+{% block public_body %}
+        <div class="span-24 all-lookupCategorie marginBottom20p">
+                <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listesousrub %}          
+                                        {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id)}}
+                                 {% endfor %}
+                </div>
+        </div> 	
+	<div class="span-24 marginBottom20p borderBotStyle paddingBottom10p bgBlanc">
+		<div class="listePrets leftSpace">	<!-- DEBUT COLONNE GAUCHE-->
+		<h1 class="boxSection-titre bleuLogo tWithLeftBar">{{larubrique[0].nomRubrique|raw}}</span></h1>
+                
+                        {% for article in listearticle  %}
+                            <div class="onePret">
+                                    <div class="titredescr">
+                                            <h1 id="{{'pretdetails'~article.id}}">{{article.titreArticle}}</h1>
+                                            <p class="gris-comment"> </p>
+                                    </div>
+                                    <div class="leftPosition"><a class="btmoore coinsArrondis" id="{{'pretliste_button'~article.id}}" href="#" onClick="AfficherDetails({{article.id}}); return false;" ><span>En savoir plus</span><span></span></a></div>
+                                    <div class="clr"></div>
+                            </div>
+                        {% endfor  %}
+                
+		</div>		<!-- FIN LISTE DES PRETES-->
+                
+                {% if (listearticle is not null) and (listearticle|length >0) and ( listearticle[0] is not null) %}
+                    <div class="contentPretBox">	<!-- DIV AFFICHAGE DETAIL PRET-->
+                            <div class="rightSpace">	<!-- DIV Mie en Page Marge Droite-->
+                                    <div class="contentAssur-dyn">	<!-- DIV contenu dynamique selon les ID des prêts-->
+                                            
+                                            <h1 class="boxSection-titre red-text tWithTopBar">{{listearticle[0].titreArticle}}</h1>
+                                            <div class="detailPret">
+                                                    <p>{{listearticle[0].descriptionArticle|raw}}</p>
+                                            </div>
+                                    </div>
+                            </div>
+                    </div>
+                {% endif %}
+                            
+		<div class="clr"></div>
+	</div>
+
+	<!--****************************  DONNEES NORMALEMENT DYNAMQUES, PROVENANT DE LA BD **************************** -->
+	
+	{% for article in listearticle  %}
+            <div class="{{'pretliste_container'~article.id~' '~'hide'}}">
+
+                    {{article.descriptionArticle|raw}}
+
+            </div>
+        {% endfor %}
+
+        {# ******************************************** #}        
+        
+	<div class="span-24 marginBottom20p borderBotStyle paddingBottom20p bgBlanc">
+
+		<div class="span-7">
+			<div class="serviceAssocie leftSpace">
+				<div class="serviceAssocie-cnt"> 
+					<h1 class="boxSection-titre bleuLogo tWithLeftBar">Services associés
+					<span>aux offres d'assurances</span></h1>
+					<div class="list-item1">
+						<ul>
+							<li><a href="">Conseil et assistance</a></li>
+							<li><a href="">Gestion de Projets et Management des risques</a></li>
+							<li><a href="">Prêts et Financement</a></li>
+						</ul>
+					</div>
+				</div>	
+			</div>		<!-- FIN Services Associés-->
+		</div>		<!-- fin span - 8 -->
+		<div class="span-9">
+			<div class="faqInLarg bgFaqTop">
+				<h1 class="boxSection-titre bleuLogo tWithLeftBar">Conseils de Gestionnaires
+				<span>et Réponses aux Questions Fréquemment posées</span></h1>
+				
+					<div class="allQR">	<!-- FAQ-->
+						<ul>
+                                                    {% for faq in listefaq  %}
+							<li class=""><a href="">{{faq.titreArticle}}</a></li>
+                                                    {% endfor  %}    
+							{#<li class=""><a href="">Quels sont les types de projet que soutient l'UTB ?</a></li>
+							<li class=""><a href="">Dans le contexte de la crise économique, comment conserver la stabilité des échanges interbancaires ?</a></li>#}
+						</ul>
+					</div>
+					<div class="divButmoore rightPosition">
+						<a class="btmoore coinsArrondis" href=""><span>Voir toutes les Questions/Répse</span><span></span></a>
+					</div>
+			</div> <!-- FIN FAQ-->
+		</div> <!-- FIN SPAN - 8-->		
+		<div class="span-8 last">		<!-- APPELER POUR PLUS D'INFO-->
+			<div class="rightSpace">		<!-- APPELER POUR PLUS D'INFO-->
+				<div class="boxAppelinfo coinsArrondis">
+					<div class="boxAppelinfo-head"><h1 class="boxSection-titre bleuLogo">Besoin d'infos</h1></div>
+					<div class="boxAppelinfo-cnt">
+						<h3>Pour toute information sur nos produits ou services, contactez-nous</h3>
+						<div class="center"><img src="{{asset('img/site-img/phone-number.png')}}" alt="" title="" /></div>
+						<h3>ou <a class="bleuLink" href="">par Email</a></h3>
+					</div>
+				</div>
+			</div>		<!-- FIN DIV.boxAppelinfo-->
+		</div>		<!-- FIN SPAN-7-->		
+	
+	</div>		<!-- FIN SPAN 24-->        
+        
+       {# ******************************************** #}
+        <script>
+            $(function(){
+                $(".tWithTopBar").html( $("#pretdetails"+1).html() );  
+                var html =  $(".pretliste_container").html();
+                $(".detailPret").html(html);               
+            });
+            function fermerDetails(idliste){            
+                $("#closecreditTerrain").click(function(){
+                                $(".titreCreditTerrainContainer").show();
+                                $("#creditTerrain").hide();
+                });
+            }            
+            function AfficherDetails(idliste){
+  
+                 $(".tWithTopBar").html( $("#pretdetails"+idliste).html() );                  
+                 var html =  $(".pretliste_container"+idliste).html();
+                 $(".detailPret").html(html);            
+             }                      
+        </script>
+{% endblock %}
+  

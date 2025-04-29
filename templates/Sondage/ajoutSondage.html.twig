@@ -1,0 +1,134 @@
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'sondages.ajout.grandtitrepg'|trans({}, 'sondages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+  
+   				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listesondage', {'locale': locale})}}">{{ 'admin.layout.sondage'|trans}} </a> > <a href="{{path('utb_admin_listesondage', {'locale': locale})}}">{{'sondages.ajout.titre1'|trans({}, 'sondages')}}</a> > {{'admin.ajouter'|trans()}} 
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Service" title="" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'sondages.ajout.titre1'|trans({}, 'sondages') }} <span>: {{ 'sondages.ajout.titre2'|trans({}, 'sondages') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+                              
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.valider'|trans}}" title="{{ 'admin.valider'|trans}}" /></div>
+                                  {{ 'admin.ajouter'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a class="back" href="#"><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                         {# STATISTIQUES #}    
+                                         {{ information.stats(listestat) }} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                              <div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+                                                  <div class="MarginBottomBox">
+                                                      <form action=" {{ path("utb_admin_ajoutsondage") }} " method="post" {{ form_enctype(form) }}>
+                                                           {{ form_errors(form.question) }}
+                                                                <span class="colorBleu">{{ form_label(form.question, 'sondages.form.nom'|trans({}, 'sondages')) }}</span> 
+								{{ form_widget(form.question) }}
+                                                                <div class="ecartLabel">&nbsp;</div>
+
+                                                                {#{ form_errors(form.sondageOpinions) }}
+                                                                <span class="colorBleu">{{ form_row(form.sondageOpinions) }}</span> 
+                                                                    {{ form_row(form.sondageOpinions) }}
+                                                                <div class="ecartLabel">&nbsp;</div> #}
+                                                                <ul class="sondageOpinions" data-prototype="{{ form_widget(form.sondageOpinions.vars.prototype)|e }}">
+                                                                    
+                                                                </ul>
+                                                                
+                                                               {# <a href="#" class="add_tag_link">Ajouter</a>#}
+                                                               <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none">
+                                                                                                                              
+                                                          </form>
+                                                      <div class="clr"></div>
+                                                  </div>
+
+                                              </div>
+
+
+                                          </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>			<!--  FIN  SPAN - 19 -->
+
+                          </div>				<!--  FIN SPAN - 25 -->
+  
+  <script language="javascript" >                         
+                                // Récupère le div qui contient la collection de tags
+      var collectionHolder = $('ul.sondageOpinions');
+
+      // ajoute un lien « add a tag »
+      var $addTagLink = $('<a href="#" class="add_tag_link">Ajouter</a>');
+      var $newLinkLi = $('<li></li>').append($addTagLink);
+
+      jQuery(document).ready(function() {
+          // ajoute l'ancre « ajouter un tag » et li à la balise ul
+          collectionHolder.append($newLinkLi);
+
+          $addTagLink.on('click', function(e) {
+              // empêche le lien de créer un « # » dans l'URL
+              e.preventDefault();
+
+              // ajoute un nouveau formulaire tag (voir le prochain bloc de code)
+              addOpinionForm(collectionHolder, $newLinkLi);
+          });
+      });
+      
+      function addOpinionForm(collectionHolder, $newLinkLi) {
+            // Récupère l'élément ayant l'attribut data-prototype comme expliqué plus tôt
+            var prototype = collectionHolder.attr('data-prototype');
+
+            // Remplace '__name__' dans le HTML du prototype par un nombre basé sur
+            // la longueur de la collection courante
+            var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+
+            // Affiche le formulaire dans la page dans un li, avant le lien "ajouter un tag"
+            var $newFormLi = $('<li></li>').append(newForm);
+            $newLinkLi.before($newFormLi);
+        } 
+        
+</script> 
+
+  {% endblock %}
+

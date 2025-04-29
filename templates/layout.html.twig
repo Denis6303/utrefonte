@@ -1,0 +1,34 @@
+{# src/utb/UserBundle/Resources/views/layout.html.twig #}
+{# On étend notre layout à nous #}
+{% extends "::layoutAuth.html.twig" %}
+{# Dans notre layout, il faut définir le block body #}
+{% block body %}
+
+
+  {% block administration_body %} 
+
+  {# On affiche les messages flash que définissent les controleurs du bundle #}
+  {% for key, message in app.session.flashbag.all() %}
+
+    <div class="alert alert-{{ key }}">
+      {{ message|trans({}, 'FOSUserBundle') }}
+    </div>
+  {% endfor %}
+
+  {# On définit ce block, dans lequel vont venir s'insérer les autres vues du bundle #}
+	<div class="span-25">			<!-- TOUTE LA PAGE CENTRALE : MODULES + DETAILS -->
+<!-- COLONNE GAUCHE-->
+		<div class="boxAuthentification">					<!-- COLONNE GAUCHE-->
+			<div class="coinsArrondis colorCadreArrondi bgHeaderColor authForm" style="padding:1px;">
+			<h3 class="titreImgConnex">Authentification</h3>
+				<div class="coinsArrondis bgBlanc">
+					<div class="FrmConnex">        
+					 {% block fos_user_content %}
+					 {% endblock fos_user_content %}
+					</div>
+				</div>        
+			</div>
+		</div>        
+	</div>        
+  {% endblock %}
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - 
+{% endblock %}
+  
+{% block client_centre_body %}
+                        <!-- **************************************************** CENTRE + DROITE ********************************************** -->
+        <div class="paddingBottom20p">
+                <ul class="filariane bleuLink">
+                        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+                        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li><a href="">{{'chargement.titre'|trans({},'chargement') }}</a></li>
+                        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li>{{'chargement.form.infosSurChargement'|trans({},'chargement') }}</li>
+                </ul>
+
+                  {#  <div class="marginBottom10p">
+                            <div class="printBut"> <a href="" title="Imprimer le détail des transactions">Imprimer</a></div>
+                            <form class="form-search-operation bgGrisatr1" action="{{ path("utb_client_recherche_operationadmin",{'locale':locale}) }} " method="post"  id="ajoutImage">
+                                    <div class="downloadBut">
+                                            <img src="{{ asset('img/client-img/icon-24-download.png')}}" alt="Télécharger" title="Téléchargement d'opérations" />
+                                            <span>
+                                                Télécharger au format
+                                            </span>
+                                            <select name="typefichier">
+                                                    <option value="0" >-- FORMAT --</option>
+                                                    <option value="1" >EXCEL</option>
+                                                    <option value="2" >CSV</option>
+                                                    <option value="3" >TXT</option>
+                                                    <option value="4" >PDF</option>
+                                            </select>
+                                            <input type="submit" value="ok"/>
+                                            <div class="clr"></div>
+                                    </div>
+                            </form>
+
+                            <div class="clr"></div>
+                    </div> #}   
+                
+                    
+                    
+                    <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'chargement.liste.titre'|trans({},'chargement')}}</h2>
+                    <table class="infoCompte noLeftBorder noGras">                                    
+                        <tr>
+                            <th class="w30">&nbsp; </td>
+                            <th class="w100">{{'chargement.compte'|trans({},'chargement')}}</td>
+                            <th class="w100">{{'chargement.type'|trans({},'chargement')}}</td>
+                            <th class="w60">{{'chargement.notif'|trans({},'chargement')}}</td>
+                        </tr>                  
+                        
+                        {% for cpte  in cptesinexistants %}
+                            <tr>
+                                <td class="w30"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                                <td class="w100">{{cpte.compte}}</td>
+                                <td class="w100">{{cpte.libTypeCompte}}</td>
+                                <td class="w60">{{cpte.dateNotification|date("d/m/Y")}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    
+                    <div class="page center">
+
+                    {% if last_page > 1 %}
+                        <div class="paginationTry">
+
+                              <a href="{{ path('utb_client_Statload', { 'page': 1,'idfile':idfile,'locale':locale }) }}"> <span> << </span> </a> 
+                              <a href="{{ path('utb_client_Statload', { 'page': previous_page,'idfile':idfile,'locale':locale }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                              {% for page in 1..last_page %}
+                                    {% if page == current_page %}
+                                    <span class="pagination_active">{{ page }}</span>
+                                    {% else %}
+                                    <span><a href="{{ path('utb_client_Statload', { 'page': page, 'idfile':idfile, 'locale':locale }) }}">{{ page }}</a></span>
+                                    {% endif %}
+                              {% endfor %}
+                              <a href="{{ path('utb_client_Statload', { 'page': next_page,'idfile':idfile,'locale':locale }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                              <a href="{{ path('utb_client_Statload', { 'page': last_page,'idfile':idfile,'locale':locale }) }}"> <span> >> </span></a>
+
+                          </div>
+                     {% endif %}
+                      <br/>    
+                    <div class="pagination_desc">
+                       <center>
+                           <strong>{{ total }}</strong> {{'chargement.existe'|trans({},'chargement')}}
+                           {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                       </center>
+                    </div>
+
+                    </div>
+                    
+                    <br/><br/>
+                    
+                    <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'fichier.titre'|trans({},'chargement')}}</h2>
+                    <table>                                    
+                        <tr>
+                            <th class="w30">&nbsp; </td>
+                            <th class="w100">{{'fichier.dateOp'|trans({},'chargement')}}</td>     
+                            <th class="w100">{{'fichier.type'|trans({},'chargement')}}</td>
+                            <th class="w100">{{'fichier.nbFichier'|trans({},'chargement')}}</td>
+                            <th class="w100">{{'fichier.nbTraite'|trans({},'chargement')}}</td>  
+                            <th class="w100">{{'fichier.Prct'|trans({},'chargement')}}</td>    
+                            <th class="w100">{{'fichier.nbOp'|trans({},'chargement')}}</td>    
+                            <th class="w60"> {{'fichier.nbTrait'|trans({},'chargement')}}</td>
+                            <th class="w100">{{'fichier.op'|trans({},'chargement')}}</td>     
+                        </tr>                  
+                        
+                        {% for stat  in chargementsStat %}
+                            <tr>
+                                <td class="w30"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                                <td class="w60">{{stat.datestat|date('d/M/Y H:m:s')}}</td>
+                                <td class="w100">   
+                                    {% if stat.typeCompte == 1 %}
+                                        <div class="center"> AFBW </div> 
+                                    {% elseif stat.typeCompte == 2 %}     
+                                        <div class="center"> AFBW2 </div> 
+                                    {% elseif stat.typeCompte == 3 %}      
+                                        <div class="center"> UWEB </div>
+                                    {% endif %}    
+                                </td>
+                                <td class="w100">{{stat.prcentImport}}</td>
+                                <td class="w100">{{(stat.prcentImport - stat.nbreCpteInexistant)}}</td>
+                                <td class="w100">
+                                    {% if stat.prcentImport!= null and stat.prcentImport > 0 %}
+                                        {{100*((stat.prcentImport - stat.nbreCpteInexistant)/(stat.prcentImport))|number_format(2, '', ' ')}}
+                                    {% else %}
+                                        0
+                                    {% endif %}    
+                                </td>        
+                                <td class="w100">{{stat.nbreTotalLigne}}</td>
+                                <td class="w100">{{stat.nbreImportLigne}}</td>
+                                <td class="w100">
+                                    {% if stat.nbreTotalLigne!= null and stat.nbreTotalLigne > 0 %}
+                                        {{100*(stat.nbreImportLigne/stat.nbreTotalLigne)|number_format(2, '', ' ')}}
+                                    {% else %}
+                                        0
+                                    {% endif %}    
+                                </td>        
+                            </tr>
+                        {% else %}    
+                            <div class="center" style="border: 1px solid red;font-weight: bold;"> Aucune statistique de traitement </div>
+                        {% endfor %}
+                    </table> 
+                    
+        </div>
+                        
+{% endblock %}

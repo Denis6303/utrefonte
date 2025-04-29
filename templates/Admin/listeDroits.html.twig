@@ -1,0 +1,37 @@
+{# Debut du bloc pour afficher les actions pr chaque profil :-)#}  
+<form method="POST" id="listDroitForm">
+    <input type="hidden" name="idProfil" value="{{thisProfil.getId()}}" />
+<h2>{{thisProfil.getLibProfil()}}</h2>
+                {% for key, data in listeActions %}
+                <div style="font-weight:normal;margin-bottom:10px; float:left; margin:2px;">
+                    {% set tab = key|split('|') %}
+                    <input type="checkbox" class="checkall" name="checkall_{{tab.0}}" value="{{tab.0}}" {% if tab.1==1 %} checked="checked" {% endif %} > {{tab.2}} <br/> 
+                    {% for value in data %}
+                           {% set atab = value.idAction|split('|') %}
+                          <div style="margin-left:10px;" ><input name="action_module{{tab.0}}[]" type="checkbox"  value="{{atab.0}}" {% if atab.1==1 %} checked="checked" {% endif %} {% if tab.1==0 %} disabled="disabled" {% endif %} >{{value.DescriptionAction}}</div> 
+                    {% endfor %}
+                </div>  
+                {% endfor %}
+              <div class="clear"><br/></div>  
+              <div id="wait" style="float:left;margin-right: 15px;"></div><input  value="Sauvegarder" id="submit" style="text-align:center; cursor:pointer">
+              <div class="clear"></div>
+</form>              
+{# Fin du bloc pour afficher les actions pr chaque profil :-)#}
+              <script>
+                    $(".checkall").click(function(){
+                            $(this).closest("div").find("input[type=checkbox]").prop("checked", this.checked);
+                            if( !$(this).is(':checked') ){
+                                $(this).closest("div").find("input[type=checkbox]").attr("disabled","disabled");
+                                $(this).removeAttr('disabled');
+                            }
+                            else{
+                                $(this).closest("div").find("input[type=checkbox]").removeAttr('disabled');
+                            }
+                    });
+                    $("#submit").click(function(){
+                      	var html = "";
+                        html += "<div ><img src='{{ asset('img/wait.gif') }}' /></div>";  
+                      $("#wait").html(html);
+                      doDroitsProcess( $("#listDroitForm").serialize()  ); 
+                    });
+              </script>

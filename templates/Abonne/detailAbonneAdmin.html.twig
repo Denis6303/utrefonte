@@ -1,0 +1,315 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{'abonnes.infosabonnes.titre'|trans({},'abonnes') }}
+{% endblock %}
+
+  {% block client_centre_body %}	
+						
+    <ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li><a href="">{{'abonnes.gestion.titre'|trans({},'abonnes') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'abonnes.gestion.fiche'|trans({},'abonnes') }}</li>
+    </ul>
+  
+    {% for contenu in app.session.flashbag.get('notice') %}
+            {% if contenu == "success" %}
+
+            {% endif %}
+            {% if contenu == "compteerror" %}
+                    <div class="error rightSpace leftSpace center">                        
+                                    {{ 'compte.compteerror'|trans({}, 'compte') }}
+                    </div>  
+            {% endif %}
+
+            {% if contenu == "modifpwdsuccess" %}
+
+            <div class="success rightSpace leftSpace center">                        
+                    {{'abonnes.modifpwdsuccess'|trans({},'abonnes') }}
+            </div>    
+
+            {% endif %} 
+
+            {% if contenu == "genepwdsuccess" %}
+
+            <div class="success rightSpace leftSpace center">                        
+                    {{'abonnes.genepwdsuccess'|trans({},'abonnes') }}
+            </div>    
+
+            {% endif %} 
+
+            {% if contenu == "modifinfosuccess" %}
+
+            <div class="success rightSpace leftSpace center">                        
+                    {{'abonnes.modifinfosuccess'|trans({},'abonnes') }}
+            </div>    
+
+            {% endif %} 
+
+            {% if contenu == "errancienpwd" %}
+
+            <div class="error rightSpace leftSpace center">                        
+                    {{'abonnes.errancienpwd'|trans({},'abonnes') }}
+            </div>    
+
+            {% endif %}
+
+            {% if contenu == "emailformaterror" %}
+
+                <div class="error rightSpace leftSpace center">                        
+                    {{'abonnes.errorEmail'|trans({},'abonnes') }}
+                </div>    
+
+            {% endif %} 
+
+            {% if contenu == "passworderror" %}
+            <div class="error rightSpace leftSpace center">                        
+                    {{'abonnes.errorPwd'|trans({},'abonnes') }}
+            </div>    
+            {% endif %}
+
+            {% if contenu == "smallpassworderror" %}
+               <div class="error rightSpace leftSpace center">                        
+                       {{ 'abonnes.smallpassworderror'|trans({}, 'abonnes') }}
+               </div>    
+            {% endif %}
+
+    {% endfor %}
+  
+   <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'abonnes.gestion.detail'|trans({},'abonnes') }}</h2>
+   
+  {% for abonne in unAbonne %}
+    
+    
+    <div class="marginBottom20p">
+            <div>
+                    <h3 class="oneCompte titleStyleTB title3 bleuLink "><a href="#">{{'abonnes.gestion.generale'|trans({},'abonnes') }}</a></h3>
+                    <!-- <div class="printBut"> <a href="" title="Imprimer le détail des transactions">Imprimer</a></div> -->
+                    <div class="clr"></div>
+            </div>
+            <table class="infoCompte">
+                <tr><td style="width:310px">{{'abonnes.form.nomPrenom'|trans({}, 'abonnes')}}</td> <td>{{abonne.nomPrenom}}</td></tr>
+            
+                <tr><td>{{ 'abonnes.form.email'|trans({}, 'abonnes')}}</td> <td>{{abonne.email}}</td></tr>
+                <tr><td>{{ 'abonnes.form.tel'|trans({}, 'abonnes')}}</td> <td>{% if abonne.telAbonne !="" %}{{abonne.telAbonne}}{%else%}-{% endif %}</td></tr>
+                <tr><td>{{ 'abonnes.form.cel'|trans({}, 'abonnes')}}</td> <td>{% if abonne.celAbonne !="" %}{{abonne.celAbonne}}{%else%}-{% endif %}</td></tr>
+                <tr><td>{{ 'abonnes.form.adresse'|trans({}, 'abonnes')}}</td> <td>{% if abonne.adresseAbonne !="" %}{{abonne.adresseAbonne}}{%else%}-{% endif %}</td></tr>
+            </table>
+            {#%if abonneid == abonne.id %#}
+            {#% endif %#}
+            {% if( 'modifSuivantTypeInfosAction'|validAcess)%}
+                    <a href="#" class="boutonLink" onClick="modifierFicheAbonne(); scrolltoEl(); return false;">{{'admin.modifier'|trans({}, 'messages')}}</a>
+            {% endif%}
+            <div class="clr"></div>
+      </div>
+
+
+        <div class="marginBottom20p">
+            <h3 class="operCompte titleStyleTB title3 bleuLink shortTitle"><a href="#">{{ 'abonnes.form.password'|trans({}, 'abonnes')}}</a></h3>
+            <div class="clr"></div>
+            
+            <table class="infoCompte">
+                <tr>
+                    <td style="width:310px">{{ 'abonnes.form.username'|trans({}, 'abonnes')}}</td> 
+                    <td>{{abonne.username}}</td>
+                </tr>
+                <tr>
+                    <td>
+                      {% if abonne.genPsswd|trim == ""%}
+                        {{ 'abonnes.form.password'|trans({}, 'abonnes')}}
+                      {% else %}
+                        {{ 'abonnes.form.newPass'|trans({}, 'abonnes')}}
+                      {% endif %}                        
+                        
+                    </td>
+                    <td>
+                      {% if abonne.genPsswd|trim == "" or passGene != abonne.password%}
+                        ********
+                      {% else %}
+                         <b class="newPass"> {{abonne.genPsswd}} </b>
+                      {% endif %}
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="">
+                {% if('genererMotPasseAdminAction'|validAcess) %}
+                <a href="{{ path("utb_client_change_eclate",{'locale':locale,'id':abonne.id,'type':3}) }}" class="boutonLink" onClick="return(confirm('{{'abonnes.confirmation.confirmegenererpwd'|trans({},'abonnes') }}'))">
+                        {{'admin.genererpwd'|trans({}, 'messages')}}
+                    </a> 
+                {% endif %}
+               {% if( 'modifSuivantTypePwdAction'|validAcess)%}               
+                <a href="#" class="boutonLink" onClick="modifierPwd(); scrolltoE2(); return false;">
+                    {{'admin.modifier'|trans({}, 'messages')}}
+                </a>
+               {% endif %}
+                <div class="clr"></div>
+            </div>
+        </div>
+
+                      
+        <div class="marginBottom20p">
+            <h3 class="oneCompte titleStyleTB title3 bleuLink "><a href="#">{{ 'abonnes.form.numCompte'|trans({}, 'abonnes')}}</a></h3>
+            <div class="clr"></div>
+            <table class="withTDborder bgHomeVertTable">
+                {% if subab.getProfil().getId() != profilSubAb %} 
+                <tr>
+                    <th>&nbsp; </th>
+                    <th>{{ 'abonnes.form.compte'|trans({}, 'abonnes')}}</th>
+                    <th>{{ 'gestionnaire.nom'|trans({}, 'abonnes')}}</th>
+                    <th>{{'fond.nom'|trans({},'fond')}}</th>
+                    {#<th>{{ 'abonnes.form.detail'|trans({}, 'abonnes')}}</th>#}
+                    
+                        <th class="center">{{'admin.supprimer'|trans({}, 'messages')}} </th>
+                    
+                </tr>
+                
+                    {% for uncompte in listeCompte %}
+                               <tr>
+                                   <td class="w30"> <img src="{{ asset('img/client-img/puce-pencil-vert.png')}}" alt="" title="" /></td>
+                                   <td class="w250"> {{ uncompte.numeroCompte }} {#- {{ uncompte.facturation }} #} </td>
+                                   {#
+                                       <td>
+                                         {%if uncompte.facturation != 1 %} 
+                                                    <a href="{{ path('utb_client_definir_compte_facturation',{'idcompte':uncompte.numeroCompte,'idabonne':abonne.id,'locale':locale})}}" onClick="return(confirm('Êtes-vous sûr de définir ce compte comme compte de facturation ?'));">Déf Compte facturation</a>
+                                         {% else %} Compte de facturation{% endif %}   
+                                       </td>
+                                       #}
+                                       <td><a href="{{path('utb_client_detail_utilisateur',{'locale':locale,'id':listeCompteGest[uncompte.numeroCompte][0].id,'cas':1})}}">{{listeCompteGest[uncompte.numeroCompte][0].nomPrenom}}</a> </td>
+                                       <td><a href="{{path('utb_client_detailfonds',{'locale':locale,'fonds':listeCompteGest[uncompte.numeroCompte][1].id})}}"> {{listeCompteGest[uncompte.numeroCompte][1].libFonds}} </a> </td>
+
+                                       {#<td><a href="{{ path('utb_client_detail_compte',{'locale':locale,'idCompte':uncompte.numeroCompte,'idAbonne':abonne.id})}}">
+                                               <img src="{{ asset('img/client-img/icon-16-mescomptes.png')}}" alt="" title="" />
+                                        </a> 
+                                          --
+                                       </td> #}            
+                                       <td class="center"> <a href="{{ path('utb_client_suppr_compte',{'locale':locale,'idCompte':uncompte.numeroCompte,'idAbonne':abonne.id})}}" onClick="return(confirm('{{'abonnes.confirmation.confirmesuppression1'|trans({},'abonnes') }}'));">
+                                               <img src="{{ asset('img/client-img/icon-16-cancel.png')}}" alt="" title="" />
+                                           </a> </td>
+                                </tr>  
+                    {% endfor %} 
+                {%else%}     
+                                <div class="center operCompte titleStyleTB title3 bleuLink shortTitle" > 
+                                    {{'abonnes.subfil'|trans({},'abonnes')}} 
+                                    {% if subab.getIdAbonneParent() != null and subab.getIdAbonneParent().getNomPrenom() != null %}
+                                        {{ subab.getIdAbonneParent().getNomPrenom() }}
+                                    {% endif %}
+                                    </br>
+                                    {{  subab.getCompteParents()  }}
+                                </div>
+                {%endif%} 
+            </table>
+
+            {% if subab.getProfil().getId() != profilSubAb %}              
+            <div>
+                <a class="boutonLink" href="{{ path('utb_client_ajout_compte',{'locale':locale,'idabonne':abonne.id})}}" >{{'client.ajouter'|trans({},'messages') }}</a>
+                <div class="clr"></div>
+            </div>
+            {% else %}
+                <div class="clr"></div>
+            {% endif %}
+        </div>
+      
+    
+        <div class="marginBottom20p">
+            <h3 class="operCompte titleStyleTB title3 bleuLink shortTitle"><a href="#">{{ 'utilisateur.gestion.connexion'|trans({}, 'utilisateurs')}}</a></h3>
+            <div class="clr"></div>
+             <table class="withTDborder bgHomeGrisTable">
+                <tr>
+                        <th>&nbsp; </th>
+                        <th>{{'client.tb.deb'|trans({},'messages') }}</th>
+                        <th>{{'client.tb.fin'|trans({},'messages') }}</th>
+                        <th>{{'client.tb.duree'|trans({},'messages') }}</th>
+                </tr>  
+                
+            {% if (listeHisto is defined) and (listeHisto|length >0) %}
+                {% for histo in listeHisto %}                   
+                    <tr>
+                        <td style="width:30px;"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                        <td style="width:300px;">{{histo.dateDeb|date('d/M/Y H:i:s')}}</td>
+                        <td style="width:250px;">{{histo.dateFin|date('d/M/Y H:i:s')}}</td>
+                        <td style="width:150px;">{{histo.duree}}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            
+            </table>
+        </div>
+            
+         {% if( 'modifSuivantTypeInfosAction'|validAcess)%}
+		<div class="frmInside bgGrisatr1" id="modifFicheAbonne_container" style="display:none;">
+			{{ render(controller('utbClientBundle:Abonne:modifSuivantTypeUtil', {'id': abonne.id,'locale':locale,'type':2})) }}  
+			<a href="#" class="annulerBut" onClick="AnnulerFicheAbonne(); return false;">{{'admin.annuler'|trans}}</a>
+			<div class="clr"></div>
+		</div> 
+         {% endif %}
+         
+         {% if( 'modifSuivantTypePwdAction'|validAcess)%}
+		<div class="frmInside bgGrisatr1" id="modifPwd_container" style="display:none;">
+			{{ render(controller('utbClientBundle:Abonne:modifSuivantTypeUtil', {'id': abonne.id,'locale':locale,'type':1})) }}  
+			<a href="#" class="annulerBut" onClick="AnnulerPwd(); return false;">{{'admin.annuler'|trans}}</a>
+			<div class="clr"></div>
+		</div>
+        {% endif %}
+
+{% endfor %}
+        <script language="javascript" >
+                function modifierFicheAbonne() {
+
+                    $("#modifPhoto_container").hide();
+                    $("#modifFicheAbonne_container").show();
+                    $("#modifPwd_container").hide();
+
+                    var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+                    $(".updateImgInArt").html(html);
+
+                    /* var html = '<a class="updateLink" href="#" onClick="AnnulerFicheAbonne( ); return false;">Annuler Modification</a>';
+                     $(".updateImgInArt").html(html);*/
+                }
+
+                function AnnulerFicheAbonne() {
+
+                    $("#modifFicheAbonne_container").hide();
+                    /*var html = '<a class="updateLink" href="#" onClick="modifierFicheAbonne( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+                     $(".updateImgInArt").html(html);*/
+
+                }
+
+                function modifierPwd() {
+
+                    $("#modifPwd_container").show();
+                    $("#modifPhoto_container").hide();
+                    $("#modifFicheAbonne_container").hide();
+
+                    var html = '<a class="updateLink" href="#" onClick="modifierPhoto( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+                    $(".updateImgInArt").html(html);
+                    /* var html = '<a class="updateLink" href="#" onClick="AnnulerPwd( ); return false;">Annuler Modification</a>';
+                     $(".updateImgInArt").html(html);*/
+                }
+
+                function AnnulerPwd() {
+
+                    $("#modifPwd_container").hide();
+                    /* var html = '<a class="updateLink" href="#" onClick="modifierPwd( ); return false;">{{ 'admin.modifimgul'|trans({}, 'messages') }}</a>';
+                     $(".updateImgInArt").html(html);*/
+
+                }
+                function scrolltoEl(){
+                    $('html, body').animate({
+                                scrollTop: $("#modifFicheAbonne_container").offset().top}, 2000);
+                }
+                function scrolltoE2(){
+                    $('html, body').animate({
+                                scrollTop: $("#modifPwd_container").offset().top}, 2000);
+                }
+
+                $(document).ready(function() {
+                    $(".ilustrArticleImg").mouseover(function() {
+                        $(".butGestImgIlustr").show()
+                    });
+                });
+        </script>
+{% endblock %}
+

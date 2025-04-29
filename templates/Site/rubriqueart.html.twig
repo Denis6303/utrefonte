@@ -1,0 +1,192 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}  
+{% block public_body %}
+    {% set idrubrique = app.request.get('idparentrub') %}
+    {% if listecateg|length <= 5 %}
+          <div class="span-24 all-lookupCategorie marginBottom10p">
+                  <div class="leftSpace blocArPart">
+                                  {% for sousrubrique in listecateg %}
+                                          {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id,locale)}}
+                                          {% else %}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}                        
+                                          {% endif %}
+                                   {% endfor %}                        
+                  </div>
+          </div> 
+    {% endif %} 		
+        {#% for unarticle in listearticlefirst  %}                         
+                          <div class="span-24 borderBotStyle bgBlanc paddingBottom20p marginBottom10p">
+
+                                <div class="leftSpace rightSpace">                                       
+                                     <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                     <h1 class="boxSection-titre title-WithLeftBar bleuLogo">
+                                                                             {#<a class="" href="{{path('utb_site_article',{'id': unarticle.id,'locale':locale})}}">
+                                                                             {{unarticle.titreArticle}}
+                                                                             {#</a></h1>
+                                     <div class="typesCartesBq inlineList listItem1 textContent">                                                   
+                                             {# <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px; float:left;"/> #}									   
+                                                {#% if unarticle.introTexteArticle|trim|length > 0 %}
+                                                   {{unarticle.introTexteArticle|raw}}
+                                                {% else % {% endif %}   
+                                                   {{unarticle.descriptionArticle|raw}}
+                                     </div>	<!-- FIN typesCartesBq listItem1-->
+                             </div>
+                         </div> 
+       {% endfor %#}       
+  {% if listecategorie|length > 0  %} 
+       {% for categorie in listecategorie %} 
+             {% if articlecategorie[categorie.id]|length > 0 %}
+              <div class="span-24 borderBotStyle bgBlanc marginBottom10p">                    
+                                <div class="leftSpace rightSpace"> 
+					<h1 class="boxSection-titre title-WithLeftBar bleuLogo">{{categorie.nomRubrique}}</a></h1>  
+				</div>
+              {% for article in articlecategorie[categorie.id]  %}                                                          
+                         {%  if loop.index == 1 %} 
+                                <div class="span-24">
+					
+                                      <div class="leftSpace rightSpace">                                       
+                                           <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                           <h2 class="title2"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}} </a></h2>
+                                           <div class="typesCartesBq inlineList listItem1 textContent">                                                   
+											  {# <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px; float:left;"/> #}										   
+                                                {% if article.introTexteArticle|trim|length > 0 %}
+                                                   {{article.introTexteArticle|raw}}
+                                                {% else %}  
+                                                   {{article.descriptionArticle|raw}}
+                                                {% endif %}                                                     
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>
+                               </div> 
+                        {% else%}                                                                                                                      
+                              <div class="span-12 {% if loop.index % 2 %} last {% endif %}  ">  
+                                <div class="leftSpace paddingTopBot20p bgSeparate" style="padding-right:20px;">                                       
+                                           <h2 class="listItem3 title1"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq listItem1">
+                                                   
+                                                      {% if article.urlMedia != ""%}
+                                                            <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="Image Illustrative" style="margin-top:25px; float:left;"/> 
+                                                      {% endif %}
+                                                   
+                                                       {% if article.introTexteArticle|trim|length > 0 %}
+                                                            {{article.introTexteArticle|raw}}
+                                                       {% else %}     
+                                                            {{article.descriptionArticle|raw}}
+                                                       {% endif %}    
+                                                   
+                                                   <div class="clr"></div>
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>                             
+                            </div> 
+                    {% endif %}    
+                    {% endfor %}
+                                  
+                  </div> 
+                 {% endif %}
+	{% else %}
+
+	{% endfor %} 
+{% else %}	
+  
+       {% for categorie in listesousrub %} 
+           {% if articlesousrubrique[categorie.id]|length > 0 %}   
+                <div class="span-24 borderBotStyle bgBlanc marginBottom10p">
+                <div class="leftSpace rightSpace"> 
+		    <h1 class="boxSection-titre title-WithLeftBar bleuLogo">{{categorie.nomRubrique}}</a></h1>  
+		</div>       
+              {% for article in articlesousrubrique[categorie.id]  %}                                                          
+                         {%  if loop.index == 1 %} 
+                                <div class="span-24 paddingBottom20p">
+					
+                                      <div class="leftSpace rightSpace">                                       
+                                           <!-- <h1 class="boxSection-titre listItem3 bleuLogo">Cartes VISA Gold</h1> -->
+                                           <h2 class="title2"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq inlineList listItem1 textContent">                                                   
+						{# <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" style="margin-top:25px; float:left;"/> #}										   
+                                                {% if article.introTexteArticle|trim|length > 0 %}
+                                                   {{article.introTexteArticle|raw}}
+                                                {% else %}  
+                                                   {{article.descriptionArticle|raw}}
+                                                {% endif %}   
+                                                  
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>
+                               </div> 
+                        {% else%}                                                                                                                      
+                              <div class="span-12 {% if loop.index % 2 %} last {% endif %}  ">  
+                                <div class="leftSpace paddingTopBot20p bgSeparate" style="padding-right:20px;">                                       
+                                           <h2 class="listItem3 title1"><a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}">{{article.titreArticle}}</a></h2>
+                                           <div class="typesCartesBq listItem1">
+                                                   <div class="boxilustrC">
+                                                       {% if article.urlMedia !=""%}
+                                                            <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="Image Illustrative" style="margin-top:25px; float:left;"/> 
+                                                       {% endif %}    
+                                                   </div>
+                                                   <div class="boxdescrptC">
+                                                        {% if article.introTexteArticle|trim|length > 0 %}
+                                                           {{article.introTexteArticle|raw}}
+                                                        {% else %}   
+                                                           {{article.descriptionArticle|raw}}
+                                                        {% endif %}
+                                                   </div>
+                                                   <div class="clr"></div>
+                                           </div>	<!-- FIN typesCartesBq listItem1-->
+                                   </div>                             
+                            </div> 
+                    {% endif %}    
+                    {% endfor %}
+                                  
+                  </div>  
+           {% endif %}
+	{% else %}
+
+	{% endfor %} 
+  
+{% endif %}
+<!-- Bloc de pub compte en ligne -->
+    <div class="span-24 borderBotStyle marginBottom10p paddingBottom20p bgBlanc">		<!-- borderBotStyle bgBlanc -->
+        <!-- <h1 class="paddingTopBot20p paddingBottom20p bleuLogo center">Nos Produits et Services offerts aux Particuliers</h1> -->
+        <div class="boxEinfo leftSpace rightSpace">
+            <h1 class="boxSection-titre red-text">{{ 'ligne.votre'|trans({}, 'site') }} </h1>
+            <div class="">
+                <div class="einfoIlustr"> <img src="{{asset('img/site-img/icon-acces-distant.jpg')}}" alt="" title=""/></div>
+                <div class="einfoDescr listItem4">
+                    <ul>
+                        <li>{{ 'ligne.depuis'|trans({}, 'site') }}</li>
+                        <li>{{ 'ligne.profitez'|trans({}, 'site') }}</li>
+                        <li>
+                            <p>{{ 'ligne.gerez'|trans({}, 'site') }}</p>
+                            
+                            <div class="clr"></div>
+                        </li>
+                        <li>{{ 'ligne.effectuez'|trans({}, 'site') }}</li>
+                    </ul>
+
+                </div>
+                <div class="clr"></div>
+            </div>			
+            <div class="cnxion-inscription">
+                <div class="cnxion-inscrip-cnt">
+                    <div class="cnxion-inscrip-cntL">
+                        <a class="bleuLink" href="">{{ 'ligne.deja'|trans({}, 'site') }}</a>
+                        <a class="accesCpt coinsArrondis" href="{{path('utb_client_accueil',{'locale':locale})}}">{{ 'ligne.acces'|trans({}, 'site') }}</a>
+                    </div>
+                    <span class="clr"></span>
+                </div>
+                <div class="cnxion-inscrip-cnt">
+                    <div class="cnxion-inscrip-cntR">
+                        <a class="bleuLink" href="">{{ 'ligne.pas'|trans({}, 'site') }}</a>
+                        <a class="inscriptionCpt coinsArrondis" href="{{path('utb_site_souscription',{'locale':locale})}}">{{ 'ligne.souscri'|trans({}, 'site') }}</a>
+                    </div>
+                    <span class="clr"></span>
+                </div>
+                <span class="clr"></span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+  
+

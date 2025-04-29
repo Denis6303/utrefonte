@@ -1,0 +1,377 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'messageries.liste.grandtitrepg'|trans({}, 'messageries') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion message > Modifier -->
+    <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listemessage', {'locale': locale})}}">{{ 'messageries.liste.grandtitrepg'|trans({}, 'messageries') }}</a> > {{ 'messageries.liste.titrepg'|trans({}, 'messageries') }}
+</div>
+
+            {% for contenu in app.session.flashbag.get('notice') %}                        
+                {% if contenu == "supprdossierimp" %}
+                                <div class="span-25">
+                                     <div class="error errorMsg">
+                                            {{ 'services.dossiers.supprimp'|trans({}, 'services') }}
+                                     </div>
+                                </div> 
+                {% elseif contenu == "supprdossiersuc" %}
+                                <div class="span-25">
+                                     <div class="success successMsg">
+                                            {{ 'services.dossiers.supprsuccess'|trans({}, 'services') }}
+                                     </div>
+                                </div> 
+                {% endif%}
+
+            {% endfor %}
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-19">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-new-privatemessage.png')}}" alt="" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'messageries.liste.titrepg'|trans({}, 'messageries') }}                        
+                        {% for unnbremsg in nbreMsgNonLu %}
+                            {% if unnbremsg.msgLu ==0 %} {%else %}({{unnbremsg.msgLu}}){%endif %}                                                             
+                        {% endfor %} 
+                            
+                            </h1></div>
+
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-5 last">
+
+                            <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+                          {#  <div class="boutonGestion">
+                                <div><a href="{{path('utb_admin_ajoutmessagerie')}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="Ajouter" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></div>
+                            {{ 'admin.modifier'|trans}}</a>
+                            </div>
+
+                            <div class="ecartBoutons">&nbsp;</div>#}
+{#
+                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="{{ 'admin.activer'|trans}}" /></div>
+                            {{ 'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="{{ 'admin.desactiver'|trans}}" /></div>
+                            {{ 'admin.desactiver'|trans}}</a>
+                            </div>
+
+
+                            <div class="ecartBoutons">&nbsp;</div>
+#}
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="corbeilleAll(getMessagesID(),1); return false;"><img src="{{ asset('img/admin-img/corbeille.png')}}" alt="{{ 'admin.supprimer'|trans({}, 'messages') }}" title=" {{ 'admin.corbeille'|trans}}" /></div>
+                             {{ 'admin.corbeille'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">
+                                   <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						<h3 class="colorBleu titreInfos"> INFORMATIONS  </h3>
+				        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox autreInfoLinks">
+                                                            
+                                                               <a href="{{path('utb_admin_listemessage',{'locale':locale})}}">{{ 'messageries.liste.titrepg'|trans({}, 'messageries') }} 
+
+                                                                            
+                                                                    {% for unnbremsg in nbreMsgNonLu %}
+                                                                        {% for msg in nbreMsg %}
+                                                                             ({% if unnbremsg.msgLu ==0 %}{{msg.msg}}{%else %}<b>{{unnbremsg.msgLu}}</b>/{{msg.msg}}{%endif %})
+                                                                             
+                                                                        {% endfor %} 
+                                                                    {% endfor %} 
+                                                               </a> 
+                                                            
+                                                                <a href="{{path('utb_admin_listecorbeillemessage',{'locale':locale})}}">
+                                                                        {{ 'admin.corbeille'|trans}}
+                                                                        {% for unnbremsg in nbreMsgCorb %}                                             
+                                                                                 {% if unnbremsg.msgLu == 0 %}{%else %}({{unnbremsg.msgLu}}){%endif %}                                            
+                                                                        {% endfor %}                                                                         
+                                                                </a>
+                                                               <a href="{{path('utb_admin_listemessageenvoye',{'locale':locale})}}">
+                                                                   {{ 'admin.messageenvoye'|trans}}
+                                                                        {% for unnbremsgenv in nbreMsgEnv %}                                             
+                                                                                 {% if unnbremsgenv.msg == 0 %}{%else %}({{unnbremsgenv.msg}}){%endif %}                                            
+                                                                        {% endfor %}                                                                                
+                                                                                
+                                                               </a> 
+                                                     
+                                                            </div>
+						</div>
+					 </div>                                    
+                                    
+                                    <!-- COLONNE GAUCHE-->
+                                    
+                                    
+                                   <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						<h3 class="colorBleu titreInfos"> {{ 'services.dossiers.titre'|trans({}, 'services') }}  </h3>
+				        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox autreInfoLinks">                                                                                                   
+                                                                 <a class="updateLink" href="#" onClick="modifierDossier( ); return false;">{{ 'services.dossiers.ajout'|trans({}, 'services') }}</a>                                                               
+                                                                 {% for unservice in listeservice %}
+                                                                        <a class="ptiLigneInfo" href="{{ path('utb_admin_listemessage', {'idservice': unservice.id,'locale':locale}) }}" onMouseover="affichersupprimer({{unservice.id}})" >{{unservice.libService}} </a> 
+                                                                        <a  href="{{ path('utb_admin_supprservice', {'id': unservice.id,'locale':locale,'type':1}) }}" onClick="return(confirm('{{ 'messageries.suppression.message'|trans({}, 'messageries') }}'))"><img src="{{ asset('img/admin-img/icon-16-delete.png')}}" alt="{{ 'admin.supprimer'|trans({}, 'messages') }}" title="{{ 'admin.supprimer'|trans({}, 'messages') }}" style="display:none" id="{{"btsupprimer"~unservice.id}}"/> </a> 
+                                                                        <div class="clr"></div>
+                                                                {% endfor %}
+                                                                        <div class="clr"></div>
+                                                        </div>
+						</div>
+				 </div> 
+                                    
+
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">
+                                            
+                                            <!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						{#	<div class="filtersMessages">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>{{ 'messageries.liste.statut'|trans({}, 'messageries') }} </option>
+									<option>{{ 'messageries.liste.actif'|trans({}, 'messageries') }}</option>
+									<option>{{ 'messageries.liste.inactif'|trans({}, 'messageries') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'messageries.liste.statut'|trans({}, 'messageries') }}</option>
+									<option>Administrateur</option>{#options messageries issus dune bd 
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>		#}
+                                            <!-- FIN filtersMessages-->
+                                                
+                                                        <div class="FrmAjoutArt FrmTopDetailArt FrmUserIn" id="modifDossier_container"  style="display:none;">
+                                                            <div class="FrmUserIn2">
+                                                                {{render(controller('utbAdminBundle:Service:ajoutService', {'locale':locale,'type':1}))}}  
+                                                                <div class="clr"></div>
+                                                            </div>
+                                                            <div class="noEffectBack"><a href="#" class="" onClick="AnnulerDossier(); return false;">{{'admin.annuler'|trans}}</a></div>
+                                                            <div class="clr"></div>
+                                                        </div>                                                         
+
+                                                <table class="listMenusCateg listMessagesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall" /></th>
+                                                        <th>{{ 'messageries.liste.grandtitrepg1'|trans({}, 'messageries') }}</th>
+                                                        <th>{{ 'messageries.internaute'|trans({}, 'messageries') }}</th>
+                                                        <th colspan="2"></th>
+                                                    </tr>	
+                                                               {% for unmessage in listemessage %}                                                            
+
+                                                           
+                                                    <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgBlanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="message[]" value="{{unmessage.id}}" rel="message_c"/></td>
+                                                           <td>       
+                                                            
+                                                              {% if unmessage.messageLu == 0 %}
+                                                                    <b> <a href="{{ path('utb_admin_detailmessage',{'id':unmessage.id,'locale':locale})}}">{{unmessage.titreMessage}}</a></b>
+                                                             {% elseif unmessage.messageLu == 1 %}
+                                                                     <a href="{{ path('utb_admin_detailmessage',{'id':unmessage.id,'locale':locale})}}">{{unmessage.titreMessage}} </a>                                                                            
+                                                             {% endif %}
+                                                                             
+                                                            </td>
+                                                            <td>   
+                                                                
+                                                                     {{unmessage.mailInternaute}}
+                                                                
+                                                                       <div id="{{"formDeplacer_container"~unmessage.id}}" style="display:none;">
+                                                                            <form action=" {{ path("utb_admin_deplacerdossier",{'locale': locale}) }} " method="post"   style="margin-top:15px;">
+                                                                                        <a href="#" class="" onClick="annulerChangerDossier({{unmessage.id}}); return false;">
+                                                                                            Annuler
+                                                                                        </a><br/>
+                                                                                      <span class="colorBleu"><label>{{ "Service "}}<label></span>
+
+                                                                                      <select id="idservice" class="idservice" required="required" name="idservice">                    
+                                                                                         {% for unservice in listeservice %}
+                                                                                                 <option value="{{unservice.id}}"> {{unservice.libService}}  </option> 
+                                                                                         {% endfor %}                        
+                                                                                      </select>  
+                                                                                     <input type="hidden" value="{{unmessage.id}}" name="idmessage" id="idmessage" >             
+
+                                                                                    <div id="wait_bloc_m" style="display:none;margin-left:15px;">
+                                                                                               <img src="{{ asset('img/wait.gif') }}" />
+                                                                                    </div>
+                                                                                    <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" >              
+                                                                                    {#{ form_widget(form.idarticle) }} {{ form_widget(form.lastrub) }} {{ form_widget(form.compteur) }#}
+                                                                                   <div class="clr"></div>         
+                                                                            </form>    
+                                                                        </div>                                                                                                                                 
+                                                            </td>
+                                                                
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_reponsemessage', {'id': unmessage.id,'locale':locale}) }}">
+
+                                                                      <img src="{{ asset('img/admin-img/icon-messagingSmall.png')}}" alt="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}" title="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}" />
+                                                                    </a> 
+                                                                </td>  
+                                                                <td>              
+                                                                    <a href="#" class="" onClick="changerDossier({{unmessage.id}}); return false;">
+                                                                        {{ 'messageries.liste.de'|trans({}, 'messageries') }}
+                                                                    </a> 
+                                                                </td>                                                                 
+
+                                                            </tr>
+                                                                        {% else %}                                                    
+                                                            <tr>
+                                                                        <td colspan="4"> {{ 'messageries.none'|trans({}, 'messageries') }} </td>       
+                                                                    
+                                                            </tr>       
+                                                                        {% endfor %}
+                                                                </table>
+
+                                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                                    </div>		<!--  FIN COL RIGHT -->
+                                                </div>			<!--  FIN  SPAN - 19 -->
+
+                                            </div>				<!--  FIN SPAN - 25 -->
+                                            
+                                           
+                                            
+ <script language="javascript" >
+     
+         
+  
+      function changerDossier(id){       
+             $("#formDeplacer_container"+id).show();             
+             var html = '<a class="updateLink" href="#" onClick="AnnulerDossier( ); return false;">Annuler </a>';
+             $(".updateLink").html(html);
+       }
+       
+       
+      function affichersupprimer(id){           
+             $("#btsupprimer"+id).show();                
+       }
+       
+      function cachersupprimer(id){           
+             $("#btsupprimer"+id).hide();                
+       }
+    
+    
+      function annulerChangerDossier(id){       
+             $("#formDeplacer_container"+id).hide();             
+       }       
+    
+    
+  
+      function modifierDossier(){
+       
+             $("#modifDossier_container").show();             
+             /*var html = '<a class="updateLink" href="#" onClick="AnnulerDossier( ); return false;">Annuler </a>';
+             $(".updateLink").html(html);*/
+       }
+       
+      function AnnulerDossier(){
+           
+           $("#modifDossier_container").hide();        
+       } 
+ 
+ 
+    
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getMessagesID(){
+           
+            var messages_id = "";
+            
+            $(":input[rel=message_c]:checked").each(function(){
+		messages_id = messages_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return messages_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'messageries.suppression.confirmation'|trans({}, 'messageries')}}"; 
+ 
+    
+       function corbeilleAll( messagerieId,etat ){
+          if( messagerieId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans({}, 'messages') }}");
+          var args = {modal: true, autoOpen: false, title: (' {{ 'messageries.suppression.supprimer'|trans({}, 'messageries') }}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'messageries.suppression.supprimer'|trans({}, 'messageries') }}')};
+       
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{path('utb_admin_corbeillemessagerie')}}",
+                                data: {messageriesIds:messagerieId,etat:etat},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'messageries.suppression.impossible'|trans({}, 'messageries') }}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'messageries.suppression.reussie'|trans({}, 'messageries') }}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+</script>                                            
+ <div id="process_tpl" style="display:none;"></div>                                           
+  {% endblock %}
+
+                                            

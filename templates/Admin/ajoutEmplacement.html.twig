@@ -1,0 +1,18 @@
+
+
+	<form action=" {{ path("utb_admin_ajoutEmplacement",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutEmplacement">
+		<div class="FrmAjoutArt">
+			{{ form_errors(form.libEmplacement) }}
+			{{ form_label(form.libEmplacement, 'emplacements.emplacement'|trans({}, 'emplacements')) }}
+                        <br/><br/>
+			{{ form_widget(form.libEmplacement) }}
+			<div class="clr"></div>
+		</div>
+                <div class="FrmAjoutArt selectTypProfil">
+                    {{ form_errors(form.cadre) }}
+                    {{ form_label(form.cadre, 'cadres.ajout.titre3'|trans({}, 'cadres')) }}
+                    {{ form_widget(form.cadre) }}
+                    <div class="clr"></div>
+                </div>
+		<input type="submit" value="{{ 'admin.btnajouter'|trans({}, 'messages') }} " name="op" id="j_bouton">
+	</form>

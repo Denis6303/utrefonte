@@ -1,0 +1,263 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+				
+{% block client_centre_body %} 
+    <ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'messagerie.titre'|trans({}, 'messagerie')}}</li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'messagerie.ecrire'|trans({}, 'messagerie')}}</li>
+    </ul>    
+	
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{ 'messagerie.interne'|trans({}, 'messagerie')}}</h2>
+	{# { 'messagerie.interne'|trans({}, 'messagerie')} #}
+	
+	
+        <div class="menu_messag">
+            <div class="onglets title3" style="margin-bottom:7px;">
+				<span class="onglet_0 onglet read" id="onglet_read" onclick="javascript:change_onglet('read');"><a href="{{ path("utb_client_boitereceptionutil",{'locale':locale}) }}">{{ 'messagerie.reception'|trans({}, 'messagerie')}}</a></span>
+				<span class="onglet_0 onglet sent" id="onglet_sent" onclick="javascript:change_onglet('sent');"><a href="{{ path("utb_client_messageenvoyeutil",{'locale':locale}) }}">{{ 'messagerie.envoye'|trans({}, 'messagerie')}}</a></span>
+				<span class="onglet_0 onglet writeabonne" id="onglet_writeabonne" onclick="javascript:change_onglet('writeabonne');"><a href="{{ path("utb_client_envoimessageutilabonne",{'locale':locale}) }}">{{ 'messagerie.ecrire'|trans({}, 'messagerie')}}</a></span>
+				<span class="onglet_0 onglet writeutil" id="onglet_writeutil" onclick="javascript:change_onglet('writeutil');"><a href="{{ path("utb_client_envoimessageutil",{'locale':locale}) }}">{{ 'messagerie.ecrireUtil'|trans({}, 'messagerie')}}</a></span>
+            </div>
+        </div>  
+		
+		
+        <div  id="contenu_onglet_write">           
+                                <h5><span class='red-text'>*</span> {{'client.obligatoire'|trans({},'messages') }}</h5>
+				{#<h5><span class='red-text'>*</span> {{ 'client.obligatoire'|trans({}, 'messages')}}</h5>#}                
+				<div class="FrmAbonne" style="margin:0px; padding-top:0px;">
+					<label class="labelNoFloat" style="margin:0px;display:inline;">{{ 'messagerie.dest'|trans({}, 'messagerie')}}
+						<span class="red-text">*</span><span style="font-weight:normal;font-style: italic;color:#555"> {{ 'rechercheabonne.cocher'|trans({}, 'messagerie')}} </span>
+					</label>
+				</div>
+               
+		<div class="scroll bgGrisatr1 border-gris1 coinsArrondis-min"> 
+                    <div class=""></div>
+                    <table> 
+                       <thead style="border-bottom: 1px solid #ddd;">
+                            <tr>
+                             <th class="" style="width:10px; padding-top: 7px;background: none;"><input type="checkbox" class="checkall" name="checkall" /></th>
+                             <th  colspan="2" class="" style="background: none;">
+                                 <label for="rechercheabonne" class="marginRight10p">{{ 'rechercheabonne.entrernom'|trans({}, 'messagerie')}}</label>
+                                 <input type="text" id="rechercheabonne" name="checkall" style="width: 150px;" />
+                                 <span style="font-weight:normal;font-style: italic;padding-left: 2px;">{{ 'rechercheabonne.rapid'|trans({}, 'messagerie')}}</span>
+                             </th>
+                             <th style="background: none;"><img src="{{asset('img/client-img/loading.gif')}}"  style="display:none;" class="imgload"/></th>
+                              
+                            </tr>
+                            
+                       </thead>
+                       <tbody class="lunabonne">
+                                {#{% for unAbonne in listeAbonne %}
+                                           <td class="" ><input type="checkbox" name="abonne[]" value="{{ unAbonne.id }}" rel="abonne_c"> {{ unAbonne.nomPrenom}}</td> 
+                                {% if loop.index % 4==0 %}   </tr>{% if loop.last %} {% else %}  <tr >{% endif%}    {% endif%} 
+                                {% endfor %} #} 
+                           
+                                {% for unAbonne in listeAbonne %}
+                                        <tr class="{{'idabonne'~unAbonne.id }}">
+                                            <td style="width:10px;"  ><input class="{{'idabonne'~unAbonne.id }}" type="checkbox"  value="{{ unAbonne.id }}"   onClick="validate('{{ unAbonne.id }}','{{ unAbonne.nomPrenom|striptags}}','{{ unAbonne.email}}','{{ unAbonne.telAbonne}}'); return false;"></td><td>{{ unAbonne.nomPrenom}}</td><td>{{ unAbonne.email}}</td>  <td>{{ unAbonne.telAbonne}}</td>                   
+                                        </tr>
+                                {% endfor %} 
+                        </tbody>   
+                       
+                     </table>
+
+                </div> 
+                   <span style="display:block;padding: 5px;"> {{ 'rechercheabonne.envoyera'|trans({}, 'messagerie')}} </span>               
+                <div class="scroll bgGrisatr1 border-gris1 coinsArrondis-min"> 
+                    <div class=""></div>
+                    <table>
+
+                      <tbody class="lvraiabonne">
+                              <img src="{{asset('img/wait.gif')}}"  style="display:none;margin:auto;padding:20px;" class="imgload1"/>
+                               {#{% for unAbonne in listeAbonne %}
+                                          <td class="" ><input type="checkbox" name="abonne[]" value="{{ unAbonne.id }}" rel="abonne_c"> {{ unAbonne.nomPrenom}}</td> 
+                               {% if loop.index % 4==0 %}   </tr>{% if loop.last %} {% else %}  <tr >{% endif%}    {% endif%} 
+                               {% endfor %} #} 
+                       </tbody> 
+                   </table> 
+
+                </div>                                 
+            
+            <form action=" {{ path("utb_client_envoimessageutilabonne") }} " method="post" {{form_enctype(form)}} >  
+                
+                <input type="hidden" name="lesabonnes" id="lesabonnes"/> 
+                <div class="FrmAbonne addperso2"> 
+                    {{ form_errors(form.objetMessageClient) }}
+					<span class="requis">
+						{{ form_label(form.objetMessageClient, 'form.objet'|trans({}, 'messagerie')) }}
+						<span class="red-text">*</span>
+					</span>
+                    {{ form_widget(form.objetMessageClient) }}
+                    <div class="clr"></div>
+                </div>
+				
+                <div class="bleuBanniere addperso3" >
+                    {{ form_errors(form.contenuMessageClient) }}
+                        <span class="labelNoFloat">{{ form_label(form.contenuMessageClient, 'form.contenu'|trans({}, 'messagerie')) }}<span class="red-text">*</span></span>
+                    {{ form_widget(form.contenuMessageClient) }}
+                </div>
+                <div>
+
+                        <input type="submit" value="{{'client.envoyer'|trans({},'messages') }}"  class="boutonSubmit" id="soumisform" style="color:#fff"/> 
+                            <a  href="{{ path('utb_client_boitereceptionutil',{'locale':locale}) }}"><input type="button" class="annulerBut back" value="{{'client.annuler'|trans({},'messages') }}" name="" id="" > </a>
+                        <div class="clr"></div>
+                </div>
+            </form>
+        </div>  
+<script type="text/javascript">
+        //<!--
+        function change_onglet(name)
+        {
+            document.getElementById('onglet_'+anc_onglet).className = 'onglet_0 onglet';
+            document.getElementById('onglet_'+name).className = 'onglet_1 onglet';
+            document.getElementById('contenu_onglet_'+anc_onglet).style.display = 'none';
+            document.getElementById('contenu_onglet_'+name).style.display = 'block';
+            anc_onglet = name;
+        }
+        //-->
+    function addslashes(ch) {
+        ch = ch.replace(/\\/g,"\\\\");
+        ch = ch.replace(/\'/g,"\\'");
+        ch = ch.replace(/\"/g,"\\\"");
+        return ch;
+    }
+        tabIdAbonne = new Array; 
+    function validate(id,nomPrenom,email,telAbonne) {                       
+             nomPrenom=addslashes(nomPrenom);
+             var test=0;
+             var l = tabIdAbonne.length;
+             for(var i = 0; i < l; i++) {
+                   if(tabIdAbonne[i] == id) {
+                      test=1;
+                   }
+             }
+             tabIdAbonne.push(id);
+              $(".idabonne"+id).remove();
+             if(test==1){
+                     $(".idabonne"+id).css("border-color","#FF0");  
+                     //supprAbonne(id);
+                    $(".idabonne"+id).remove();
+                     //alert("test");
+             }else{
+                    $('.lvraiabonne').append('<tr class="idabonnec"'+id+'" ><td style="width:10px;"  ><input type="checkbox" name="abonne[]"  value="'+ id +'" rel="abonne_c" checked></td><td>'+nomPrenom+'</td><td>'+ email+'</td>  <td>'+telAbonne+'</td></tr>');                   
+
+                    //$('.lvraiabonne').append('<tr  class="idabonneSupp'+id+'"><td style="width:10px;"><input type="checkbox" name="abonne[]" class="idabonne'+id+'" value="'+id+'" rel="abonne_c" onClick="supprAbonne('+id+'); return false;" checked></td><td>'+nomPrenom+'</td><td>'+ email+'</td>  <td>'+telAbonne+'</td></tr>');                   
+             }
+    }
+    
+  
+                    //<!--
+    var anc_onglet = 'writeabonne';
+    change_onglet(anc_onglet);
+        function abonneSelect(id,nomPrenom,email,telAbonne){
+             $('.lvraiabonne').append('<tr class="idabonnec"'+id+'" ><td style="width:10px;"><input type="checkbox" name="abonne[]" value="'+ id +'" rel="abonne_c" ></td><td>'+nomPrenom+'</td><td>'+ email+'</td>  <td>'+telAbonne+'</td></tr>');                                    
+            
+            // $('.lvraiabonne').append('<tr  class="idabonne'+id+'"><td style="width:10px;"><input type="checkbox" name="abonne[]" value="'+ id +'" rel="abonne_c" onClick="supprAbonne('+id+'); return false;"></td><td>'+nomPrenom+'</td><td>'+ email+'</td>  <td>'+telAbonne+'</td></tr>');                                    
+        }
+</script>         
+<script language="javascript" >  
+    
+        $("#rechercheabonne").on("input",function(e) {            
+        $(".imgload").css("display","block");              
+        var vendor = this.value;
+        var DATA = 'key=' + vendor;           
+                $.ajax({
+                    type: "POST",
+                    dataType: 'json',
+                    url:  "{{ path('utb_client_remplirunabonne')}}",
+                    data: DATA,
+                    success: function(msg)
+                    {                   
+                         i=0;                                        
+                        $.each(msg, function(index, unabonne)
+                        {
+                               $('.lunabonne').html('');
+                                for(var i =0;i < unabonne.length;i++){                                                          
+                                        $('.lunabonne').append('<tr class="idabonne"'+unabonne[i].id+'"><td style="width:10px;"><input type="checkbox" class="idabonne"'+unabonne[i].id+'" name="abonne[]" value="'+ unabonne[i].id +'" onClick="validate('+ unabonne[i].id +',\''+ unabonne[i].nomPrenom  +'\',\''+ unabonne[i].email +'\',\''+ unabonne[i].telAbonne +'\'); return false;" rel="abonne_c" ></td><td>'+unabonne[i].nomPrenom+'</td><td>'+ unabonne[i].email+'</td>  <td>'+unabonne[i].telAbonne+'</td></tr>');
+                                }                                                
+                        });
+                        $(".imgload").css("display","none");
+                    }
+                });
+        }); 
+
+ 
+   jQuery(document).ready(function() {
+         $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+             if($(".checkall").is(":checked")){  
+                $(".imgload1").css("display","block");
+                var vendor = this.value;
+                var DATA = 'key=';           
+                        $.ajax({
+                            type: "POST",
+                            dataType: 'json',
+                            url:  "{{ path('utb_client_remplirunabonne')}}",
+                            data: DATA,
+                            success: function(msg)
+                            {                   
+                                 i=0;                                        
+                                $.each(msg, function(index, unabonne)
+                                {
+                                       $('.lvraiabonne').html('');
+                                        for(var i =0;i < unabonne.length;i++){                                                          
+                                                $('.lvraiabonne').append('<tr class="idabonne"'+ unabonne[i].id +'"><td style="width:10px;"><input type="checkbox" checked name="abonne[]" value="'+ unabonne[i].id +'" onClick="validate('+ unabonne[i].id +',\''+ unabonne[i].nomPrenom  +'\',\''+ unabonne[i].email +'\',\''+ unabonne[i].telAbonne +'\'); return false;" rel="abonne_c" ></td><td>'+unabonne[i].nomPrenom+'</td><td>'+ unabonne[i].email+'</td>  <td>'+unabonne[i].telAbonne+'</td></tr>');
+                                        }                                                
+                                });
+                                $(".imgload1").css("display","none");
+                            }
+                        });
+             }else{
+                 
+                 $('.lvraiabonne').html('');
+                  tabIdAbonne = new Array;
+             }
+                
+       }); 
+       
+
+       
+         function getUtilsID(){           
+            var abonnes_id = "";
+            
+            $(":input[rel=abonne_c]:checked").each(function(){
+		abonnes_id = abonnes_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });              
+            return abonnes_id;
+       }         
+       function soumettreAll( abonnesId ){ 
+            if( abonnesId.length === 0 ){              
+               alert("{{'messagerie.choisirAbonne'|trans({},'messagerie') }}") ;
+               return false;
+           }else{
+               return true; 
+           }
+        }      
+        $('#soumisform').click(function(){ 
+            var liste=getUtilsID();
+
+             $('#lesabonnes').val(getUtilsID());
+              //alert($('#lesabonnes').val());   
+             if(!soumettreAll(getUtilsID())){
+                 return false;
+             }else{
+               return true;                      
+             }                                                                 
+         });   
+   });
+         function supprAbonne(enCours) { 
+              //alert("OK");
+              //enCours.preventDefault();
+               $('.idabonneSupp'+enCours).remove(); 
+               //$(this).parents('li:eq(0)').remove();
+               // $("."+enCours).prev('li').remove();
+       };                                                                                        
+</script>                     
+{% endblock %}

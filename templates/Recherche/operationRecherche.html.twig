@@ -1,0 +1,8 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Login
+{% endblock %}
+
+{% block client_centre_body %} 
+        {{ render(controller('utbClientBundle:Recherche:rechercheOperation', {'idCompte':1 ,'idAbonne':1 ,'locale':locale})) }}
+{% endblock %}

@@ -1,0 +1,116 @@
+{# src/utb/AdminBundle/Resources/views/ajoutProfil.html.twig #}
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Modifier un profil
+{% endblock %}
+
+  {% block administration_body %} 
+ <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="{{ 'admin.profil'|trans({}, 'messages') }}" title="{{ 'admin.layout.menu.titreuser'|trans({}, 'messages') }}" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'actions.form.module'|trans({}, 'actions') }}<span>:{{ 'actions.ajout.titre2'|trans({}, 'actions') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+
+                              <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('j_bouton').click()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="{{ 'admin.btnvalider'|trans}}" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a class="back" href="#"><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                      <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                                          <h3 class="colorBleu titreStats">{{ 'admin.stat'|trans({},'messages')}}</h3>
+                                          <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                              <table class="tableStats">
+                                                  <tr class="">
+                                                      <td>{{ 'statistiques.allrubrique.statgestion.toutartcle'|trans({},'statistiques')}} - Site</td>
+                                                      <td class="valStats">135</td>
+                                                  </tr>
+                                                  <tr class="bgGris">
+                                                      <td>{{ 'statistiques.allrubrique.statgestion.enligne'|trans({},'statistiques')}}</td>
+                                                      <td class="valStats">41</td>
+                                                  </tr>
+                                                  <tr class="">
+                                                      <td >{{ 'statistiques.allrubrique.statgestion.horsligne'|trans({},'statistiques')}}</td>
+                                                      <td class="valStats">25</td>
+                                                  </tr>
+                                                  <tr class="bgGris">
+                                                      <td class="valDecalee">Soumis pour validation</td>
+                                                      <td class="valStats">25</td>
+                                                  </tr>
+                                                  <tr class="">
+                                                      <td class="valDecalee">{{ 'admin.totalartattentevalid'|trans({}, 'messages') }}</td>
+                                                      <td class="valStats">33</td>
+                                                  </tr>
+                                                  <tr class="bgGris">
+                                                      <td class="valDecalee">Dé-publiés</td>
+                                                      <td class="valStats">5</td>
+                                                  </tr>
+                                                  <tr class="">
+                                                      <td>Archivés</td>
+                                                      <td class="valStats">14</td>
+                                                  </tr>
+                                                  <tr class="">
+                                                      <td >Supprimés</td>
+                                                      <td class="valStats">17</td>
+                                                  </tr>
+                                              </table>
+                                          </div>
+                                      </div>
+
+
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                              <div class="FrmAjoutImg colorCadreArrondi bgBlanc">
+                                                  <div class="MarginBottomBox">
+                                                    <form action=" {{ path( "utb_admin_langueprofil", {'id': id,'locale':locale} ) }} " method="post" {{ form_enctype(form) }} id="ajoutLangueProfil" >
+                                                       {{ form_widget(form) }}
+                                                         <input type="submit" value="{{ 'admin.ajouter'|trans({}, 'messages')}}" name="op" id="j_bouton" style="display: none"><a href=""></a>   
+                                                    </form>
+
+ <div class="clr"></div>
+                                                  </div>
+
+                                              </div>
+
+
+                                          </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>			<!--  FIN  SPAN - 19 -->
+
+                          </div>				<!--  FIN SPAN - 25 -->
+
+  {% endblock %}

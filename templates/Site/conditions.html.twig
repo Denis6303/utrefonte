@@ -1,0 +1,39 @@
+{# src/utb/SiteBundle/Resources/views/site/correspondant.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Conditions générales de banque
+{% endblock %}
+
+{% block public_body %}
+
+{#    <div class="span-24 marginBottom20p paddingTopBot20p bgBlanc borderBotStyle boxDesConditionsdeBank">		<!-- borderBotStyle bgBlanc -->#}
+    <div class="span-24 marginBottom20p paddingTopBot20p bgBlanc boxDesConditionsdeBank borderBotStyle">
+        <!-- borderBotStyle bgBlanc -->
+        <div class="span-12">		<!-- borderBotStyle bgBlanc -->
+            <div class="leftSpace">
+                <h1 style="" class="textConditions2Bank bleuLogo">{{ 'texteConditions'|trans({}, 'site') }}</h1>
+                <div class="txt">
+                    <strong>
+                        {{ 'tarifs'|trans({}, 'site') }}
+                    </strong>
+                    <h5 class="link">
+                        <a href="{{ asset('files/ConditionsUTB_2017.pdf')}}" target="_blank">
+    {#                    <a href="{{ path("utb_site_download",{'locale': locale})}}">#}
+                            <img src="{{ asset('img/site-img/iDown.png')}}" alt="" />
+                            {{ 'downloads'|trans({}, 'site') }}
+                        </a>
+                    </h5>
+                </div>
+
+            </div>	<!-- FIN DIV.all-orrespondants-->
+        </div>
+        <div class="span-12 last" style="margin-top: -20px;">
+            <img src="{{ asset('img/site-img/conditionGene_JPEG.jpg')}}" alt="" class="positionImg" />
+        </div>
+                    <!-- DIV.SPAN - 24 --> 
+    </div>	<!-- DIV.SPAN - 24 --> 
+    
+  
+{% endblock %}
+  

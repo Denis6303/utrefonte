@@ -1,0 +1,244 @@
+{# src/utb/AdminBundle/Resources/views/Admin/menus.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Droits
+{% endblock %}
+  
+  {% block administration_body %}
+            
+
+<div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+	{% if app.session.hasFlash('notice') %}
+	<div class="error errorMsg">{{ app.session.flash('notice') }}</div> 
+	{% endif %}           
+	
+	<div class="MarginBottomBox"></div>
+
+	<div class="span-6">						<!-- COLONNE GAUCHE-->
+		<div class="colLeft">				<!-- COLONNE GAUCHE-->
+
+		{# BOX INFOS #}    
+		{{ information.boxinfos(infos,infos.paramDescription,infos.actif) }} 
+
+		{# STATISTIQUES #}    
+		{{ information.stats(listestat) }}                                 
+
+		</div>			<!-- Fin COLONNE COLLEFT -->
+	</div>				<!-- Fin COLONNE GAUCHE span 6 -->
+	<div class="span-19 last">	<!-- COLONNE DROITE -->
+		<div class="colRight">	
+                        <!-- COLONNE DROITE-->
+                        {% if typedemenu == 0   %}
+                            <a href="#" onclick="addMenu({{groupe}});return false;" class="addLink ajoutMenu coinsArrondisMin noSoulignHover">{{ 'menus.gestion.ajout2'|trans({},'menus')}}</a>
+                        {#% else %#}                        
+                            <a href="{{ path('utb_admin_listeLiens', {'groupe': groupe,'typedemenu': 1,'locale': locale})}}" class="addLink ajoutMenu coinsArrondisMin noSoulignHover">{{ 'menus.gestion.menusparents'|trans({},'menus')}}</a>
+                        {% endif  %}
+			<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+				<div class="colRightContentPadding">
+
+					<table class="listMenusCateg listArticlesRub" id="menuList">
+						<tr>
+							<th class="chekBox"> </th>
+							<th>Titre menu</th>
+							<th>Type menu</th>
+							<th> </th>
+							<th>Actions</th>
+						</tr>   
+					</table>
+					<div class="oneEntreMenu">
+					{% for keyP,mP in listeLiens %}                                   
+							<table id="recordsArray_{{mP.id}}">
+								<tr {% if loop.index is even %} class="bgBlanc"{% endif %} rel="parent">
+									<td class="select-entreMenu"><input type="checkbox" /></td>
+									<td class="titre-entreMenu"><span>{{mP.libelle}}</span></td>
+									<td class="type-entreMenu">{{mP.typeMenu}}</td>
+									<td class="icon-entreMenu"><img src="{{asset('img/admin-img/')}}{{mP.imageMenu}}" alt="Public Link" title="Article en ligne" /></td>
+									<td class="action-entreMenu"> 
+										<a class="addLink2" title="" href="#"></a>
+										<a class="updateLink2" title="Modifier ce menu" href="#" onclick="modifMenu( {{groupe}}, {{mP.id}}, 0 ); return false;"><img src="{{asset('img/admin-img/btmodifier.png')}}" alt="{{ 'menus.gestion.modifmenu'|trans({}, 'menus') }}" title="{{ 'menus.gestion.modifmenu'|trans({}, 'menus') }}" /></a>
+										<a class="suppLink2" href="#" onclick="supprimerMenu( {{mP.id}} ); return false;" title="{{ 'menus.gestion.supprimer'|trans({}, 'menus') }}"><img src="{{asset('img/admin-img/icon-16-deny.png')}}" alt="{{ 'menus.gestion.supprimer'|trans({}, 'menus') }}" title="{{ 'menus.gestion.supprimer'|trans({}, 'menus') }}" /></a>
+										<span class="clr"></span>
+									</td> 
+								</tr>
+							</table>
+					{% endfor %}
+                                        </div>
+				</div>			<!-- FIN colRightContentPadding-->
+			</div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+		</div>		<!--  FIN COL RIGHT -->
+	</div>			<!--  FIN  SPAN - 19 -->
+</div>				<!--  FIN SPAN - 25 -->
+
+  <script>
+      function addMenu(idGroup,idMenuParent){
+        init_data();
+        click_precedent();
+        $('#menuParent').val(idMenuParent);
+          
+        var args = {modal: true, autoOpen: false, title: ('{{ 'menus.gestion.ajout2'|trans({},'menus')}}'), width:600,height:500};
+        $('#form_ajout_menu').dialog(args);
+            $('#form_ajout_menu').dialog({
+		buttons: {                
+			"{{ 'admin.annuler'|trans({},'messages')}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })             
+           $('#form_ajout_menu').dialog('open');
+          $("#idgroupemenu").val(idGroup);
+      }
+      
+      function modifMenu( idGroup, idMenu, idMenuParent ){
+        init_data(); 
+        click_precedent();
+         $('#menuParent').val(idMenuParent);
+         
+         // on fait un ajax pour aller récupérer les valeurs du menu à modifier
+         $.ajax({
+               type: "POST",
+                url: "{{ path('utb_admin_getMenu')}}",
+                data: {idmenu:idMenu},
+                cache: false,
+                success: function(data){
+                    var resJson = jQuery.parseJSON(data);
+                    console.log(data);
+                    $("input[value="+resJson.data.type+"]").prop('checked', true);
+                    $("#titreMemu").val(resJson.data.libelle);
+                    $("#menuParent").val(resJson.data.idParent);
+                    $("#url_menu").val(resJson.data.urlExterneMenu);
+                    $("#modif_menu").val(idMenu);
+                    
+                   var type_menu = resJson.data.type;
+                   var tab = resJson.data.urlExterneMenu.split("|")
+                    if( type_menu !=1 ){
+
+                        if( type_menu>=2 && type_menu<=4 ){
+                            r_container_show();
+                            a_container_hide();    
+                            p_container_hide();
+                            
+                            $("#form_rubrique").val(tab[1]);
+                        }
+                        else if( type_menu == 5 ){
+                             a_container_show();
+                             r_container_hide();
+                             p_container_hide();
+                             
+                             $("#form_article").val(tab[1]);
+                        }
+                        else if( type_menu == 6 ){
+                          r_container_hide();
+                          a_container_hide(); 
+                          p_container_show();
+                          
+                          $("#form_page").val(tab[0]);
+                        }            
+                        else{
+                          p_container_hide();
+                          r_container_hide();
+                          a_container_hide();   
+                        }
+                    }
+                    else{
+                        p_container_hide();
+                        r_container_hide();
+                        a_container_hide();
+                    }
+                }
+         });         
+
+        var args = {modal: true, autoOpen: false, title: ('{{ 'menus.gestion.ajout2'|trans({},'menus')}}'), width:600,height:500};
+        $('#form_ajout_menu').dialog(args);
+            $('#form_ajout_menu').dialog({
+		buttons: {                
+			"{{ 'admin.annuler'|trans({},'messages')}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            });             
+           $('#form_ajout_menu').dialog('open');
+          $("#idgroupemenu").val(idGroup);      
+      }
+      
+      function supprimerMenu( idMenu ){
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+            var htmldefault = "{{ 'menus.gestion.confirmation2'|trans({},'menus')}}";      
+  
+            $('#process_tpl').html(htmldefault);
+        var args = {modal: true, autoOpen: false, title: ('{{ 'menus.controleur'|trans({},'menus')}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_deletMenu')}}",
+                                data: {idMenu:idMenu},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans({}, 'messages') }}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            }) ;   
+            $("#process_tpl").dialog('open');             
+      }
+  </script> 
+  <div id="form_ajout_menu" style="display:none;">
+    {% include "utbAdminBundle:Admin:ajoutMenuForm1.html.twig"  %}
+        <div class="butonAccord boutonSavePosition" style="float:right;" id="suivant_container"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a href="#" id="suivant">{{ 'admin.suivant'|trans({},'messages')}}</a></h4></div><div class="clr"></div>         
+        <div class="butonAccord boutonSavePosition" style="float:left; display:none;"  id="precedent_container"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a href="#" id="precedent">{{ 'admin.precedent'|trans({},'messages')}}</a></h4></div><div class="clr"></div>         
+        
+     <script>
+      $("#suivant").click(function(){
+          click_suivant();
+      });
+      $("#precedent").click(function(){
+          click_precedent();
+      });  
+      
+      function click_precedent(){
+         $("#form1").show();
+         $("#form2").hide();
+         $("#suivant_container").show();
+         $("#precedent_container").hide();  
+         $("#wait_bloc").hide();
+      }
+      function click_suivant(){
+         $("#form1").hide();
+         $("#form2").show();
+         $("#suivant_container").hide();
+         $("#precedent_container").show();  
+         $("#wait").html("");
+      }
+      
+ 	$(function() {
+		$(".oneEntreMenu").sortable({ opacity: 0.6, cursor: 'move', update: 
+                    function() {
+                	var order = $(this).sortable("serialize"); 
+                        $.ajax({
+                            type: "POST",
+                            url: "{{path('utb_admin_updateMenuParents')}}",
+                            data: {formdata:order},
+                            cache: false,
+                            success: function(data){
+                                var resJson = jQuery.parseJSON(data);
+                                 //console.log(resJson);
+                            }
+                        });	
+                    }								  
+		});
+	});     
+     </script>
+     <div id="process_tpl" style="display:none;"></div> 
+  </div>   
+  {% endblock %}
+  

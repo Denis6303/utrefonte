@@ -1,0 +1,229 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.listebox'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > 
+    <a href="{{path('utb_admin_ajoutParams',{ 'locale': locale })}}"> {{ 'admin.layout.menu.maintenance'|trans}}</a> > 
+    <a href="{{path('utb_admin_ListeDiffusion', {'etat': 1,'ajoutliste': 0,'locale': locale})}}">{{'admin.layout.gestnewsletter'|trans}}</a> > 
+    {{'listedif.details'|trans}}
+</div>
+
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-19">
+			<div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-new-privatemessage.png')}}" alt="Objets" title="" /></div>
+			<div class="titreModule colorBleu"><h1>{{'admin.layout.gestnewsletter'|trans}}:{{'listedif.details'|trans}}<h1></div>	
+			<div class="clr"></div>
+	</div>
+
+        <div class="span-5 last">
+
+            <div class="ecartBoutonsFirst for2Butons">&nbsp;</div>
+
+            {#<div class="boutonGestion">
+                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getObjetsID(),1); return false;"><img src="{{ asset('img/admin-img/publier.png')}}" alt="{{ 'admin.affiche2'|trans({}, 'messages') }}" title="{{ 'admin.affiche2'|trans({}, 'messages') }}" /></div>{{'admin.affiche2'|trans({}, 'messages')}} </a> 
+            </div>
+            <div class="ecartBoutons">&nbsp;</div>
+            <div class="boutonGestion">
+                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getObjetsID(),0); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="{{ 'admin.notaffiche2'|trans({}, 'messages') }}" title="{{ 'admin.notaffiche2'|trans({}, 'messages') }}" /></div>{{'admin.notaffiche2'|trans({}, 'messages')}}</a> 
+            </div>
+
+            <div class="clr"></div>
+            #}
+        </div>					<!--  FIN allBoutonsGestion -->
+        
+        <div class="clr"></div>
+        
+    </div>						<!--  FIN toulbar 3 -->
+</div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+                                    <p> &nbsp; </p>
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>
+                            <p> &nbsp;</p>
+                            <div class="span-25 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+                                    
+                                       <form method="POST" id="listeMailForm"> 
+						
+						<div class="colorCadreArrondi coinsArrondis bgGris">
+								<div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+								  <div class="MarginBottomBox"></div> 								   
+                                                                                                                                             
+									   <table class="listArticlesRub">
+											<tr class="span-25">
+												<th>
+                                                                                                    <div class="ecartBoutons"></div>
+                                                                                                    <input type="checkbox" class="checkall" name="checkall"/> {{ 'messageries.mail.deselectionner'|trans({}, 'messageries') }}
+                                                                                                </th>
+											</tr>	
+                                                                                        
+											{% for objet in listeMails %}                                                                                                
+                                                                                            
+                                                                                            {% if (loop.index % 2) %}
+                                                                                                <tr>
+                                                                                            {% endif %}
+                                                                                                    <td>                                                                                                        
+                                                                                                        <input type="checkbox"  name="objet[]"  rel="objet_c" value="{{objet.mail}}" {% if objet.nbre == 1  %} checked="checked" {% endif %} />                                                                                                                                                                                                                                                                                   
+                                                                                                        {{objet.mail}}                                                                                                                                                    
+                                                                                                    </td>
+                                                                                                {% if (loop.index % 2) and loop.last %}
+                                                                                                    <td>&nbsp</td>
+                                                                                                {% endif %}
+                                                                                            {% if (loop.index0 % 2) or loop.last %}
+                                                                                               </tr>
+                                                                                            {% endif %}
+                                                                                 
+											{% else %}
+												 <tr>
+												   <td colspan="4">{{ 'listedif.none'|trans({}, 'messages') }} </td>       
+												 </tr>       
+											{% endfor %}                                                                                                       
+									   </table> 
+                                                                               
+                                                                           <div class="MarginBottomBox"></div>    
+                                                                           
+								</div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						</div> 
+                                    
+                                                <!-- Ecart entre les listes -->
+                                                <div class="MarginBottomBox"></div>                                    
+
+                                                
+                                                
+                                                <div class="clr">
+                                                    {{ 'messageries.mail.listediffusion'|trans({}, 'messageries') }}
+                                                        <select id="listediffusion" name="listediffusion">
+                                                         {%if listediffusion|length >1 %}   
+                                                            {% for rb in listediffusion %}
+                                                               {{dump(rb)}}
+                                                                <option value="{{rb.getId}}">{{rb.getNomListeDiffusion}}</option>
+                                                            {% endfor %} 
+                                                         {% else %} 
+                                                                <option value="{{listediffusion.getId}}">{{listediffusion.getNomListeDiffusion}}</option>
+                                                         {% endif %}  
+                                                        </select>                                                 
+                                                </div>
+
+                                                <div class="accessModuleName-submit">                                                                                  
+
+                                                     
+
+                                                     <div id="wait"></div>
+                                                     {% if (listeMails|length>0) and (listeMails is not null) %}
+                                                         <input value="{{ 'admin.sauvegarder'|trans}}" id="submit">
+                                                     {% endif %}    
+
+                                                </div>                                      
+                                    
+                                        </form>          
+ 
+								  
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+
+			</div>				<!--  FIN SPAN - 25 -->
+                                            
+ <script language="javascript" >
+     
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getObjetsID(){
+           
+            var objet_id = "";
+            
+            $(":input[rel=objet_c]:checked").each(function(){
+		objet_id = objet_id.concat( "|" + $(this).val() );
+            });   
+            
+            return objet_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+
+    
+        $("#submit").click(function(){
+            var html = "";
+            html += "<div ><img src='{{ asset('img/wait.gif') }}' /></div>";  
+          $("#wait").html(html);
+          allobjet = getObjetsID();
+          SaveListeProcess( allobjet, $("#listediffusion").val() ); 
+        });
+
+        function SaveListeProcess( data1,data2 ){
+            $.ajax({
+                type: "POST",
+                url: "{{path('utb_admin_saveListeDiffusion')}}",
+                data: {formdata:data1, idliste: data2},
+                cache: false,
+                success: function(data){
+                                var resJson = jQuery.parseJSON(data);
+                                if( resJson.result == "success")
+                                        window.location = "{{path('utb_admin_ListeDiffusion',{'etat':1, 'ajoutliste':0, 'locale':locale})}}";   
+                                else
+                                        alert("{{ 'messageries.mail.erreurchargement'|trans({}, 'messageries') }}");
+                }
+            });	
+        }    
+    
+    
+       
+</script>                                            
+     <div id="process_tpl" style="display:none;"></div>   
+     
+  {# dépublier d'articles #}
+  <div id="msgconfirmactiver" style="display:none;">
+    {{ 'confirmation.activer'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmactiver" style="display:none;">
+    {{ 'confirmation.titreactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibleactiver" style="display:none;"> 
+    {{ 'confirmation.impossibleactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussiteactiver" style="display:none;"> 
+    {{ 'confirmation.succesactive'|trans({}, 'messages') }} 
+  </div>      
+  
+  <div id="msgconfirmdesactiver" style="display:none;">
+    {{ 'confirmation.desactiver'|trans({}, 'messages') }}
+  </div>   
+
+  <div id="titreconfirmdesactiver" style="display:none;">
+    {{ 'confirmation.titredesactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="impossibledesactiver" style="display:none;"> 
+    {{ 'confirmation.impossibledesactive'|trans({}, 'messages') }}
+  </div> 
+
+  <div id="reussitedesactiver" style="display:none;"> 
+    {{ 'confirmation.succesdesactive'|trans({}, 'messages') }} 
+  </div>  
+     
+  <div id="sivide" style="display:none;"> 
+    {{ 'confirmation.sivide'|trans({}, 'messages') }} 
+  </div> 
+   
+   <div id="accessdenied" style="display:none;"> 
+    {{ 'confirmation.accessdenied'|trans({}, 'messages') }} 
+  </div>     
+    
+  {% endblock %}

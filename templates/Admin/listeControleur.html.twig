@@ -1,0 +1,231 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'controleurs.liste.grandtitrepg'|trans({}, 'controleurs') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+			<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil',{ 'locale': locale })}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listecontroleur', {'locale': locale})}}">{{ 'controleurs.ajout.titre1'|trans({}, 'controleurs') }}</a> > <a href="#">Liste</a>
+    
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-17">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-help-this.png')}}" alt="{{ 'admin.layout.menu.articles'|trans({}, 'messages') }}" title="{{ 'admin.layout.menu.articles'|trans({}, 'messages') }}" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'controleurs.liste.titrepg'|trans({}, 'controleurs') }}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+                        <div class="span-7 last">
+
+                            <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                            <div class="boutonGestion">
+                                <div><a href="{{ path('utb_admin_ajoutmodule',{'locale':locale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+							{{ 'admin.ajouter'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="{{ 'admin.modifier'|trans}}" title="{{ 'admin.modifier'|trans}}" /></div>
+                                  {{ 'admin.modifier'|trans}}</a>
+                            </div>
+                            <div class="ecartBoutons">&nbsp;</div>
+                           {# <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="{{ 'admin.activer'|trans}}" /></div>
+                                    {{ 'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="{{ 'admin.desactiver'|trans}}" /></div>
+                                    {{ 'admin.desactiver'|trans}}</a>
+                            </div> #}
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="deleteAll( getControleursID() ); return false;" ><img src="{{ asset('img/admin-img//corbeille.png')}}" alt="Corbeille" title="{{ 'admin.corbeille'|trans}}" /></div>
+                                  {{ 'admin.corbeille'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                            {# STATISTIQUES #}    
+                                            {{ information.stats(listestat) }} 
+                                    
+                                    
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                             {# <div class="filtersArticles">
+                                                  <input type="text"> <input type="submit" value="OK">
+
+
+                                                  <div class="clr"></div>
+                                              </div>		#}				<!-- FIN filtersArticles-->
+
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+                                                        <th colspan="2">{{ 'actions.controleur.nom'|trans({}, 'actions') }}</th>
+                                                        <th>{{ 'actions.controleur.description'|trans({}, 'actions') }}</th>
+                                                        <th colspan="2">{{ 'actions.controleur.action'|trans({}, 'actions') }}</th>
+                                                    </tr>
+                                                               {% for controleur in entities %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="controleur[]" value="{{controleur.id}}" rel="controleur_c"/></td>
+                                                        <td colspan="2">              
+                                                                         {{controleur.nomControleur }}
+                                                            </td>     
+                                                            <td>     
+                                                                          {{ controleur.description|raw }}
+                                                                </td>
+                                                                <td colspan="2">              
+                                                                    <a href="{{ path('utb_admin_modifcontroleur', {'id': controleur.id}) }}">{{ 'admin.modifier'|trans}}</a>    
+                                                                    <div class="ecartBoutons">&nbsp;</div>
+
+
+                                                                    <a href="{{ path('utb_admin_supprcontroleur', {'id': controleur.id}) }}" onclick="return confirm('{{ 'admin.confirmsuppression'|trans}}');">{{ 'admin.supprimer'|trans}}</a>
+                                                                </td> 
+
+                                                            </tr>
+
+                                                                {% else %}
+                                                            <tr>
+                                                                <td colspan="4">{{ 'controleurs.none'|trans({}, 'controleurs') }} </td>       
+                                                            </tr>       
+                                                                {% endfor %}
+                                                        </table>
+                                              <br/><br/>
+                                                        
+
+                                         {% if last_page > 1 %}
+                                              <div class="paginationTry">
+                                                  
+                                                  <a href="{{ path('utb_admin_listecontroleur', { 'page': 1 }) }}"> <span> << </span> </a> 
+                                                  <a href="{{ path('utb_admin_listecontroleur', { 'page': previous_page }) }}"> <span> {{ 'admin.precedent'|trans}} </span> </a>
+                                                  {% for page in 1..last_page %}
+                                                        {% if page == current_page %}
+                                                        <span>{{ page }}</span>
+                                                        {% else %}
+                                                        <span><a href="{{ path('utb_admin_listecontroleur', { 'page': page }) }}">{{ page }}</a></span>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                  <a href="{{ path('utb_admin_listecontroleur', { 'page': next_page }) }}"> <span> {{ 'admin.suivant'|trans}} </span> </a>
+                                                  <a href="{{ path('utb_admin_listecontroleur', { 'page': last_page }) }}"> <span> >> </span></a>
+
+                                              </div>
+                                         {% endif %}
+                                          <br/>    
+                                        <div class="pagination_desc">
+                                           <center>
+                                               <strong>{{ total }}</strong> controleurs dans la base
+                                               {% if last_page > 1 %} - page <strong>{{ current_page }}/{{ last_page }}</strong> {% endif %}
+                                           </center>
+                                        </div>
+
+                                   </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                            </div>		<!--  FIN COL RIGHT -->
+                                        </div>			<!--  FIN  SPAN - 19 -->
+
+                                    </div>
+                        
+                        
+      <script language="javascript" >
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getControleursID(){
+           
+            var controleurs_id = "";
+            
+            $(":input[rel=controleur_c]:checked").each(function(){
+		controleurs_id = controleurs_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return controleurs_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.natdoc.effectuer'|trans({}, 'messages') }}";
+       
+       //function pour supprimer plusieurs elements a la fois
+       function deleteAll( controleursId ){
+          if( controleursId.length == 0 ){              
+              $('#process_tpl').html("{{ 'actions.cocher'|trans({}, 'actions') }}");
+          var args = {modal: true, autoOpen: false, title: ('Supprimer des controleurs')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault);
+          var args = {modal: true, autoOpen: false, title: ('Supprimer des controleurs')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_delectAllcontroleurs')}}",
+                                data: {controleursIds:controleursId},
+                                cache: false,
+                                success: function(data){ 
+                                   window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }
+       
+                  
+       //function pour  activer plusieurs elements a la fois
+       function activeAll( actionsId ){
+         //To do
+       }
+       //function pour  desactiver plusieurs elements a la fois
+       function adesactiveAll( actionsId ){
+         //To do
+       }       
+</script>
+<div id="process_tpl" style="display:none;"></div>                  
+                        
+                        <!--  FIN SPAN - 25 -->
+    {{ information.decochetoutbox() }}                      
+                        
+{% endblock %}

@@ -1,0 +1,202 @@
+<style>
+    html div{font-family: 'DejaVu Sans', serif; }
+
+    div#boxEntete div.logo{width: 100%;border-top: 1px solid #0049ba;border-bottom: 1px solid #0049ba;padding-top: 4px; padding-bottom: 4px;margin-top:8px;}
+    div#boxEntete div.logo h1{padding: 0px; margin: 0px;font-family:helvetica;color: #0049ba;font-size: 10px;}
+    div#boxEntete div.logo h1 img{width: 75%;}
+
+    div#boxEntete .mentionsLegales{width: 100%;border-bottom: 1px solid #0049ba;padding-top: 4px; padding-bottom: 4px;margin-top:0px;font-size:11px;text-align: center;}
+
+    div.infosClient{margin-bottom: 10px; font-size: 12px;}
+    div.infosClient ul{list-style: none;margin: 0px;margin-top: 0px;margin-left: -35px;}
+
+    .page{margin-top:10px;margin-bottom:0px; width:100%;font-size: 14px;margin-left: 5px;}
+
+    table.tabloReleve{width:100%;border-collapse: collapse;text-align: left;font-size: 10px; margin-bottom: 0px;}
+    table.tabloReleve td, table.tabloReleve th{border: 1px solid #555; padding: 3px;}
+    table.tabloReleve th{background: #555; color: #fff;}
+    .center{text-align: center;}
+    .droite{text-align: right;}
+    .footer{border-top: 2px solid #555;width:100%;margin-top: 20px;}
+</style>
+
+{% if listeOperation[0][1].numeroCompte is defined %}
+    {% set cptee = listeOperation[0][1].numeroCompte %}
+{% endif %}
+{% set sens07 = '' %}    {% set solde07 = 0 %} {% set debindex = 0 %} {% set deblast = 0 %}
+{% set montantdebit =0 %} {% set montantcredit =0 %}
+{% for uneOp in listeOperation %}
+
+    {% set debindex = loop.index %} 
+    {% set deblast = loop.last %} 
+
+    <div id="boxEntete">
+        <div class="logo">
+            <h1> 
+                <img src="{{lien}}{{asset('img/client-img/logo_utb_mini.jpg')}}" alt="" >
+            </h1>
+        </div>
+        <div class="mentionsLegales">
+            <div>{{ 'client.aptitresa2'|trans({}, 'messages') }}</div> 
+            <div>{{ 'client.aptitresa3'|trans({}, 'messages') }}</div>
+        </div>
+    </div>
+
+    <div class="page"> 
+        <strong>
+            <div> {{'compte.relever'|trans({},'compte') }} : {{laperiode}}(Page {{loop.index}}/{{listeOperation|length}} )</div>
+            <div> {{ periodentete }}</div>
+        </strong>
+    </div> 
+
+    <div class="infosClient">
+        <ul>      
+            <li><strong>{{'compte.rsoc'|trans({},'compte')|upper }}</strong>: <span>{{ unAbonne.getNomPrenom()|trim|upper }}</span></li>
+            <li><strong>{{'compte.num'|trans({},'compte') }}</strong>: <span>{{ cptee}}</span></li>
+
+            {% if numrib|trim != '' %}
+                <li><strong>{{'compte.numrib'|trans({},'compte') }}</strong>: <span>{{ numrib }}</span> </li>
+                    {% endif %}    
+            <li><strong>{{'compte.releves.solde'|trans({},'compte')|upper }}</strong>: 
+                <span>
+                    {% if finsolde[0] is defined and finsolde[0].sens|lower =='d' %} - {% endif %}
+                    {% if finsolde[0] is defined %}   {{ finsolde[0].solde|number_format(0, '', ' ') }} {% endif %}
+                </span>
+            </li>                        
+            {% if telGest|trim != '' %}
+                <li>
+                    <strong>{{'compte.telgest'|trans({},'compte') }}</strong>: <span>{{ telGest }}</span>
+                </li> 
+            {% endif %} 
+
+        </ul>
+    </div> 
+
+    <div  style=" width: 100%;">
+
+        {% if uneOp is defined and uneOp!= null and uneOp|length>0 %}                
+
+            <table class="tabloReleve">                    
+                <thead>
+                    <tr>   
+                        <th>{{'compte.date'|trans({},'compte') }}</th>
+                        <th>{{'compte.operations.libelle'|trans({},'compte') }}</th>
+                        <th>{{'compte.valeur'|trans({},'compte') }}</th>
+                        <th>{{'compte.debit'|trans({},'compte') }}</th>
+                        <th>{{'compte.credit'|trans({},'compte') }}</th>
+                        <th>{{'compte.operations.nummvt'|trans({},'compte')|upper }}</th>
+                        <th>{{'operation.soldeligne2'|trans({}, 'recherche')|upper}}</th>
+                    </tr>                 
+                </thead>  
+
+                {% if debindex == 1 and  ( debsolde !=null and debsolde|length > 0) %}
+                    <tr>
+                        <td colspan="3" class="center">
+                            {% if debsolde[0] is defined and debsolde[0].sens|lower == 'd' %}
+                                <strong> {{'compte.releves.soldedeb'|trans({},'compte')|upper}} </strong> 
+                                {{debsolde[0].dateSolde|date('d/m/Y')}}  
+                            {% elseif debsolde[0] is defined and debsolde[0].sens|lower == 'c' %}
+                                <strong> {{'compte.releves.soldecred'|trans({},'compte')|upper}} </strong>
+                                {{debsolde[0].dateSolde|date('d/m/Y')}}
+                            {% endif %}                                
+                        </td>
+                        <td> </td>
+                        <td> </td>  
+                        <td> </td>
+                        <td class="droite">
+                            {% if debsolde[0].sens|lower == 'd' %} <strong> -{{ debsolde[0].solde|number_format(0, '', ' ') }} </strong> {% endif  %}
+                            {% if debsolde[0].sens|lower == 'c' %} <strong>  {{ debsolde[0].solde|number_format(0, '', ' ') }} </strong> {% endif %}
+                        </td>
+
+                    </tr>                
+                {% endif %} 
+
+
+                {% for operation in uneOp %}                        
+
+
+                    {% if (operation.codOperation is defined) and (operation.codOperation!=null) and (operation.codOperation|trim == '07') %}
+                        {% set sens07 = operation.sensOperation|lower %}  
+                        {% set solde07 = operation.montant %} 
+                    {% endif %}                     
+
+
+                    {% if (operation.codOperation is defined) and (operation.codOperation!=null) and  (operation.codOperation|trim == '04') %}                             
+
+
+                        {% if operation.sensOperation|lower == 'd' %}
+                            {% set montantdebit = montantdebit + operation.montant %}
+                        {% else%} {% set montantdebit = montantdebit + 0%} {% endif %} 
+
+                        {% if operation.sensOperation|lower == 'c' %}
+                            {% set montantcredit = montantcredit + operation.montant %}
+                        {% else %} {% set montantcredit = montantcredit + 0 %} {% endif %} 
+
+
+                        <tr {% if loop.index is odd %}  class="bgGris" {% else %} class="bgBlanc"  {% endif %} >
+                            <td> {{operation.dateOperation|date("d/m/Y")|datelangue(locale) }} </td>                                 
+                            <td> {{operation.libOperation|raw }}</td> 
+                            <td> 
+                                {% if operation.dateValeur|date("d/m/Y")|slice(6,1) != '-' %}
+                                    {{operation.dateValeur|date("d/m/Y")|datelangue(locale) }} 
+                                {% endif %}
+                            </td>
+                            <td class="droite">
+                                {% if operation.sensOperation|lower == 'd' %} {{(operation.montant)|number_format(0, '', ' ') }} {% endif %}                                 
+                            </td>
+                            <td class="droite">
+                                {% if operation.sensOperation|lower == 'c' %} {{(operation.montant)|number_format(0, '', ' ') }} {% endif %}
+                            </td>
+                            <td>
+                                {% if operation.numeroMvt != "" %} {{operation.numeroMvt}} {% endif %}
+                            </td>
+                            <td class="droite">
+                                {% if operation.soldeEnLigne != 0 %}
+                                    {{operation.soldeEnLigne|number_format(0, '', ' ') }} 
+                                {% endif %}   
+                            </td>
+                        </tr>                            
+                    {% endif %} 
+
+                {% endfor %}  
+                {% if debindex == deblast %}        
+                    <tr>                        
+                        <td colspan="3">{{'compte.total'|trans({},'compte') }}</td>
+                        <td class="droite">{{montantdebit|number_format(0, '', ' ')}}</td>
+                        <td class="droite">{{montantcredit|number_format(0, '', ' ')}}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>     
+                {% endif %}
+                {% if debindex == deblast and ( finsolde !=null and finsolde|length > 0) %}
+                    <tr>
+                        <td colspan="3" class="center"> 
+                            {% if finsolde[0] is defined and finsolde[0].sens|lower == 'd' %}
+                                <strong> {{'compte.releves.soldedeb'|trans({},'compte')|upper}} </strong> 
+                                {{finsolde[0].dateSolde|date('d/m/Y')}}  
+                            {% elseif finsolde[0] is defined and finsolde[0].sens|lower == 'c' %}
+                                <strong> {{'compte.releves.soldecred'|trans({},'compte')|upper}} </strong>
+                                {{finsolde[0].dateSolde|date('d/m/Y')}}
+                            {% endif %}                                
+                        </td> 
+                        <td> </td> 
+                        <td> </td> 
+                        <td> </td>    
+                        <td class="droite">
+                            {% if finsolde[0].sens|lower == 'd' %} <strong> -{{finsolde[0].solde|number_format(0, '', ' ') }} </strong> {% endif  %} 
+                            {% if finsolde[0].sens|lower == 'c' %} <strong>{{finsolde[0].solde|number_format(0, '', ' ') }} </strong> {% endif %}
+                        </td>
+
+                    </tr>                
+                {% endif %}                     
+
+            </table>
+        {% endif %}
+
+
+
+
+    </div>
+{% endfor %}
+
+<!-- Fin page -->

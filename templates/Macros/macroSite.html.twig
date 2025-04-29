@@ -1,0 +1,441 @@
+{% macro PanelBanierre(imgbanierre,texte1,texte2,imglien,numpage) %}
+    {% if imgbanierre != "upload/rubriques/"   %}
+    <li>
+        <div>
+           
+            {% if numpage >0  %}
+                <h2 class="title hide">{{numpage}}</h2>
+            {% endif %}
+                
+            <img src="{{asset(imgbanierre)}}" alt="Bannière Site / Site banner" title=""/>
+            <div class="panel-slideText">
+                <h1>{{texte1|raw}}</h1>
+                <p>{{texte2|raw}}</p>
+                <div class="panel-slideText-foot commandBut">
+                    {% if imglien|trim != ''  %}
+                        <img src="{{asset(imglien)}}" alt="Action" title=""/>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </li>
+    {% endif %}
+{% endmacro %}
+{% macro PanelBanierreOld(imgbanierre,texte1,texte2,imglien,numpage) %}
+    
+    <div class="panel">
+            <div class="panel-wrapper">
+                
+                    {% if numpage >0  %}
+                        <h2 class="title hide">{{numpage}}</h2>
+                    {% endif %}
+                            <div class="panel-slideJpeg">
+                                  
+                                    <img src="{{asset(imgbanierre)}}" alt="Bannière Site / Site banner" title=""/>
+                            <div class="panel-slideText">
+                                
+                                    <h1>{{texte1|raw}}</h1>
+                                    <p> {{texte2|raw}}</p>                                    
+                                        
+                                        <div class="panel-slideText-foot commandBut">
+                                            {% if imglien|trim != ''  %}
+						<img src="{{asset(imglien)}}" alt="Action" title=""/>                                                
+                                            {% endif %}
+                                        </div>    
+                            </div>
+                            </div>
+            </div>
+     </div>
+   
+{% endmacro %}    
+{% macro TitreBanierre(texte1,texte2) %}
+     {% if ((texte1 !=null) or (texte1|trim|length !=0 )) or
+          ((texte2 !=null) or (texte2|trim|length !=0 ))
+      %}
+     <div class="banniere-titre">
+                {% if (texte1 !=null) or (texte1|trim|length !=0 ) %}
+                    <div class="styleRetrait styleRetrait-left bordoBox"><!-- PARTICULIER -->
+                            <div><h1 class="tests"><a href="">{{texte1|raw}}</a></h1></div>
+                            <span></span>
+                    </div>
+                {% endif %}             
+                {% if (texte2 !=null) or (texte2|trim|length !=0 ) %}
+                    <div class="banniere-descr">{{texte2|raw}} </div>
+                {% endif %}
+     </div>
+     {% endif %}
+{% endmacro %}
+{% macro TitreBanSansCrochet(texte1,texte2) %}     
+     <div class="banniere-titre">             
+        <div><h1 class="tests"><a href="">{{texte1|raw}}</a></h1></div>
+        <div class="banniere-descr">{{texte2|raw}} </div>                
+     </div>
+{% endmacro %}   
+{% macro LienVersRubrique(locale,idrubrique,typepresent,titre)%} 
+            <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':typepresent})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>    
+            {#% if typepresent==1%}
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>  
+            {% elseif typepresent==2%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>    
+            {% elseif typepresent==3%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>  
+            {% elseif typepresent==4%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>    
+            {% elseif typepresent==5%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>   
+            {% elseif typepresent==6%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':10})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>                                                   
+            {% else%}     
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}"><div class="partieDesc"><p>{{titre|raw}}</p></div></a>                                
+            {% endif%#}    
+
+{% endmacro %}
+{% macro LienVersRubriqueTitre(locale,idrubrique,typepresent,titre) %} 
+            
+            
+            {#% if typepresent==1%}
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+            {% elseif typepresent==2%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+            {% elseif typepresent==3%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+            {% elseif typepresent==4%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+            {% elseif typepresent==5% 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+            {% if typepresent!=0%} 
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':typepresent})}}">{{titre|raw}}</a>                                                   
+            {% else%}     
+                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>                                
+            {% endif%}    
+
+{% endmacro %}
+{% macro NoscriptBanierre(texte) %}
+    <noscript>
+            <div>
+               {{texte|raw}}                                          
+            </div>
+    </noscript>
+{% endmacro %}   
+{% macro AfficherSousRub(id,titre,description,imageSousRu,typepresent,locale)%}
+    
+                <div class="boxInterieur-type1"> <!-- PHP/ Boucler ce seul DIV -->
+                        <div class="cnt-boxInterieur-type1 coinsArrondis border-ciel">
+                                <div class="titre-boxInterieur-type1">
+                                        <h1 class="bleuLink title3">                                            
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==5% 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}">{{titre|raw}}</a>                                                   
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}">{{titre|raw}}</a>                                
+                                            {% endif%}                                            
+                                       </h1>
+                                </div>
+                                <div class="image-boxInterieur-type1">
+                                    {#% if typepresent==1%}
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':5})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /></a>
+                                    {% elseif typepresent==2%}       
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>   
+                                    {% elseif typepresent==3%} 
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':7})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                       
+                                    {% elseif typepresent==4%} 
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':6})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                                                          
+                                    {% elseif typepresent==5%} 
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':11})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                                   
+                                    {% elseif typepresent==6%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':10})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>
+                                      {% else%}
+                                         <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                  
+                                    {% endif%#}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /></a>                                                   
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /></a>                                
+                                            {% endif%}                                     
+				</div>
+                                <div class="descr-boxInterieur-type1">
+                                       {% if description !="- default text -" %}
+                                            {{description|raw}}
+                                       {% endif %}
+                                </div>
+                        </div>
+                </div>       
+{% endmacro %}   
+    
+{% macro AfficherSousRubLi(id,titre,description,imageSousRu,typepresent,locale)%}
+                            
+                                <li class='{{titre}}'>
+                                           
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':5})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>  
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':7})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':6})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>  
+                                            {% elseif typepresent==5%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':11})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a> 
+                                            {% elseif typepresent==6%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':10})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>                                                  
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>                                
+                                            {% endif%#}
+                                           
+                                             {% if typepresent!=0%} 
+                                                <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>                                                
+                                            {% else%}     
+                                                <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"> <img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /><span>{{titre}}</span> <div class="clear"></div></a>
+                                            {% endif%}                                                 
+                                </li>
+
+                                              
+{% endmacro %}
+    
+                                
+
+{% macro AfficherActualiteEntr(id,titre,description,imageSousRu,typepresent)%}                                
+    <li>
+        <table >
+            <tr>
+                <td colspan="2">
+                    <h2 class="capitaLetter">
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==5% 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}">{{titre|raw}}</a>                                                   
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}">{{titre|raw}}</a>                                
+                                            {% endif%} 
+                    </h2>
+                </td>
+            </tr>
+            <tr>
+                <td><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title=""  /></td>
+
+                <td><p  style="" >description</p></td>
+            </tr>
+
+        </table>
+    </li>                                                                              
+{% endmacro %}
+{% macro AfficherActualiteEntr(titre,description,imageSousRu)%}                                
+    <li>
+        <table >
+            <tr>
+                <td colspan="2">
+                    <h2 class="capitaLetter">                          
+                                {{titre}}                          
+                    </h2>
+                </td>
+            </tr>
+            <tr>
+                <td><img src="{{asset("upload/articles/"~imageSousRu)}}" alt="" title=""  /></td>
+
+                <td class="actualiteTest">{{description|raw}}</td>
+            </tr>
+        </table>              
+    </li>         
+{% endmacro %}
+    
+{% macro AfficherAgenceEntr(titre,description,imageSousRu)%}                                
+    <li>
+        <table >
+            <tr>
+                <td><img src="{{asset("upload/articles/"~imageSousRu)}}" alt="" title=""  /></td>
+                <td><h2 class="capitaLetter">                    
+                                {{titre}}</h2></td>
+                <td>{{description|raw}}</td>
+            </tr>
+
+        </table>             
+    </li>  
+
+{% endmacro %}   
+    
+                                
+{% macro AfficherSousRub2(id,titre,description,imageSousRu,typepresent)%}
+                 <div class="boxInterieur-type1"> <!-- PHP/ Boucler ce seul DIV -->
+                     <div class="cnt-boxInterieur-type1 coinsArrondis border-ciel">
+                         <div class="titre-boxInterieur-type1">
+                                <h1 class="bleuLink title3">
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==5% 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}">{{titre|raw}}</a>                                                   
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}">{{titre|raw}}</a>                                
+                                            {% endif%} 
+                              </h1>                            
+                         </div>
+                         <div class="image-boxInterieur-type1">
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==5% 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                                     
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}"><img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" title="" /></a>                                 
+                                            {% endif%}                                								</div>
+                         <div class="descr-boxInterieur-type1">
+                                    {% if description !="- default text -" %}
+                                         {{description|raw}}
+                                    {% endif %}
+                         </div>
+                     </div>
+                  </div>   
+{% endmacro %}        
+{% macro AfficherSousRubHaut(id,titre,imageSousRu,typepresent,idrubenv,locale) %}        
+                                <div class="lookupCategorie  {% if id == idrubenv %} active-lookupCategorie {% else %}{% endif %} coinsArrondis border-gris2 ">
+                                    <div>
+                                      <h4>
+                                            {#% if typepresent==1%}
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':5})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==2%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':2})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==3%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':7})}}">{{titre|raw}}</a>  
+                                            {% elseif typepresent==4%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':6})}}">{{titre|raw}}</a>    
+                                            {% elseif typepresent==5% 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': idrubrique, 'type':11})}}">{{titre|raw}}</a> #}  
+                                            {% if typepresent!=0%} 
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':typepresent})}}">{{titre|raw}}</a>                                                   
+                                            {% else%}     
+                                                 <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': id, 'type':2})}}">{{titre|raw}}</a>                                
+                                            {% endif%} 
+                                      </h4>
+                                  </div>
+                                </div>
+{% endmacro %}    
+{% macro AfficherSousRubCorrespondant(id,titre,imageSousRu,typepresent) %}             
+			<img src="{{asset("upload/rubriques/"~imageSousRu)}}" alt="" align="right" id="{{titre}}" title="{{ 'reseau.filtrer'|trans({}, 'site') }} : {{titre}}" />                                                                                                                
+{% endmacro %} 
+                        
+{% macro AfficherSolutionGral(listesousrub,locale) %}
+        {% for sousrub in listesousrub  %}                        
+                <div class="othone">
+                        <div class="othone-logo"><img src="{{asset("upload/rubriques/"~sousrub.urlMedia)}}" alt="" title="" width="80" height="67" /></div>
+                        <div class="othone-cnt listItem1">
+                            <h2>{#<a href="{{ path("utb_site_rubrique",{'locale': locale,'id': 8, 'type':15})}}">#}{{sousrub.nomRubrique}}{#</a>#}</h2>
+                                    {{sousrub.descriptionRubrique|raw}}
+                        </div>
+                        <div class="clr"></div>
+                        <div class="divButmoore othone-foot">                       
+
+                        </div>
+                </div>
+              
+          {% endfor %}              
+{% endmacro %}          
+           
+{% macro AfficherSolutionGralLi(nomRubrique,descriptionRubrique,urlMedia) %}
+        
+             
+                <li>
+                    <div class="onePrdSrv">
+                        <h2>{{nomRubrique}}</h2>
+                        <div class="rubrique">
+                            <div class="text">{{descriptionRubrique|raw}}</div>
+                            <div class="image"><img src="{{asset("upload/rubriques/"~urlMedia)}}" alt="" title="" /></div>
+                            <div class="clr"></div>
+                        </div>
+                    </div>
+                </li>
+                              
+{% endmacro %}  
+                
+{% macro AfficherSolutionGralEntr(nomRubrique,descriptionRubrique,urlMedia) %}        
+                <li>
+                    <table >
+                        <tr>
+                            <td><img src="{{asset("upload/rubriques/"~urlMedia)}}" alt="" title="" /></td>
+                            <td><h2 class="capitaLetter">{{nomRubrique}}</h2></td>
+                            <td class="truncate">{{descriptionRubrique|raw}}</td>
+                        </tr>
+
+                    </table>
+                </li>                                           
+{% endmacro %}  
+                
+{% macro AfficherArticleLi(nomRubrique,descriptionRubrique,urlMedia) %}
+        
+             
+                <li>
+                    <div class="onePrdSrv">
+                        <h4>{{nomRubrique}}</h4>
+                        <div class="rubrique">
+                            <div class="text">{{descriptionRubrique|raw}}</div>
+                            <div class="image"><img src="{{asset("upload/articles/"~urlMedia)}}" alt="" title="" /></div>
+                            <div class="clr"></div>
+                        </div>
+                    </div>
+                </li>
+                              
+{% endmacro %} 
+{% macro AfficherArticleLi2(id,nomRubrique,descriptionRubrique,urlMedia) %}
+        
+             
+                <li>
+                    <div class="onePrdSrv">
+                        <h4><a href="{{path("utb_site_article",{'id':id})}}">{{nomRubrique}}</a></h4>
+                        <div class="rubrique">
+                            <div class="text">{{descriptionRubrique|raw}}</div>
+                            <div class="image"><img src="{{asset("upload/articles/"~urlMedia)}}" alt="" title="" /></div>
+                            <div class="clr"></div>
+                        </div>
+                    </div>
+                </li>
+                              
+{% endmacro %} 
+                
+         
+{% macro Newsletter(titre,texte) %}   
+        <div class="rightBox newsletterBox border-gris1">	<!-- NEWSLETTER-->
+                <div class="rightBox-cnt butValideBordeau">
+                        <h2 class="title-WithTopBar bar-bordeau capitaLetter">{{titre}}</h2>
+                        <p>{{texte}}</p>
+                           {{ render(controller('utbSiteBundle:Site:contact', {'type': 1,'locale':locale})) }}  
+
+                        <a href="javascript:document.getElementById('j_bouton').click()">
+                           <input type="submit"/>
+                        </a>
+                </div>
+        </div>        
+{% endmacro %}      
+{% macro Sondage() %}              
+      {{ render(controller('utbSiteBundle:Site:sondage', {'type': 1,'locale':locale})) }}
+{% endmacro %}     
+   

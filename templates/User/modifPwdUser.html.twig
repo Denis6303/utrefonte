@@ -1,0 +1,39 @@
+
+                                                <form action="{{ path('user_change_eclate',{'id':unuser.id , 'type' : 1, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUser">
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.nameUser) }}
+													{{ form_label(form.nameUser, 'users.form.nom'|trans({}, 'users')) }}
+													{{ form_widget(form.nameUser) }}
+													<div class="clr"></div>
+													</div>
+													
+                                                                                                       
+                                                        
+                                                                                                            <div class="FrmAjoutArt">
+                                                                                                                <label class="required"> {{ "Ancien mot de passe" }} </label>
+                                                                                                                <input type="password" name="vpassword" id="vpassword" >
+                                                                                                                <div class="clr"></div>
+                                                                                                            </div>
+													
+                                                                                                        
+                                                                                                            <div class="FrmAjoutArt">
+                                                                                                                {{ form_errors(form.password) }}
+                                                                                                                {{ form_label(form.password, 'users.form.pass'|trans({}, 'users')) }}
+                                                                                                                {{ form_widget(form.password) }}
+                                                                                                                <div class="clr"></div>
+                                                                                                            </div>
+                                                        
+                                                                                                            <div class="FrmAjoutArt selectTypProfil">
+                                                                                                                {{ form_errors(form.cpassword) }}
+                                                                                                                {{ form_label(form.cpassword, "Confirmation ") }}
+                                                                                                                {{ form_widget(form.cpassword) }}
+                                                                                                                <div class="clr"></div>
+                                                                                                            </div>
+                                                        
+                                                        
+                                                                                                      
+
+													
+													
+												<input type="submit" value="Ajouter" name="op" id="j_bouton" >
+                                               </form>

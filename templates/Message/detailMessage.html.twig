@@ -1,0 +1,142 @@
+{# src/utb/AdminBundle/Resources/views/Admin/ajoutMenu.html.twig #}
+
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Message recu
+{% endblock %}
+  
+  {% block administration_body %}
+  {% for unmessage in detailmessage %}
+              <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listemessage', {'locale': locale})}}">{{ 'messageries.liste.grandtitrepg'|trans({}, 'messageries') }}</a> > {{ 'admin.detail'|trans }}
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-19">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-new-privatemessage.png')}}" alt="" title="" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'messageries.detail.titre'|trans({}, 'messageries')}} <span></span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-5 last">
+                              
+                            <div class="boutonGestion">
+                                <div><a href="{{ path('utb_admin_reponsemessage', {'id': unmessage.id}) }}"><img src="{{ asset('img/admin-img/envoyerMessage.png')}}" alt="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}" title="{{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}"/></div>
+                             {{ 'messageries.ajout.titre1'|trans({}, 'messageries') }}</a>
+                            </div>
+                            <div class="clr"></div>                              
+                             
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+ </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+ <div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+       <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">
+                                   <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						<h3 class="colorBleu titreInfos"> INFORMATIONS  </h3>
+				        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox autreInfoLinks">
+                                                            
+                                                               <a href="{{path('utb_admin_listemessage',{'locale':locale})}}">{{ 'messageries.liste.titrepg'|trans({}, 'messageries') }} 
+                                                                    {% for nbremsg in nbreMsgNonLu %}
+                                                                               
+                                                                    {% endfor %} 
+                                                                            
+                                                                    {% for unnbremsg in nbreMsgNonLu %}
+                                                                        {% for msg in nbreMsg %}
+                                                                             ({% if unnbremsg.msgLu ==0 %}{{msg.msg}}{%else %}<b>{{unnbremsg.msgLu}}</b>/{{msg.msg}}{%endif %})
+                                                                             
+                                                                        {% endfor %} 
+                                                                    {% endfor %} 
+                                                               </a> 
+                                                            
+                                                                <a href="{{path('utb_admin_listecorbeillemessage',{'locale':locale})}}">
+                                                                        {{ 'admin.corbeille'|trans}}
+                                                                        {% for unnbremsg in nbreMsgCorb %}                                             
+                                                                                 {% if unnbremsg.msgLu == 0 %}{%else %}({{unnbremsg.msgLu}}){%endif %}                                            
+                                                                        {% endfor %}                                                                         
+                                                                </a>
+                                                               <a href="{{path('utb_admin_listemessageenvoye',{'locale':locale})}}">
+                                                                   {{ 'admin.messageenvoye'|trans}}
+                                                                        {% for unnbremsgenv in nbreMsgEnv %}                                             
+                                                                                 {% if unnbremsgenv.msg == 0 %}{%else %}({{unnbremsgenv.msg}}){%endif %}                                            
+                                                                        {% endfor %}                                                                                
+                                                                                
+                                                               </a>                                                      
+                                                            </div>
+						</div>
+					 </div>                                    
+                                    
+                                    <!-- COLONNE GAUCHE-->
+                                    
+                                    
+                                   <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+						<h3 class="colorBleu titreInfos"> {{ 'services.dossiers.titre'|trans({}, 'services') }}  </h3>
+				        <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+							<div class="cntLeftBox autreInfoLinks">                                                                                                   
+                                                                 {# <a class="updateLink" href="#" onClick="modifierDossier( ); return false;">{{ 'services.dossiers.ajout'|trans({}, 'services') }}</a> #}                                                               
+                                                                 {% for unservice in listeservice %}
+                                                                        <a href="{{ path('utb_admin_listemessage', {'idservice': unservice.id,'locale':locale}) }}" onMouseover="affichersupprimer({{unservice.id}})" >{{unservice.libService}} </a> 
+                                                                        <a href="{{ path('utb_admin_supprservice', {'id': unservice.id,'locale':locale,'type':1}) }}" onClick="return(confirm('Voulez-vous supprimer ce dossier?'))"><img src="{{ asset('img/admin-img/icon-16-delete.png')}}" alt="Supprimer" title="Supprimer" style="display:none" id="{{"btsupprimer"~unservice.id}}"/> </a><br/>  
+                                                                {% endfor %}                                                            
+                                                        </div>
+						</div>
+				 </div> 
+                                    
+
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->			<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+					<div class="colRight">	
+						<div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+						<div class="colRightContentPadding">
+							<div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+								<div class="MarginBottomBox">
+									<span class="colorBleu">{{ 'messageries.internaute'|trans({},'messageries')}}</span> 
+									<span class="">{{unmessage.mailInternaute}}</span>
+									<div class="btModifier"></div>
+									<div class="clr"></div>
+								</div>                                                            
+								<div class="">
+									<span class="colorBleu">{{ 'messageries.titre'|trans({},'messageries')}} : </span> 
+									<span class="">{{unmessage.titreMessage}}</span>
+									<div class=""></div>
+									<div class="clr"></div>
+								</div>
+									
+								<div class="">
+									<span class="colorBleu">{{ 'messageries.contenu'|trans({},'messageries')}}: </span> 
+									<span class="">{{unmessage.contenuMessage}} </span>
+									<div class="clr"></div>
+								</div>
+								<div class="MarginBottomBox">
+									<span class="colorBleu">{{ 'services.ajout.titre3'|trans({}, 'services') }}: </span> 
+									<span class="">{{unmessage.libService}}</span>
+									<div class="btModifier"></div>
+									<div class="clr"></div>
+								</div>
+								<div class="MarginBottomBox">
+									<span class="colorBleu">{{ 'objets.ajout.titre3'|trans({}, 'objets') }} : </span> 
+									<span class="">{{unmessage.libObjet}}</span>
+									<div class="btModifier"></div>
+									<div class="clr"></div>
+								</div>
+								
+							</div>
+						</div>			<!-- FIN colRightContentPadding-->
+					</div>
+					</div>		<!--  FIN COL RIGHT -->
+				</div>			<!--  FIN  SPAN - 19 -->
+
+                              </div>				<!--  FIN SPAN - 25 -->
+  {% endfor %}
+  {% endblock %}
+  

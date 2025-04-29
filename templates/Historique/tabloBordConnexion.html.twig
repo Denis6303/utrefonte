@@ -1,0 +1,91 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+				
+  
+  
+{% block client_centre_body %} 
+    <ul class="filariane bleuLink">
+		<li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'historique.recherche'|trans({}, 'messages')}}</li>
+		<li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+		<li>{{ 'historique.titre'|trans({}, 'messages')}}</li>
+    </ul>
+	<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{ 'historique.titre'|trans({}, 'messages')}}</h2>
+    {#		#}
+    {%if listehistor is defined and listehistor!= null%}
+    <div class="menu_messag">
+        <div class="onglets title3">            
+               {% for an in listean %}
+                        <span class="onglet_0 onglet read" id="onglet_read"><a href="{{ path("utb_client_gethistor",{'locale':locale,'an':an.annee,'mois':0}) }}">{{an.annee}}</a></span>
+               {% endfor %}                        
+        </div>
+    </div> 
+ 
+        {% for mois in listehistor['lesmois'] %}     
+             <h3 class="bgGrisatr1 title3 bleuLink operMois"><a href="{{ path("utb_client_gethistor",{'locale':locale,'an':an,'mois':mois.mois}) }}">{{  mois.mois|moislangue(locale) }}</a></h3> 
+             <h3 class="bgGrisatr1 title3 bleuLink operMois"><a href="{{ path("utb_client_gethistor",{'locale':locale,'an':an,'mois':mois.mois}) }}">{{ 'historique.all'|trans({}, 'messages')}}</a></h3>	
+             <div class="clr"></div>
+             <table class="infoCompte noLeftBorder noGras">
+                                                         <tbody>
+                                                          <tr>
+                                                            <th>&nbsp; </th>
+                                                            <th>{{ 'historique.dateDeb'|trans({}, 'messages')}}</th>
+                                                            <th>{{ 'historique.dateFin'|trans({}, 'messages')}}</th>
+                                                            <th> {{ 'historique.duree'|trans({}, 'messages')}} </th>
+                                                          </tr>  	
+                                                         {% for liste in listehistor[mois.mois]['liste'] %}     
+                                                                <tr>
+                                                                    <td style="width:30px;"> <img src="{{ asset('img/client-img/puce-pencil-gris.png')}}" alt="" title="" /> </td>
+                                                                    <td style="width:300px;">{{liste.dateDeb|date('d/M/Y H:i:s')}}</td>                         
+                                                                    <td style="width:250px">
+                                                                                {% if liste.dateFin != null %}   
+                                                                                    {{liste.dateFin|date('d/M/Y H:i:s')}}                                
+                                                                                {% else %} 
+                                                                                     -
+                                                                                {% endif %} 
+                                                                    </td>                              
+
+                                                                    <td style="width:200px;">
+                                                                                {% if liste.duree != '' %}   
+                                                                                    {{liste.duree}}                                
+                                                                                {% else %} 
+                                                                                   {% if loop.index != 1 %}
+                                                                                       {{ 'historique.tempsConnexion'|trans({}, 'messages')}}
+                                                                                   {% else %}
+                                                                                       Connexion en cours ...
+                                                                                   {% endif %}
+                                                                                {% endif %} 
+                                                                    </td>
+                                                                </tr>
+                                                         {% endfor %}
+                                                         
+                                                         </tbody>
+             </table>    
+             {% endfor %}
+   {% endif %} 
+ 
+
+<script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getMessagesID(){
+           
+            var messages_id = "";
+            
+            $(":input[rel=message_c]:checked").each(function(){
+		messages_id = messages_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });               
+            return messages_id;
+       }
+</script>                                                
+ <div id="process_tpl" style="display:none;"></div> 
+{% endblock %}
+                                            

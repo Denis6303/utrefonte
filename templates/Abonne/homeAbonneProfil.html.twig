@@ -1,0 +1,175 @@
+{# src/utb/AdminBundle/Resources/views/Admin/index.html.twig #}
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.espaceadminaccueil'|trans}}
+{% endblock %}  
+        
+{% block administration_body %}
+  				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > {{ 'admin.layout.menu.abonnes'|trans }} 
+</div>
+            
+<div class="span-25">			<!-- TOUTE LA PAGE CENTRALE : MODULES + DETAILS -->
+      {#% for message in app.session.flashbag.get('accesdenied') %}
+        <div class="error">{{ message|trans }}</div>
+      {% endfor %#} 
+    <div id="tableauBord" class="coinsArrondis colorCadreArrondi bgGris">
+            <div class="boxAllRubriquesBOX">	<!-- span-13 -->	
+            <div class="boxAllRubriques">
+
+                    <div class="ilustreModule bgBlanc coinsArrondisMin">
+                            <a class="defaultColor hoverBleu" href="{{path('utb_admin_listeprofil', {'locale': locale})}}" title="{{ 'admin.layout.menu.titreart'|trans}}">
+                                    <div class="logoModule"><img src="{{ asset('img/admin-img/icon-48-groups.png')}}" alt="{{ 'admin.layout.profil'|trans}}" title="{{ 'admin.layout.profil'|trans}}" /></div>
+                                    <span>{{ 'admin.layout.profil'|trans}}</span>
+                            </a> 
+                    </div>
+                
+                    <div class="ilustreModule bgBlanc coinsArrondisMin">
+                            <a class="defaultColor hoverBleu" href="{{path('utb_admin_droit', {'locale': locale})}}" title="{{ 'admin.layout.menu.titrerub'|trans}}">
+                                    <div class="logoModule"><img src="{{ asset('img/admin-img/icon-48-cpanel.png')}}" alt="{{ 'admin.layout.droit'|trans}}" title="{{ 'admin.layout.droit'|trans}}" /></div>
+                                    <span>{{ 'admin.layout.droit'|trans}}</span>
+                            </a> 
+                    </div>
+
+		    <div class="ilustreModule bgBlanc coinsArrondisMin">
+                            <a class="defaultColor hoverBleu" href="{{path('liste_utilisateur', {'locale': locale})}}" title="{{ 'admin.layout.menu.titreabonnes'|trans}}">
+                                    <div class="logoModule"><img src="{{ asset('img/admin-img/icon-45-abonne.png')}}" alt="{{ 'admin.layout.abonne'|trans}}" title="{{ 'admin.layout.abonne'|trans}}" /></div>
+                                    <span>{{ 'admin.layout.abonne'|trans}}</span>
+                            </a> 
+                    </div>
+
+                    <div class="ilustreModule bgBlanc coinsArrondisMin">
+                         {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                            <a class="defaultColor hoverBleu" href="{{ path('fos_abonne_security_logout') }}">
+                                    <div class="logoModule"><img src="{{ asset('img/admin-img/ball-cute-shutdown-icone.png')}}" alt="{{ 'admin.layout.deconect'|trans}}" title="{{ 'admin.layout.deconect'|trans}}" /></div>
+                                    <span>{{ 'admin.layout.deconect'|trans}}</span>
+                            </a> 
+                           {% endif %}     
+                    </div>
+                                                               
+                    <div class="clr"></div>
+            </div>
+            </div> <!-- FIN SPAN 13-->
+
+            <div class="boxVisualRubriqBOX"> 	<!-- span-11 last -->			
+            <div class="boxVisualRubriq" > 		<!-- PARTIE DROITE AVEC ACORDEON etc.-->
+                    <div id="accordion">
+
+                            {% for texte in letexte %}
+                                {% if (texte is not null) and (texte.actif == 1) %}
+                                <h3>{{ texte.titre|raw }}</h3>
+                                <div class="conteuTextJustify">
+
+                                    <p>{{ texte.description|raw }}</p>    
+
+                                </div>
+                                {% endif %}    
+                            {% endfor %}                        
+                                                
+                            <h3>{{ 'admin.index.artrecentpub'|trans}}</h3>
+                            <div>
+                                    <table class="listMenusCateg listArticlesRub">
+                                            <tr>
+                                                    <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                            </tr>
+                                            {% for article in listearticlerecent %}
+                                                {% if article.titreArticle is not null %}
+                                                <tr {% if loop.index is divisibleby(2) %} class="bgBlanc"{% else %} class="bgGris" {% endif %}>
+                                                        <td class="numArtList" style="width:80px"> {{'N°'~article.id}}</td>
+                                                        <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                            
+                                                        {{ information.statutlisteaccordeon(article)}}    
+                                                            
+                                                        <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                        <td class="langArtList"> {{locale}}</td>
+                                                </tr>
+                                                {% endif %} 
+                                            {% endfor %}
+                                           
+                                    </table>
+                                    {% if (listearticlerecent is not null) and (listearticlerecent|length>0) %}
+                                    <div class="listecomplete"><a href="
+                                                                  {{path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 4,'locale': locale}) }}
+                                                               " >{{ 'admin.voirtout'|trans}}</a></div>
+                                    {% endif %}
+                            </div>
+
+                            <h3>{{ 'admin.index.artattentepub'|trans}}</h3>
+                            <div>
+                                    <table class="listMenusCateg listArticlesRub">
+                                            <tr>
+                                                    <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                            </tr>					 
+                                           {% for article in listearticleattente %}
+                                                {% if article.titreArticle is not null %}
+                                                <tr {% if loop.index is divisibleby(2) %} class="bgBlanc"{% else %} class="bgGris" {% endif %}>
+                                                        <td class="numArtList"  style="width:80px"> {{'N°'~article.id}}</td>
+                                                        <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+                                                                                                                
+                                                        {{ information.statutlisteaccordeon(article)}}
+                                                        
+                                                        <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                        <td class="langArtList"> {{locale}}</td>
+                                                </tr>
+                                                {% endif %} 
+                                            {% endfor %}
+                                    </table>
+                                    {% if (listearticleattente is not null) and (listearticleattente|length>0) %}
+                                        <div class="listecomplete"><a href="{#{ path('utb_admin_listearticleattente', {'locale': locale}) }#}
+                                                                        {{path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 3,'locale': locale}) }}
+                                                                      " >{{ 'admin.voirtout'|trans}}</a></div>
+                                    {% endif %}
+                            </div>
+                            
+                            <h3>{{ 'admin.index.artsoumis'|trans}}</h3>
+                            <div>
+                                    <table class="listMenusCateg listArticlesRub">
+                                            <tr>
+                                                    <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                                                    <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+                                            </tr>					 
+                                           {% for article in listearticlesoumis %}
+                                                {% if article.titreArticle is not null %}
+                                                <tr {% if loop.index is divisibleby(2) %} class="bgBlanc"{% else %} class="bgGris" {% endif %}>
+                                                        <td class="numArtList"  style="width:80px"> {{'N°'~article.id}}</td>
+                                                        <td class="titreArtList"><a href="{{ path('utb_admin_detailarticle', {'id': article.id,'locale': locale,'type': article.idrubrique}) }}" >{{article.titreArticle}}</a></td>
+
+                                                        {{ information.statutlisteaccordeon(article)}}
+                                                        
+                                                        <td class="dateArtList"> {{article.articleDateAjout|date("d/m/Y")}}</td>
+                                                        <td class="langArtList"> {{locale}}</td>
+                                                </tr>
+                                                {% endif %} 
+                                            {% endfor %}
+                                    </table>
+                                    {% if (listearticlesoumis is not null) and (listearticlesoumis|length>0) %}
+                                        <div class="listecomplete"><a href="{#{ path('utb_admin_listearticleattente', {'locale': locale}) }#}
+                                                                        {{path('utb_admin_ListeParStatut', {'id': 0,'page': 1,'statut': 2,'locale': locale}) }}
+                                                                      " >{{ 'admin.voirtout'|trans}}</a></div>
+                                    {% endif %}
+                            </div>                            
+                            
+                            
+                    </div>		<!-- FIN des accordéons -->
+            </div>			<!-- FIN boxVisualRubriq APercus -->
+            </div>			<!-- FIN SPAN - 12 -->
+            <div class="clr"></div>
+    </div> <!-- FIN tableauBord -->
+</div> 	<!-- FIN SPAN - 25 -->    
+{% endblock %}

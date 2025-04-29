@@ -1,0 +1,49 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+{% block title %}
+  {{ parent() }} - Nos services
+{% endblock %}  
+{% block public_body %}
+<script type="text/javascript" src="{{ asset('js/site-js/tabulation.js') }}"></script>
+
+{% if larubrique[0].id != 7 %}    
+            
+    <div class="span-24 borderBotStyle marginBottom20p paddingBottom20p bgBlanc positionRelative">
+            {#<button class="prev">prec.</button>
+            <button class="next">suiv.</button>#}
+      <div id="tabulation" class=" blocService menuCoulissant" style="background: none;">  
+        <ul class="menuService" style="position: relative;">
+                {% for categorie in listesousrub | reverse %} 
+                       <li><a href="{{'#'~categorie.id}}" title="">{{categorie.nomRubrique}}</a></li>
+                         {#<div class="leftSpace rightSpace"> 
+                                 <h1 class="boxSection-titre title-WithLeftBar bleuLogo">{{categorie.nomRubrique}}</a></h1>  
+                         </div> #}                                                                                 
+                 {% else %}
+
+                 {% endfor %}           
+                  <div class="clr" style="background: none;"></div>
+            </ul>
+       
+       <div id="tabulConteneur" class="span-24" style="position: relative;">
+         {% for categorie in listesousrub | reverse %}
+          <div id="{{categorie.id}}" class="bolocus conteneurDetails">
+             <div class="span-10 detailsService">
+                  {{categorie.descriptionRubrique|raw}}
+              </div>
+              <div class="span-12 imageService">
+                    {% if categorie.urlMedia != "" %}
+                        <img src="{{ asset('upload/rubriques/'~categorie.urlMedia)}}" alt="" title="" style="margin-left: 25px; ;float:left;"/> 
+                    {% endif %}
+              </div>
+              <div class="clr"></div>
+          </div>
+         {% else %}
+
+         {% endfor %}
+       </div>
+        </div>
+    </div>   
+
+{% endif%}
+
+{% endblock %}

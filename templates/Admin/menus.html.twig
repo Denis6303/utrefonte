@@ -1,0 +1,196 @@
+{# src/utb/AdminBundle/Resources/views/Admin/menus.html.twig #}
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - Droits
+{% endblock %}
+  
+  {% block administration_body %}
+            
+
+ <div class="span-25">		<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                                                 {% if app.session.hasFlash('notice') %}
+                                                     <div class="error">{{ app.session.flash('notice') }}</div> 
+                                                 {% endif %}           
+       <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+								  
+                                    {# BOX INFOS #}    
+                                    {{ information.boxinfos(infos,infos.paramDescription,infos.actif) }}                                       
+                                      
+                                    {# STATISTIQUES #}  
+                                    {{ information.stats(listestat) }} 
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+
+											<table class="listMenusCateg">
+													<tr>
+															<th> </th>
+															<th>{{ 'menus.gestion.titregrpemenu'|trans({},'menus')}} </th>
+															<th>{{ 'menus.gestion.visibilite'|trans({},'menus')}}</th>
+															<th>{{ 'menus.gestion.menus'|trans({},'menus')}}</th>
+															<th colspan="2">{{ 'menus.gestion.actions'|trans({},'menus')}}</th>
+													</tr>
+													
+												{% for groupe in GroupeMenu %}
+													<tr {% if loop.index is even %} {% else %}class="bgBlanc"{% endif %}>
+														<td><input type="checkbox" /></td>
+															<td class="titreMenuGrpe">{{groupe.getLibGroupeMenu}}</td>
+															<td>{{groupe.getVisibileteGroupeMenu}}</td>
+															<td><a href="{{path('utb_admin_listeLiens', {'groupe': groupe.getId})}}">{{ 'menus.gestion.listliens'|trans({},'menus')}}</a></td>
+															<td><a href="#" onclick="modifierGroupeMenu({{groupe.getId}},{{'\''~locale~'\''}});return false;" class="updateLink">{{ 'menus.gestion.modif'|trans({},'menus')}}</a></td>
+															<td><a href="#" onclick="addMenu({{groupe.getId}});return false;" class="addLink">{{ 'menus.gestion.ajout'|trans({},'menus')}}</a></td>
+													</tr> 
+												<tr class="{% if loop.index is even %} {% else %}bgBlanc{% endif %} commentsMenu" >
+														<td colspan="6"><i>{{groupe.getCommentaireGroupeMenu|raw}}</i></td>
+													</tr>            
+												{% endfor %}
+											  </table>     
+                                         <div class="clr"></div>
+
+									  </div>			<!-- FIN colRightContentPadding-->
+								  </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+							  </div>		<!--  FIN COL RIGHT -->
+						  </div>			<!--  FIN  SPAN - 19 -->
+
+					  </div>				<!--  FIN SPAN - 25 -->
+  <style>
+      #formModifGroup_container{
+          text-align:center;
+      }  
+      #formModifGroup_container label{
+          text-align:right;
+          width:100px;
+          float:left;
+      }   
+      #formModifGroup_container input{
+          float:left;
+          margin-left:10px;
+      }
+  </style>                                 
+  <div id="formModifGroup_container" style="display:none;">
+      <form id="form_groupe" method="POST">
+             <div id="wait_bloc_m" style="display:none;">
+                   <img src='{{ asset('img/wait.gif') }}' />
+              </div>
+              <div class="clr"></div>
+              <p >
+                  <span class="colorBleu"><label>{{ 'menus.groupe.libelle'|trans({},'menus')}}<label></span> 
+                   <input type="text" name="libelle" id="libelle" style="width:200px; height:20px;">           
+              </p> 
+               <div class="clr"></div>
+              <p >
+                  <span class="colorBleu"><label>{{ 'menus.groupe.commentaire'|trans({},'menus')}}<label></span> 
+                              <textarea name="commentaire" id="commentaire" style="width:300px;height:100px;" >
+                              </textarea>           
+              </p>      
+              <input type="hidden" id="idgroupe" name="idgroupe" value="">
+             <div class="clr"></div>         
+      </form>    
+  </div>                            
+  <script>
+      function addMenu(idGroup){
+          click_precedent();
+        var args = {modal: true, autoOpen: false, title: ('{{ 'menus.gestion.ajout2'|trans({},'menus')}}'), width:600,height:500};
+        $('#form_ajout_menu').dialog(args);
+            $('#form_ajout_menu').dialog({
+		buttons: {                
+			"{{ 'admin.annuler'|trans({},'messages')}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })             
+           $('#form_ajout_menu').dialog('open');
+          $("#idgroupemenu").val(idGroup);
+      }
+      
+      function modifierGroupeMenu( idGroup,locale ){
+     
+        
+        // on fait un ajax pour aller récupérer les valeurs du groupe
+         $.ajax({
+               type: "POST",
+                url: "{{ path('utb_admin_getGroupe')}}",
+                data: {idgroupe:idGroup,local:locale},
+                cache: false,
+                success: function(data){
+                    var resJson = jQuery.parseJSON(data);
+                    $("#libelle").val( resJson.data.libelle );
+                    $("#commentaire").val( resJson.data.commentaire );
+                }
+         }); 
+          
+         var args = {modal: true, autoOpen: false, title: ('{{ 'menus.groupe.modifier'|trans({},'menus')}}'), width:500,height:300};
+         $('#formModifGroup_container').dialog(args);
+            $('#formModifGroup_container').dialog({
+		buttons: {   
+			"{{ 'admin.btnvalider'|trans({},'messages')}}": function() {                         
+                            $("#wait_bloc_m").show();
+                            $.ajax({
+                               type: "POST",
+                                url: "{{ path('utb_admin_menus')}}",
+                                data: {formdata:$('#form_groupe').serialize(),locals:locale},
+                                cache: false,
+                                success: function(data){
+                                      var resJson = jQuery.parseJSON(data);
+                                      if( resJson.result == "success"){
+                                           window.location.reload();
+                                      }      
+                                       else
+                                            alert("Erreur durant le traitement. Veuillez réessayer svp.");           
+                                     //console.log(data);
+                                }
+                          });                          
+			},                    
+			"{{ 'admin.annuler'|trans({},'messages')}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })             
+           $('#formModifGroup_container').dialog('open');
+           $("#idgroupe").val(idGroup);
+      }
+
+  </script>
+  <div id="form_ajout_menu" style="display:none;">
+    {% include "utbAdminBundle:Admin:ajoutMenuForm1.html.twig"  %}
+        <div class="butonAccord boutonSavePosition" style="float:right;" id="suivant_container"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a href="#" id="suivant">{{ 'admin.suivant'|trans({},'messages')}}</a></h4></div><div class="clr"></div>         
+        <div class="butonAccord boutonSavePosition" style="float:left; display:none;"  id="precedent_container"><h4 class="ui-state-default ui-corner-all"><span class="ui-icon hackStyle"></span><a href="#" id="precedent">{{ 'admin.precedent'|trans({},'messages')}}</a></h4></div><div class="clr"></div>         
+        
+     <script>
+      $("#suivant").click(function(){
+          click_suivant()
+      });
+      $("#precedent").click(function(){
+          click_precedent();
+      });  
+      
+      function click_precedent(){
+         $("#form1").show();
+         $("#form2").hide();
+         $("#suivant_container").show();
+         $("#precedent_container").hide();  
+         $("#wait_bloc").hide();
+      }
+      function click_suivant(){
+         $("#form1").hide();
+         $("#form2").show();
+         $("#suivant_container").hide();
+         $("#precedent_container").show();  
+         $("#wait").html("");
+      }
+     </script>
+  </div>   
+  {% endblock %}
+  

@@ -1,0 +1,589 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'admin.grandtitre'|trans({}, 'messages') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+  
+<!-- Pour la gestion des erreur ddddd -->  
+  
+    				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="">{{  'admin.layout.menu.maintenance'|trans({}, 'messages') }}</a> > {{  'admin.banniereaccueil'|trans({}, 'messages') }}
+            </div>
+                                
+
+            {% for contenu in app.session.flashbag.get('notice') %}
+            
+                {% if contenu == "successajtart" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                            {{  'notification.ajoutbn'|trans({}, 'articles') }}                    
+                        </div>
+                    </div>
+                    {% elseif contenu == "errortypficart" %}
+					<div class="span-25">
+						 <div class="error errorMsg">
+                        {{ 'notification.errortype'|trans({}, 'articles') }}
+						 </div>
+					</div>
+                        
+                    {% elseif contenu == "successupimg" %}
+					<div class="span-25">
+						 <div class="success successMsg">
+                        {{ 'confirmation.successupimg'|trans({}, 'articles') }}
+						 </div>
+					</div>            
+                {% elseif contenu == "successajtrub" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%} 
+                            {{  'notification.ajoutbn'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                            {{  'notification.ajoutsousrubbn'|trans({}, 'rubriques') }}
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}                            
+                            {{  'notification.ajoutcategbn'|trans({}, 'rubriques') }}                   
+                        {% endif %}                        
+                        </div>
+                    </div>
+            
+                {% elseif contenu == "errorajtrub" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.ajoutsousrubbad'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.ajoutcategbad'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.ajoutbad'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>            
+            
+            
+                {% elseif contenu == "successsuprub" %}
+
+                    <div class="span-25">
+                        <div class="success successMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supsousrubbn'|trans({}, 'rubriques') }}                    
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.supcategbn'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.supbn'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>            
+            
+                {% elseif contenu == "errorsuprub" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supbad'|trans({}, 'rubriques') }}                   
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                            {{  'notification.supsousrubbad'|trans({}, 'rubriques') }}
+                        {% else %}
+                            {{  'notification.supcategbad'|trans({}, 'rubriques') }}                    
+                        {% endif %}                        
+                        </div>
+                    </div>         
+                        
+                {% elseif contenu == "successmodrub" %}
+             
+                    <div class="span-25">
+                        <div class="success successMsg">                                
+                            {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0%} 
+                                {{  'notification.modifbn'|trans({}, 'rubriques') }}                     
+                            {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent%}
+                                {{  'notification.modifsousrubbn'|trans({}, 'rubriques') }}
+                            {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent != rubrique.idParent%}                            
+                                 {{  'notification.modifcategbn'|trans({}, 'rubriques') }}                 
+                            {% endif %}                                                                                                 
+                        </div>                                                        
+                    </div>             
+            
+                {% elseif contenu == "errormodrub" %}
+           
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                            {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                                {{  'notification.modifsourubbad'|trans({}, 'rubriques') }}                    
+                            {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+                                {{  'notification.modifcategbad'|trans({}, 'rubriques') }}
+                            {% else %}
+                                {{  'notification.modifbad'|trans({}, 'rubriques') }}                    
+                            {% endif %}                        
+                        </div>
+                    </div> 
+            
+                    {% elseif contenu == "errorsuprubbase" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                            
+                            
+                            {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                                {{  'notification.supbadsysteme'|trans({}, 'rubriques') }}                     
+                            {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                                                                              
+                                {{  'notification.supsousrubbadsysteme'|trans({}, 'rubriques') }}                            
+                            {% else %}
+                                {{  'notification.supcategbadsysteme'|trans({}, 'rubriques') }}                   
+                            {% endif %} 
+                            
+                        </div>
+                    </div>       
+                    
+             {% elseif contenu == "reussitesupprdesc" %}
+            
+                    <div class="span-25">
+                        <div class="success successMsg">
+                            {{  'notification.reussitesupprdesc'|trans({}, 'rubriques') }}
+                        </div>
+                    </div>
+            
+            {% elseif contenu == "echecsupprdesc" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">
+                            {{  'notification.echecsupprdesc'|trans({}, 'rubriques') }}
+                        </div>
+                    </div>
+            
+                    {% elseif contenu == "errorsuprubcontenu" %}
+            
+                    <div class="span-25">
+                        <div class="error errorMsg">            
+                        {% if rubrique.idParent ==0 and rubrique.idGrandParent ==0 and rubrique.idGrandParent == rubrique.idParent%} 
+                            {{  'notification.supbadcontenu'|trans({}, 'rubriques') }}     
+                               
+                                
+                        {% elseif rubrique.idParent !=0 and rubrique.idGrandParent !=0 and rubrique.idGrandParent == rubrique.idParent %}                      
+        
+                            {{  'notification.supsousrubbadcontenu'|trans({}, 'rubriques') }}    
+                                
+                        {% else %}
+                            {{  'notification.supcategbadcontenu'|trans({}, 'rubriques') }}   
+                                
+                        {% endif %}             
+                         </div>
+                    </div> 
+            
+                {% endif %}
+            {% endfor %}                                
+                                
+			
+	<div class="span-25">			<!-- Contien les menus -->
+		<div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+			<div class="span-14">
+				<div class="logoModulePage"><img src="{{ asset('img/admin-img/home-48-icon.png')}}"  alt="" title="" /></div>
+				<div class="titreModule colorBleu"> <h1 style="padding-bottom: 5px;">{{'admin.titreaccueil'|trans({}, 'messages')}}</h1></div>	
+				<div class="clr"></div>
+			</div>
+			<div class="span-10 last"> </div>
+			<div class="clr"></div>
+		</div>
+	</div>
+					
+	<div class="span-25 ">
+		<div class="backgrdIntCadre MarginBottomBox">
+			<h1 class="titresect colorBleu">{{'rubriques.gestbannieres'|trans({}, 'rubriques')}}</h1>
+			<div class="addBan2">
+				<a class="addLink" href="#" onClick="ajoutBanniere(); return false;">	{{'rubriques.addbanniere'|trans({}, 'rubriques')}}</a>
+			</div>
+
+			<div class="FrmAjoutArt FrmTopDetailArt FrmInRubriqTop" id="ajoutBanniere_container" style="display:none;">
+				<div style="float:left;">
+				{{ render(controller('utbAdminBundle:Rubrique:ajoutMediaRubrique', {'id':0,'locale':locale,'type':1})) }}  
+				</div>
+				<a href="#" class="noSoulignHover" onClick="AnnulerAjoutBanniere( ); return false;">{{'admin.annuler'|trans}}</a>
+				<div class="clr"></div>
+			</div>
+
+			<div class="allBann">
+		{% for unimage in banniere %}
+                      {% if unimage.urlMedia !=""%}
+			<div class="onePic colorCadreNonArrondi">
+				<div class="picMini">
+				<img src="{{  asset('upload/rubriques/'~unimage.urlMedia)}}" alt="" title="" width="220" height="70"/>
+				</div>
+				{#<div class="namePicMini">{{unimage.nomMedia|raw}}</div>#}
+				<div class="actionPicMini"><a href="javascript:void(0);" onclick="corbeilleAllBanniere( {{unimage.idMedia}} ); return false;"><img src="{{ asset('img/admin-img/icon-16-delete.png')}}" alt="{{ 'admin.supprimer'|trans}}" title="{{ 'admin.supprimer'|trans}}" /></a></div>
+				<div class="clr"></div>
+			</div>
+                       {% endif %}
+		{% endfor %} 
+		<div class="clr"></div>							 
+			</div>
+		</div> <!-- FIN.backgrdIntCadre-->                                        
+	</div>                                         
+    
+	
+	<div class="span-25"> 
+	<div class="backgrdIntCadre">
+	
+	<h1 class="titresect colorBleu">{{'rubriques.gestencart'|trans({}, 'rubriques')}}</h1>
+	<div class=""><a href="{{ asset('img/admin-img/encartsBig.png')}}" data-lightbox="Image_1">{{'rubriques.apercuencart'|trans({}, 'rubriques')}}</a></div>
+	<p class="gris-comment"><em>{{'rubriques.encartselect'|trans({}, 'rubriques')}}</em></p>
+	{% if unerubrique|length > 0 %}
+		<table>
+
+		{% set i =0 %}
+		{% if listecadre|length >0 %}
+		{% for cadre in listecadre %}
+			<tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgblanc"  {% endif %}>
+				<td style="width:80px;">{{cadre.libCadre }} </td>
+				<td style="width:250px;"> 
+					{% if unerubrique[i] |length >0 %}			
+						{{unerubrique[i][0].nomRubrique}}
+					{% endif %}
+				</td>
+				<td style="width:250px;">  
+					<div id="{{"rubrique_container"~cadre.id}}" style="display:none;">
+						<form action="{{ path( "utb_admin_modifcadrerubriquebanniere", {'id': cadre.id,'locale':locale})}}" method="post">
+							<select class="" name="idrubrique" id="form_rubriquearborescence" style="width:250px; padding:4px;">
+								<option value="0">{{'menus.selectionner'|trans({}, 'menus')}}</option>
+							{% for rb in rubriques %}
+								<option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+							{% endfor %}
+							</select>
+							<input class="sbmt" type="submit"  value="{{ 'admin.btnvalider'|trans({}, 'messages')}}"/>
+						</form>
+					</div>                                                                            
+				</td>
+				<td style="width:40px; text-align:center;"><a href="#" onClick="afficherRubrique({{cadre.id}}); return false;">{{'admin.modifier'|trans({}, 'messages')}}</a> </td> 
+			</tr> 
+		{% set i =i+1 %}
+		{% endfor%}
+		{% endif %}
+		</table>  
+	
+	
+	<h1 class="titresect colorBleu">{{'rubriques.gestencartarticles'|trans({}, 'rubriques')}}</h1>
+	<p class="gris-comment"><em>{{'rubriques.encartselectart'|trans({}, 'rubriques')}}</em></p>
+	
+	<select name="idrubrique" class="larubrique" style="width:300px; padding:4px;">
+		<option value="0">--- {{ 'articles.selectRubrique'|trans({},'articles')}} --- </option>
+		{% for rb in rubriques %}
+		<option value="{{ rb.getId }}">{{ rb.getNomRubrique }}</option>
+		{% endfor %}
+	</select>
+	
+	<table>
+		{% set i =0 %}
+		{% for cadre in listecadreArticle %}
+		<tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgblanc"  {% endif %}>
+			<td style="width:80px;">{{cadre.libCadre }} </td>
+			<td style="width:250px;">
+				{% if unarticle[i] != null%}
+				{% if unarticle[i] != null%}
+				{{unarticle[i][0].titreArticle}} 
+				{% endif%}
+				{% endif%}
+			</td>
+			<td style="width:250px;">
+				<div id="{{"rubrique_container"~cadre.id}}" style="display:none;">
+				<form action="{{ path( "utb_admin_modifcadrearticlebanniere", {'id': cadre.id,'locale':locale})}}" method="post">
+					<select name="larticle" class="larticle" style="width:220px; padding:4px;"> </select>                             
+					<input class="sbmt" type="submit"  value="{{ 'admin.btnvalider'|trans({}, 'messages')}}"/>
+				</form>
+				</div>                                                                            
+			</td>
+			<td style="width:40px; text-align:center;"><a href="#" onClick="afficherRubrique({{cadre.id}}); return false;">{{'admin.modifier'|trans({}, 'messages')}}</a> </td>
+			
+		</tr> 
+		{% set i =i+1 %}
+		{% endfor%}
+
+	</table>
+		
+	{% endif %}
+	</div>                                   
+	</div>
+	
+
+                                             
+ <script language="javascript" >
+     
+   jQuery(document).ready(function() {  
+ 
+        $(".larubrique").change(function() {
+
+            var vendor = $("select.larubrique option:selected").val();
+            var DATA = 'id=' + vendor;
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url:  "{{ path('utb_admin_remplirarticle')}}",
+                data: DATA,
+                success: function(msg)
+                {
+                     i=0;                                        
+                    $.each(msg, function(index, article)
+                    {
+                            $('.larticle').html('');
+                            for(var i =0;i < article.length;i++){                                                          
+                                    $('.larticle').append('<option value="'+ article[i].id +'" > '+ article[i].titreArticle +' </option>');                                    
+                            }                                                
+                    });
+                }
+            });
+        }); 
+
+  });
+    
+    
+       
+       $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getArticlesID(){
+            var articles_id = "";
+            
+            $(":input[rel=article_c]:checked").each(function(){
+		articles_id = articles_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return articles_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault = "{{ 'admin.natdoc.effectuer'|trans}}";
+       var htmldefault3 = "{{ 'admin.natdoc.effectuer'|trans}}";
+       
+       
+      
+       
+       function ajoutImage(){
+       
+             $("#ajoutMedia_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerAjout( ); return false;">{{ 'admin.annulermodif'|trans}}</a>';
+            $(".apBanniere").html(html);
+       }
+       
+       function ajoutBanniere(){
+       
+             $("#ajoutBanniere_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerAjoutBanniere( ); return false;">{{ 'admin.annuler'|trans}}</a>';
+            $(".apBanniereB").html(html);
+       }
+       
+       function AnnulerAjout(){
+           
+           $("#ajoutMedia_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="ajoutImage(); return false;">	{{'rubriques.addimgillustr'|trans({}, 'rubriques')}}</a>';
+
+
+            $(".apBanniere").html(html);
+            
+       }       
+       
+       function afficherRubrique(idcadre){
+       
+             $("#rubrique_container"+idcadre).show();  
+
+            var html = '<a class="updateLink" href="#" onClick="annulerAfficherRubrique(); return false;">{{ 'admin.annuler'|trans}}</a>';
+            $(".apRubrique").html(html);
+       }   
+       
+       
+       
+       function annulerAffichageRubrique(){
+           
+           $("#rubrique_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="afficherRubrique(); return false;">	{{'rubriques.gesbloc'|trans({}, 'rubriques')}}</a>';
+
+            $(".apBanniere").html(html);            
+       } 
+       
+       function AnnulerAjoutBanniere(){
+           
+           $("#ajoutBanniere_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="ajoutBanniere(); return false;">	{{'rubriques.addbanniere'|trans({}, 'rubriques')}}</a>';
+            $(".apBanniereB").html(html);            
+       }       
+       
+       function modifImage(){
+       
+             $("#modifMedia_container").show();  
+
+            var html = '<a class="updateLink" href="#" onClick="AnnulerModif( ); return false;">{{ 'admin.annulermodif'|trans}}</a>';
+            $(".dimImgIllustr").html(html);
+       }
+       
+       function AnnulerModif(){
+           
+           $("#modifMedia_container").hide();   
+            var html = '<a class="updateLink" href="#" onClick="modifImage(); return false;"> {{ 'rubriques.modifimgrub'|trans({}, 'rubriques') }} </a>';
+
+
+            $(".dimImgIllustr").html(html);
+            
+       }
+       
+       function getBannieresID(){
+           
+            var banniere_id = "";
+            
+            $(":input[rel=banniere_c]:checked").each(function(){
+		banniere_id = banniere_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return banniere_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'banniere.supprimer.confirmation'|trans}}"; 
+       var htmldefault2 = "{{ 'banniere.statut.confirmation'|trans}}"; 
+ 
+    
+       function corbeilleAllBanniere( banniereId ){
+          if( banniereId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'banniere.supprimer.titre'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'banniere.supprimer.titre'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeillebanniere')}}",
+                                data: {banniereIds:banniereId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'banniere.supprimer.impossible'|trans}}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'banniere.supprimer.reussie'|trans}}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"{{ 'admin.annuler'|trans}}": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       }        
+       
+       
+</script>
+ 
+  
+  <div id="process_tpl" style="display:none;"></div> 
+  
+    {# suppression de rubriques #}
+  {#<div id="msgconfirmsuprub" style="display:none;">{{ 'confirmation.suppressionrub'|trans({}, 'rubriques') }}</div>   
+
+  <div id="titreconfirmsuprub" style="display:none;">{{ 'confirmation.titresuprub'|trans({}, 'rubriques') }}</div> 
+
+  <div id="impossiblesuprub" style="display:none;"> {{ 'confirmation.impossiblesuprub'|trans({}, 'rubriques') }}</div> 
+
+  <div id="reussitesuprub" style="display:none;"> {{ 'confirmation.successuprub'|trans({}, 'rubriques') }} </div> #}
+
+  <div id="sivide," style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+  
+  
+  {# suppression de articles #}
+  <div id="msgconfirmsup" style="display:none;">{{ 'confirmation.suppressionone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmsup" style="display:none;">{{ 'confirmation.titresupone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesup" style="display:none;"> {{ 'confirmation.impossiblesupone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesup" style="display:none;"> {{ 'confirmation.successupone'|trans({}, 'articles') }} </div> <div id="sivide," style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+  
+  {# corbeille de articles #}
+  <div id="msgconfirmcorb" style="display:none;">{{ 'confirmation.corbeilleone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmcorb" style="display:none;">{{ 'confirmation.titrecorbone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblecorb" style="display:none;"> {{ 'confirmation.impossiblecorbone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitecorb" style="display:none;"> {{ 'confirmation.succescorbone'|trans({}, 'articles') }} </div> 
+
+  {# validation des articles #}
+  <div id="msgconfirmval" style="display:none;">{{ 'confirmation.validerone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmval" style="display:none;">{{ 'confirmation.titrevalone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossibleval" style="display:none;"> {{ 'confirmation.impossiblevalone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussiteval" style="display:none;"> {{ 'confirmation.succesvalone'|trans({}, 'articles') }} </div> 
+
+  {# archivage d'articles #}
+  <div id="msgconfirmarch" style="display:none;">{{ 'confirmation.archiverone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmarch" style="display:none;">{{ 'confirmation.titrearchone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblearch" style="display:none;"> {{ 'confirmation.impossiblearchone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitearch" style="display:none;"> {{ 'confirmation.succesarchone'|trans({}, 'articles') }} </div> 
+
+  {# publier d'articles #}
+  <div id="msgconfirmpub" style="display:none;">{{ 'confirmation.publierone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmpub" style="display:none;">{{ 'confirmation.titrepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblepub" style="display:none;"> {{ 'confirmation.impossiblepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitepub" style="display:none;"> {{ 'confirmation.succespubone'|trans({}, 'articles') }} </div> 
+    
+
+  {# dépublier d'articles #}
+  <div id="msgconfirmdepub" style="display:none;">{{ 'confirmation.depublierone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmdepub" style="display:none;">{{ 'confirmation.titredepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossibledepub" style="display:none;"> {{ 'confirmation.impossibledepubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitedepub" style="display:none;"> {{ 'confirmation.succesdepubone'|trans({}, 'articles') }} </div> 
+  
+   {# soumission d'articles #}
+  <div id="msgconfirmsub" style="display:none;">{{ 'confirmation.soumettreone'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmsub" style="display:none;">{{ 'confirmation.titresubone'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesub" style="display:none;"> {{ 'confirmation.impossiblesubone'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesub" style="display:none;"> {{ 'confirmation.successubone'|trans({}, 'articles') }} </div> 
+  
+  <div id="accessdenied" style="display:none;"> 
+    {{ 'confirmation.accessdenied'|trans({}, 'articles') }} 
+  </div>   
+  
+{% endblock %}

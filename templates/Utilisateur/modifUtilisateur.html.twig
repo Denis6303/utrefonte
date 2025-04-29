@@ -1,0 +1,32 @@
+
+                                                <form action="{{ path('modifier_utilisateur',{'id':id, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutAbonne">
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.nameAbonne) }}
+													{{ form_label(form.nameAbonne, 'abonnes.form.username'|trans({}, 'abonnes')) }}
+													{{ form_widget(form.nameAbonne) }}
+													<div class="clr"></div>
+													</div>
+													
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.email) }}
+													{{ form_label(form.email, 'abonnes.form.email'|trans({}, 'abonnes'))) }}
+													{{ form_widget(form.email) }}
+													<div class="clr"></div>
+													</div>
+													
+													<div class="FrmAjoutArt">
+													{{ form_errors(form.username) }}
+													{{ form_label(form.username, 'abonnes.form.username'|trans({}, 'abonnes')) }}
+													{{ form_widget(form.username) }}
+													<div class="clr"></div>
+													</div>
+
+													<div class="FrmAjoutArt selectTypProfil">
+													{{ form_errors(form.profil) }}
+													{{ form_label(form.profil, 'abonnes.form.profil'|trans({}, 'abonnes'))) }}
+													{{ form_widget(form.profil) }}
+													<div class="clr"></div>
+													</div>
+													
+												<input type="submit" value="{{'client.modifier'|trans({},'messages') }}" name="op" id="j_bouton" >
+                                               </form>

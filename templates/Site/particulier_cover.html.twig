@@ -1,0 +1,257 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig -----------------#}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+
+  
+{% block public_body %}
+        {% if larubrique[0].id != 7 %}
+            <div class="span-24 borderBotStyle marginBottom20p paddingBottom20p bgBlanc positionRelative" style="">	
+                    {% if larubrique[0].id ==33 %} <!-- borderBotStyle bgBlanc -->
+                            <div class="boxGauche">
+                                <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': 46, 'type':5})}}">
+                                   {% set currentPath = app.request.attributes.get('_route') %}
+                                                                       {% if locale=="fr" %}
+                                    <img src="{{asset('img/site-img/offresTitre.png')}}"  />
+                                    <div class="clr"></div><img src="{{asset('img/site-img/offres2.png')}}"  />
+                                    {% else %}
+                                    <img src="{{asset('img/site-img/offresTitreen.png')}}"  />
+                                    <div class="clr"></div><img src="{{asset('img/site-img/offres2en.png')}}"  />
+                                    {% endif  %}
+                                </a>
+                                <div class="clr"></div>
+                            </div>
+                    {% else %}
+                            <div class="boxGauche2">
+                                <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': 46, 'type':5})}}">
+                                   {% set currentPath = app.request.attributes.get('_route') %}
+                                                                       {% if locale=="fr" %}
+                                    <img src="{{asset('img/site-img/offresTitre.png')}}"  />
+                                    <div class="clr"></div><img src="{{asset('img/site-img/offres2.png')}}"  />
+                                    {% else %}
+                                    <img src="{{asset('img/site-img/offresTitreen.png')}}"  />
+                                    <div class="clr"></div><img src="{{asset('img/site-img/offres2en.png')}}"  />
+                                    {% endif  %}
+                                </a>
+                                <div class="clr"></div>
+                            </div>
+                   {% endif%}
+                   <div class="leftSpace rightSpace marginBottom10p">
+                            <h1 class="boxSection-titre bleuLogo" style="margin: 0px;margin-top: 10px;">{{larubrique[0].nomRubrique}} </h1>{#LA BANQUE DES PARTICULIERS#}
+                            <img src="{{asset('img/site-img/ombreHorizontalTitre.png')}}" alt="" style=""/>
+                            <div class="welcomeBox">
+                                
+                                <div class="iconeWelcome"> <!-- Image de Bienvenue Particulier / Professionel -->
+                                    {% for uneimage in image %}
+                                       <img src="{{ asset('upload/rubriques/'~uneimage.urlMedia)}}" alt="" title=""/>
+                                    {% endfor %}                                                                       
+                                </div>                                
+                                <div class="texteWelcome">
+                                    <h2>
+                                        {% if larubrique[0].descriptionRubrique != "- default text -" %}
+                                             {{larubrique[0].descriptionRubrique|raw}}
+                                        {% endif %}                                
+                                    </h2>
+                         
+                                </div>
+                                <div class="clr"></div>
+                            </div>
+                    </div>  
+                                                        
+                    <div class="leftSpace rightSpace">
+                        
+                        <div class="Innerbann span-15">
+                            {% for unarticlepub in  articlepub %}
+                            <div class="Innerbannslides">  
+                                     {% if larubrique[0].id == 39 %}
+                                      <a href="{{ path("utb_site_rubrique",{'locale': locale,'id': 107, 'type':14})}}">
+                                        <img src="{{ asset('upload/articles/'~unarticlepub.urlMedia)}}" alt="" title=""/> 
+                                      </a>
+                                     {% else %}
+                                <a href="{{ path("utb_site_article",{'locale': locale,'id': unarticlepub.id})}}">
+                                       <img src="{{ asset('upload/articles/'~unarticlepub.urlMedia)}}" alt="" title=""/> 
+                                       </a>
+                                     {% endif %}
+                            </div>
+							{% if larubrique[0].id == 39 %}
+								<a href="{{ path("utb_site_rubrique",{'locale': locale,'id': 107, 'type':14})}}">
+									<div class="Innerbanndescript title5 paddingTopBot20p">
+										<h4>{{ unarticlepub.titreArticle|raw}}</h4>
+									   {{ unarticlepub.descriptionArticle|raw}}
+									</div>
+								</a>
+							{% else %}
+								<div class="Innerbanndescript title5 paddingTopBot20p">
+										<h4>{{ unarticlepub.titreArticle|raw}}</h4>
+									   {{ unarticlepub.descriptionArticle|raw}}
+									</div>
+							{% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        
+                        <div class="bannermenu span-7">
+                            {% if larubrique[0].id ==33 %}
+                            <div class="titredec colParticulier">{{ 'particulier.decouvrez'|trans({}, 'site')}}</div>
+                            <img class="arrowbaspart" src="{{ asset('img/site-img/flechebas.png')}}"  />
+                            {% else %}
+                            <div class="titredec colProfessionnel">{{ 'particulier.decouvrez'|trans({}, 'site')}}</div>
+                            <img class="arrowbaspart" src="{{ asset('img/site-img/flechebaspro.png')}}"  />
+                            {% endif %}
+                            
+                            <ul class="margin-top15p">
+                                
+                                 {% for sousrubrique in listesousrub %}
+                                        {{allmacro.AfficherSousRubLi(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.descriptionRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,locale)}}
+                                 {% endfor %}
+                            </ul> 
+                        </div>
+                        <div class="clr"></div>
+                    </div>
+                <img src="{{asset('img/site-img/ombreVertical1Droit.png')}}" class="ombreVertical1Droit" alt="" />
+            </div>  
+           {% endif %}  
+                <div class="span-24 borderBotStyle marginBottom20p paddingBottom20p bgBlanc positionRelative">		<!-- borderBotStyle bgBlanc -->
+                     <img src="{{asset('img/site-img/ombreVertical2Gauche.png')}}" alt="" style="" class="ombreVertical2Gauche"/>
+                                    <div class="leftSpace span-7 marginBottom10p">
+                                      <h1 class="boxSection-titre bleuLogo title2"> {{ 'particulier.avis'|trans({}, 'site') }} <span class="iconSlides nextItem"><img src='{{asset('img/site-img/icon-slide1.png')}}' alt='' /></span><span class="iconSlides prevItem"><img src='{{asset('img/site-img/icon-slide2.png')}}' alt='' /></span><span class='clr' style="display: inline;"></span></h1>
+					
+							<img src="{{asset('img/site-img/ombreHorizontalTitre.png')}}" alt="" style=""/>	
+					
+                                            <div class="minBoxs">
+											{% if (listeBreve|length < 1) and (listeactualite|length < 1) %}
+											<img style="    margin: 25px auto;    width: 230px;     display: block; " src="{{asset('img/site-img/socialname2.png')}}" />
+                                            
+											{% else %}
+											<div class="carousel-padeDeGarde">    
+                                                    <ul>
+													
+													{% for breve in listeBreve %}
+							
+                                                            
+															<li>
+																<div class="onePrdSrv">
+																	<a href="{{path('utb_site_article',{'id': breve.id,'locale':locale})}}"  style="color: #F39F39; font-size: 11px; font-weight: bold;">
+																	<h4>{{breve.titreArticle}}</h4>
+																	<div class="rubrique">
+																		<div class="text">{{breve.descriptionArticle|raw}}</div>
+																		
+																		<div class="clr"></div>
+																	</div>
+																	</a> 
+																</div>
+																</li>
+							
+
+                                                    {% endfor  %}
+													
+                                                        {% for lactualite in listeactualite %}
+
+                                                          {{allmacro. AfficherArticleLi2(lactualite.id,lactualite.titreArticle,lactualite.introTexteArticle,lactualite.urlMedia)}} 
+														  
+                                                        {% endfor %}
+                                                    </ul>
+													
+						</div>
+											{% endif %}    
+												
+						
+						
+						<img src="{{asset('img/site-img/ombreHorizontalBox.png')}}" alt="" style="position: absolute;bottom:-13px;"/>
+						
+					
+						
+						
+                                            </div>
+                                      </div>                     
+
+                    <div class="leftSpace span-7 marginBottom10p">
+						<h1 class="boxSection-titre bleuLogo title2"> {{ 'particulier.agences'|trans({}, 'site') }} <span class="iconSlides nextItem2"><img src='{{asset('img/site-img/icon-slide1.png')}}' alt='' /></span><span class="iconSlides prevItem2"><img src='{{asset('img/site-img/icon-slide2.png')}}' alt='' /></span><span class='clr' style="display: inline;"></span></h1>
+						<img src="{{asset('img/site-img/ombreHorizontalTitre.png')}}" alt="" style=""/>		
+                          <div class="minBoxs">
+                              <div class="carousel-padeDeGarde2">    
+                                  <ul>
+                                    {% for lasolution in listecorrespondance %}
+                                      {{allmacro. AfficherArticleLi(lasolution.titreArticle,lasolution.descriptionArticle,lasolution.urlMedia)}} 
+                                    {% endfor %}                                          
+                                  </ul>
+                              </div>
+							  <img src="{{asset('img/site-img/ombreHorizontalBox.png')}}" alt="" style="position: absolute;bottom:-13px;"/>
+                          </div>
+                    </div>   
+                     
+                     {#{dump(solutiongenerale)}#}
+                    <div class="leftSpace span-7 marginBottom10p">
+                            <h1 class="boxSection-titre bleuLogo title2">{{ 'particulier.services'|trans({}, 'site') }} <span class="iconSlides nextItem1"><img src="{{asset('img/site-img/icon-slide1.png')}}" alt="" /></span><span class="iconSlides prevItem1"><img src='{{asset('img/site-img/icon-slide2.png')}}' alt='' /></span></span><span class='clr' style="display: inline;"></span></h1>
+                            <img src="{{asset('img/site-img/ombreHorizontalTitre.png')}}" alt="" style=""/>		
+                                <div class="minBoxs">
+                                    <div class="carousel-padeDeGarde1"> 
+                                        
+                                        <ul>
+                                            {% for lasolution in solutiongenerale %}                                                
+                                              {{allmacro.AfficherSolutionGralLi(lasolution.nomRubrique,lasolution.descriptionRubrique,lasolution.urlMedia)}}                                                 
+                                            {% endfor %}
+                                        </ul>
+                                    </div><img src="{{asset('img/site-img/ombreHorizontalBox.png')}}" alt="" style="position: absolute;bottom:-13px;"/>
+                                </div>                                      
+                    </div>
+                     <img src="{{asset('img/site-img/ombreVertical2Droit.png')}}" alt="" class="ombreVertical2Droit"/>
+            </div>
+  
+            <!-- Ligne Correspondants -->
+	<div class="span-24 marginBottom20p"> 
+		<div class="leftSpace rightSpace boxCorespdant">
+			<h1 class="boxSection-titre gris-text">{{ 'acceuil.cores'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+                            <div class="slideCorespdant">
+                               {% for article in listecorrespondanceEtranger%} 
+                                    {% if article.urlMedia != "default_.png" %}
+                                           <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="{{article.titreArticle|raw}}" />
+
+                                    {% endif %}                                
+
+                               {% endfor %}     				
+                            </div>
+			<div class="divButmoore rightPosition" >
+                               
+				<a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>{{ 'acceuil.voir'|trans({}, 'site') }}</span><span></span></a>
+			</div>			
+		</div>
+	</div>		<!-- FIN Correspondants-->
+
+ 
+	                       
+<script type="text/javascript"> 
+    $('.partieDesc').truncate({
+            width: '1000px',
+
+            token: '...',
+            side: 'right',
+            addclass: false,
+            addtitle: true,
+    });       
+</script>       
+<script>
+    function fermerDetails(idliste){            
+                        $(".titreContainer"+idliste).show();
+                        $("#ptfermer"+idliste).hide();
+    }
+    function afficherDetails(idliste){
+        var tab = "";			
+        $(".titreContainer"+idliste).hide();
+       // alert(".titreContainer"+idliste);
+        tab = "#ptfermer"+idliste;
+        closeTab(tab,idliste);
+        var html =  $(".descContainer"+idliste).html();
+                    $("#ptfermer"+idliste).show();
+        $(".detailContainer"+idliste).html(html);            
+    }  
+    function closeTab(tab,idliste){					
+        $(".titreContainer"+idliste).show();
+        $(tab).hide();				
+    }	                    
+</script>
+
+{% endblock %}
+  

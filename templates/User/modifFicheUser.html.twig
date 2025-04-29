@@ -1,0 +1,29 @@
+
+                                                <form action="{{ path('user_change_eclate',{'id':unuser.id , 'type' : 2, 'locale':locale}) }}" {{ form_enctype(form) }} method="POST" id="ajoutUser">
+ 
+												   
+														<div class="FrmAjoutArt">
+														{{ form_errors(form.nameUser) }}
+														{{ form_label(form.nameUser, 'users.form.nom'|trans({}, 'users')) }}
+														{{ form_widget(form.nameUser) }}
+														<div class="clr"></div>
+														</div>																		
+														
+														<div class="FrmAjoutArt">
+														{{ form_errors(form.username) }}
+														{{ form_label(form.username, 'users.form.login'|trans({}, 'users')) }}
+														{{ form_widget(form.username) }}
+														<div class="clr"></div>
+														</div> 
+                                                    
+														<div class="FrmAjoutArt">
+														{{ form_errors(form.email) }}
+														{{ form_label(form.email, 'Email') }}
+														{{ form_widget(form.email) }}
+														<div class="clr"></div>
+														</div>                                                     
+
+													
+												<input type="submit" value="Ajouter" name="op" id="j_bouton" >
+                                               </form>
+                                    

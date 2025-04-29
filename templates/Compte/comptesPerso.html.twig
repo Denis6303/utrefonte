@@ -1,0 +1,77 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'messageries.liste.grandtitrepg'|trans({}, 'messageries') }}
+{% endblock %}
+
+  {% block client_centre_body %}     
+
+	<!-- **************************************************** CENTRE + DROITE ********************************************** -->
+<ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'compte.titre'|trans({},'compte') }}</li>
+       {# <li><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre'|trans({},'compte') }}</a></li>
+        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'compte.titre1'|trans({},'compte') }}</li>#}
+</ul>
+
+<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'compte.synthese.titre'|trans({},'compte') }}</h2>
+<div class="marginBottom20p">
+                {% for categorie in listecpte %}
+                    <h3 class="title-WithLeftBar liqidite">
+                        {% if categorie[0].getLibCategorie() == 'COMPTE AFBWN' %}
+                            
+                            COMPTES AFB120 ( VERSION COMPTE 12 POSITIONS )
+                            
+                        {%elseif  categorie[0].getLibCategorie() == 'COMPTE AFBW'%}
+                            COMPTES AFB120 ( VERSION COMPTE 11 POSITIONS )
+                        {%else%}
+                            {{categorie[0].getLibCategorie()}}
+                        {%endif%}
+                    </h3>
+                    {% if categorie is not null %}
+                       <table class="withTDborder"> 
+                           <tr>
+                                <th>&nbsp;</th>
+                                <th>{{'abonnes.form.numCompte'|trans({},'abonnes') }} </th>
+                                <th style="text-align: right;" class="padright20p" >{{'abonnes.form.solde'|trans({},'abonnes') }}</th>
+                                {#<th> <!--<a href=""><img src="{#{ asset('img/client-img/sort_asc.png')}#}{#" alt="" /></a> <a href=""><img src="{#{ asset('img/client-img/sort_desc.png')}#}{#" alt="" /></a>--></th>#}
+                            </tr> 
+                                {% for solde in categorie[1] %}
+                            <tr>
+                               <td class="w20"><img src="{{asset('img/client-img/icon-user.png')}}" alt="" title="" /></td>
+                               <td class="w300">
+                                       {#{dump(solde)}#}
+                                       <a href="{{ path('utb_client_detail_compte_abonne',{'locale':locale,'idCompte':solde['cpte'],'idAbonne':app.request.get('id_abonne')})}}">
+                                         {{solde['cpte']}}
+                                       </a>
+                               </td>
+                               <td {% if (solde['solde'] != null) and (solde['solde'].getCoef()) < 0 %} class="w250  red-text " {% else %} class="w250 padright20p " {% endif %} style="text-align: right;" >
+                                       {% if solde['solde'] != null  %}
+                                          {{ (solde['solde'].getMontant()*solde['solde'].getCoef())|number_format(0, '', ' ') }}
+                                       {% else %}
+                                            -
+                                       {% endif %}    
+                                   {#</a>#}
+                               </td>
+                               {#<td class="w60">
+                                       {% if solde['solde'] != null  %}
+                                           {{solde['solde'].getSensOperation()}}
+                                       {% else %}
+
+                                       {% endif %}
+                               </td>#}
+                           </tr>
+                                <div class="clr"></div>
+                            {% endfor %}
+
+                            <tr>&nbsp;</tr>    
+                        </table>    
+                    {% endif %}                                                                             
+                {% endfor %}
+
+</div>						
+	
+
+	<!-- **************************************************** FIN DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+{% endblock %}

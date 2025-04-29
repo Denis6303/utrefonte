@@ -1,0 +1,90 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}  
+{% block public_body %}  
+<div class="span-24 all-lookupCategorie marginBottom10p">
+    <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listecateg %}
+                                        {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id,locale)}}
+                                        {% else %}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}                        
+                                        {% endif %}
+                                 {% endfor %}
+    </div>
+</div>     
+	{% for article in listearticle %}
+
+                        {% if (loop.index % 2) %}
+<div class="span-24 borderBotStyle bgBlanc paddingBottom20p marginBottom10p">                                 
+                        {% else %}
+    <div class="span-24 last borderBotStyle bgBlanc paddingBottom20p marginBottom10p">                                               
+                        {% endif%}                                      
+        <div class="leftSpace rightSpace">
+            <h1 class="boxSection-titre bleuLogo title-WithLeftBar ">{{article.titreArticle}}</h1>
+                                                        {% if article.urlMedia == "default_.png" %}
+                                                        {% elseif article.urlMedia == "" %}
+                                                        {% else%}
+            <img style="float:left; margin-right:10px; margin-bottom:10px;" src="{{asset("upload/articles/"~article.urlMedia)}}" alt="" title=""/>
+                                                        {% endif %}                                              
+
+            <div class="conditionOpenCpt">
+                                                {{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}
+                <a class="" href="{{path('utb_site_article',{'id': article.id,'locale':locale})}}"></a>
+            </div>
+        </div>
+    </div>                                 
+    <!-- FIN COLONNE GAUCHE-->                                      	
+	{% else %}
+	{% endfor %} 
+    <!-- Bloc de pub compte en ligne -->
+    <div class="span-24 borderBotStyle marginBottom10p paddingBottom20p bgBlanc">		<!-- borderBotStyle bgBlanc -->
+        <!-- <h1 class="paddingTopBot20p paddingBottom20p bleuLogo center">Nos Produits et Services offerts aux Particuliers</h1> -->
+        <div class="boxEinfo leftSpace rightSpace">
+            <h1 class="boxSection-titre red-text">{{ 'ligne.votre'|trans({}, 'site') }} </h1>
+            <div class="">
+                <div class="einfoIlustr"> <img src="{{asset('img/site-img/icon-acces-distant.jpg')}}" alt="" title=""/></div>
+                <div class="einfoDescr listItem4">
+                    <ul>
+                        <li>{{ 'ligne.depuis'|trans({}, 'site') }}</li>
+                        <li>{{ 'ligne.profitez'|trans({}, 'site') }}</li>
+                        <li>
+                            <p>{{ 'ligne.gerez'|trans({}, 'site') }}</p>
+                            
+                            <div class="clr"></div>
+                        </li>
+                        <li>{{ 'ligne.effectuez'|trans({}, 'site') }}</li>
+                    </ul>
+
+                </div>
+                <div class="clr"></div>
+            </div>			
+            <div class="cnxion-inscription">
+                <div class="cnxion-inscrip-cnt">
+                    <div class="cnxion-inscrip-cntL">
+                        <a class="bleuLink" href="">{{ 'ligne.deja'|trans({}, 'site') }}</a>
+                        <a class="accesCpt coinsArrondis" href="{{path('utb_client_accueil',{'locale':locale})}}">{{ 'ligne.acces'|trans({}, 'site') }}</a>
+                    </div>
+                    <span class="clr"></span>
+                </div>
+                <div class="cnxion-inscrip-cnt">
+                    <div class="cnxion-inscrip-cntR">
+                        <a class="bleuLink" href="">{{ 'ligne.pas'|trans({}, 'site') }}</a>
+                        <a class="inscriptionCpt coinsArrondis" href="{{path('utb_site_souscription',{'locale':locale})}}">{{ 'ligne.souscri'|trans({}, 'site') }}</a>
+                    </div>
+                    <span class="clr"></span>
+                </div>
+                <span class="clr"></span>
+            </div>
+        </div>
+    </div>	
+    
+ 
+</div>
+
+{% endblock %}
+
+

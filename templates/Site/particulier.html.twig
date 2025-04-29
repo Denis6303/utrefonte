@@ -1,0 +1,135 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}	
+
+{% block public_body %}
+<script type="text/javascript" src="{{ asset('js/site-js/tab.js') }}"></script>
+<script>
+    $(document).ready(function($) {
+
+        $('#blocPrincipal').tabulous({
+            effect: 'scale'
+        });
+    });
+</script>
+    {% set idrubrique = app.request.get('idparentrub') %}
+    {% if listecateg|length <= 5 %}
+<div class="span-24 all-lookupCategorie marginBottom10p">
+    <div class="leftSpace blocArPart">
+                                  {% for sousrubrique in listecateg %}
+                                          {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id,locale)}}
+                                          {% else %}
+                                              {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent,locale)}}                        
+                                          {% endif %}
+                                   {% endfor %}                        
+    </div>
+</div> 
+    {% endif %} 
+
+<div class="span-24 borderBotStyle bgBlanc marginBottom10p positionRelative ">
+    <img src="{{ asset('img/site-img/ombreVertical1Gauche.png')}}" class="ombreGEtrprise" />
+    <div class="">
+
+        <div class="contdetailasspret" id="blocPrincipal">
+            
+            <div class="menu rightSpace">
+                
+                <h2>{{larubrique[0].nomRubrique}}
+                    <div class="bblanche"></div>
+                </h2>
+                <ul class="menu">
+                    {% for article in listearticle  %}  
+                    <li><a href="{{'#'~article.id}}">{{article.titreArticle}}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="image">
+                    {% set currentPath = app.request.attributes.get('_route') %}
+							   {% if locale=="fr" %}
+                    <img src="{{ asset('img/site-img/femmeinterog.png')}}" />
+                    {% else %}
+                    <img src="{{ asset('img/site-img/femmeinterogen.png')}}" />
+                    {% endif %}
+                </div>
+               
+           
+                
+                <!-- Fin div.imgage -->
+            </div><!-- Fin div.menu -->
+            <div id="tabs_container" class="detailArticle positionRelative rightSpace marginBottom20p">
+                {% for article in listearticle  %} 
+                <div id="{{article.id}}" class="blocus">
+                    <div class="bordgrisgros marginBottom20p"><h2 class="titre">{{article.titreArticle}}</h2></div>
+                    <div class="contenudetail">
+                        <div class="imgillustre">
+                            <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="" />
+                        </div>
+
+                        <div class="positionRelative left">
+                            <img class="ombre" src="{{ asset('img/site-img/ombreresume.jpg')}}" >
+                            <div class="resumearticle positionRelative marginBottom20p">
+                                         {{article.introTexteArticle|raw}}
+                            </div>
+                        </div>
+                        <div class="clear"></div>   
+                        <div class="">
+                                            {{article.descriptionArticle|raw}}
+                        </div><!-- Fin div.descriptionpass -->
+                    </div>                    
+                </div>
+                {% endfor %}
+            </div><!-- Fin div.tabs_container --><!-- Fin div.detailArticle -->
+            <div class=" clear"></div>
+        </div><!-- Fin div.contdetailasspret -->
+    </div>	<!-- FIN SPAN 24 LES 2 assurances ou les prets -->
+    <img src="{{ asset('img/site-img/ombreVertical1Droit.png')}}" class="ombreDEtrprise" />
+</div>	<!-- FIN SPAN 24 LES 2 CARTES -->        
+
+<!-- Ligne Correspondants -->
+	<div class="span-24 marginBottom20p"> 
+		<div class="leftSpace rightSpace boxCorespdant">
+			<h1 class="boxSection-titre gris-text">{{ 'acceuil.cores'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+			<div class="slideCorespdant">
+                           {% for article in listecorrespondanceEtranger%} 
+                                {% if article.urlMedia != "default_.png" %}
+                                       <img src="{{ asset('upload/articles/'~article.urlMedia)}}" alt="" title="{{article.titreArticle|raw}}" />
+
+                                {% endif %}                                
+				
+                           {% endfor %}     				
+			</div>
+			<div class="divButmoore rightPosition">
+                               
+				<a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 9, 'type':8,'typecate': 0, 'date':0})}}"><span>{{ 'acceuil.voir'|trans({}, 'site') }}</span><span></span></a>
+			</div>			
+		</div>
+	</div>		<!-- FIN Correspondants-->
+        
+
+
+<script>
+    $('.detailArticle .resumearticle p').each(function() {
+        if ($(this).html().replace(/\s|&nbsp;/g, '').length === 0) {
+            $(this).replaceWith('<div class="paragraphe"></div>');
+        }
+    });// transforme les p de l'élément sélectionné en div.paragraphe
+    $('.detailArticle .descriptionpass p').each(function() {
+        if ($(this).html().replace(/\s|&nbsp;/g, '').length === 0) {
+            $(this).replaceWith('<div ></div>');
+        }
+    });// transforme les p de l'élément sélectionné en div
+    
+    {setInterval(function(){
+        $('.contenudetail').each(function() {
+            var hautombre;
+            hautombre = $(this).find('.resumearticle').height() + 25;
+            $(this).find('img.ombre').height(hautombre);
+        });
+        
+    },1);}//Recharge la fonction toutes les millisecondes ainsi quand, la page change de résolution, l'ombre reste normale
+    
+</script>     
+{% endblock %}

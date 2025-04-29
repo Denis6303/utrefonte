@@ -1,0 +1,60 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig -----------------#}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}
+  
+{% block public_body %}
+  {% if listecateg|length <= 5 %}
+       <div class="span-24 all-lookupCategorie marginBottom10p">
+                <div class="leftSpace blocArPart">
+                                {% for sousrubrique in listecateg %}
+                                        {% if (larubrique[0].idParent == larubrique[0].idGrandParent) and (larubrique[0].idGrandParent!=0 )%}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id)}}
+                                        {% else %}
+                                            {{allmacro.AfficherSousRubHaut(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].idParent)}}                        
+                                        {% endif %}
+                                 {% endfor %}
+                </div>
+        </div>
+ {% endif %}          
+
+        <div class="span-24 marginBottom10p borderBotStyle paddingBottom20p bgBlanc">
+            <div class="leftSpace rightSpace">	<!-- DEBUT COLONNE GAUCHE-->
+                <h1 class="boxSection-titre bleuLogo title-WithLeftBar"> Nos Solutions d'{{larubrique[0].nomRubrique}}</h1>
+
+                <div class="typesCartesBq listItem1">
+                                    {% if larubrique[0].descriptionRubrique != "- default text -" %}
+					 {{larubrique[0].descriptionRubrique|raw}}
+                                    {% endif %}
+               </div>
+               <div class="all-boxInterieur-type1 box-epargne paddingTop20p">
+                   
+                                {% for sousrubrique in listecategorie %}
+                                        {{allmacro.AfficherSousRub(sousrubrique.id,sousrubrique.nomRubrique,sousrubrique.descriptionRubrique,sousrubrique.urlMedia,sousrubrique.typePresentation,larubrique[0].id)}}
+                                 {% endfor %}  
+                       
+                     <div class="clr"></div>
+                </div>	<!-- DIV.zoomProduitServices-->
+				<div class="typesCartesBq listItem1">
+					<p>Que vous vouliez</p>
+					<ul class="">
+						<li>Vous constituer un capital,</li> 
+						<li>financer vos projets,</li>
+						<li>préparer votre retraite,</li>
+						<li>ou encore financer les études de vos enfants...</li>
+						<li>Plafond transactions et Découvert selon la carte</li>
+					</ul>
+					<p>Vos objectifs quels qu'ils soient,et suivant votre profil et la période d'épargne que vous préférez, l'union togolaise de banque, votre banque, met à votre disposition les différentes offres d'épargne disponibles qui répondent au mieux à vos besoins.</p>
+				</div>
+        </div>  <!-- FIN leftSpace rightSpace-->
+    </div>  <!-- FIN span-24-->                            
+  {#  <div class="span-24 paddingTopBot10p marginBottom20p borderBotStyle bgBlanc">
+			<div class="rubriquePGarde leftSpace rightSpace marginBottom10p">
+				<h1 class="boxSection-titre title-WithLeftBar gris-text">Nos Services</h1><div class="clr"></div>
+			</div>
+             <div class="othersPrdSrv leftSpace">                            
+                  {{allmacro. AfficherSolutionGral(solutiongenerale)}}           
+             </div>	
+    </div>  #}   
+{% endblock %}

@@ -1,0 +1,707 @@
+{% macro boxinfos(infos, paramDescription,actif) %}
+    {% if actif == 1 %}
+        <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+              <h3 class="colorBleu titreInfos">{{ 'admin.infos'|trans({}, 'messages') }} </h3>
+              <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                  <div class="cntLeftBox"> 
+                      {% if infos is not  null %}
+                          {% if paramDescription is not null %}
+                             {{ paramDescription|raw }}
+                          {% endif %}
+                      {% endif %} 
+                  </div>
+              </div>
+        </div>
+    {% else %}
+        <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;">
+              <!-- <h3 class="colorBleu titreInfos">{{ 'admin.infos'|trans({}, 'messages') }} </h3> -->
+              <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                  <div class="cntLeftBox"> 
+                      <p><img src="{{ asset('img/admin-img/logomidle-utb.jpg') }}" alt="Logo UTB" title="Logo UTB" /></p>
+					  <h3 class="colorBleu">{{'admin.copyname'|trans({},'messages') }}</h3>
+					  <p class="">{{'admin.copyoffice'|trans({},'messages') }}</p>
+                  </div>
+              </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro stats(listestat) %}
+
+        <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                {% if listestat[0].rub is defined %}                
+                    <h3 class="colorBleu titreStats">
+                            {{'admin.statsLinks'|trans({}, 'messages')}}
+                    </h3>
+                    <span class="libRubInStat">
+                        {{'articles.artdela'|trans({}, 'articles')}}  
+                        {% if (listestat[0].pere == 0) and (listestat[0].grdpere == 0) %}                               
+                           {{'rubriques.rubrique'|trans({}, 'rubriques')}}                           
+                        {% elseif (listestat[0].pere != 0) and (listestat[0].grdpere != 0) and (listestat[0].pere == listestat[0].grdpere) %}   
+                           {{'rubriques.sousrub'|trans({}, 'rubriques')}} 
+                        {% elseif (listestat[0].pere != 0) and (listestat[0].grdpere != 0) and (listestat[0].pere != listestat[0].grdpere) %}      
+                           {{'rubriques.categorie'|trans({}, 'rubriques')}} 
+                        {% endif %}                            
+                        {{listestat[0].rub}}                            
+                    </span>
+                {% else %}  
+                     <h3 class="colorBleu titreStats">{{ 'admin.stats'|trans({}, 'messages') }} </h3>
+                {% endif %}
+                <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                <table class="tableStats">
+                    {% for stat in listestat %}                                                             
+                          <tr {% if loop.index is odd %}  class="bgBlanc" {% else %} class="bgGris"  {% endif %} >
+                                  <td>
+                                    {{ stat.ecart|raw }}  
+                                    <a href="{{ path(stat.route,stat.params) }}">                                          
+                                        {{ stat.libelle|raw }}
+                                    </a>  
+                                  </td>
+                                  <td class="valStats">{{stat.valeur}}</td>
+                          </tr>
+
+                    {% endfor %}    
+                </table>
+                </div>
+        </div>
+{% endmacro %} 
+
+{% macro statsdynamique(listestat) %}
+
+        <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                <h3 class="colorBleu titreStats">{{ 'admin.stats'|trans({}, 'messages') }} </h3>
+                <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                <table class="tableStats">
+                    {% for statdynamique in listestat %}                                                             
+                          <tr {% if loop.index is odd %}  class="bgBlanc" {% else %} class="bgGris"  {% endif %} >
+                                  <td>
+                                    {{ statdynamique.libProfil|raw }}  
+                                    {# <a href="{{ path(stat.route,stat.params) }}">                                          
+                                        {{ stat.libelle|raw }}
+                                    </a>  #}
+                                  </td>
+                                  <td class="valStats">{{statdynamique.valeur}}</td>
+                          </tr>
+
+                    {% endfor %}    
+                </table>
+                </div>
+        </div>
+{% endmacro %}
+
+{% macro titreslistearcordeon() %}
+
+        <tr>
+                <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+                <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+                <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+                <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+                <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+                <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+        </tr>
+
+{% endmacro %}
+        
+{% macro statutlisteaccordeon(article) %}
+
+        <td class="statutArtList">
+                             
+            {% if article.statutArticle ==1  %}
+                <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'articles.state.redact'|trans({}, 'articles') }}" title="{{ 'articles.state.redact'|trans({}, 'articles') }} " />
+               
+            {% elseif article.statutArticle ==2 %}
+                <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{{ 'articles.state.sub'|trans({}, 'articles') }}" title="{{ 'articles.state.sub'|trans({}, 'articles') }}" />
+                
+            {% elseif article.statutArticle ==3 %}
+                <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{{ 'articles.state.val'|trans({}, 'articles') }}" title="{{ 'articles.state.val'|trans({}, 'articles') }}" />
+                
+            {% elseif article.statutArticle ==4  %}
+                <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'articles.state.pub'|trans({}, 'articles') }}" title="{{ 'articles.state.pub'|trans({}, 'articles') }}" />
+                
+            {% elseif article.statutArticle ==5 %}
+                <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'articles.state.unpub'|trans({}, 'articles') }}" title="{{ 'articles.state.unpub'|trans({}, 'articles') }}" />
+               
+            {% elseif article.statutArticle == 6 %}
+                <img src="{{ asset('img/admin-img/bloquerSmall.png')}}"  alt="{{ 'articles.state.rejected'|trans({}, 'articles') }}" title="{{ 'articles.state.rejected'|trans({}, 'articles') }}" />
+                            
+                
+            {% endif %}                 
+                
+        </td>
+
+{% endmacro %}
+        
+{% macro statutliste(statutArticle) %}
+
+        <td class="statutArtList">
+                             
+            {% if statutArticle ==1  %}
+                <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'articles.state.redact'|trans({}, 'articles') }}" title="{{ 'articles.state.redact'|trans({}, 'articles') }} " />
+               
+            {% elseif statutArticle ==2 %}
+                <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{{ 'articles.state.sub'|trans({}, 'articles') }}" title="{{ 'articles.state.sub'|trans({}, 'articles') }}" />
+                
+            {% elseif statutArticle ==3 %}
+                <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{{ 'articles.state.val'|trans({}, 'articles') }}" title="{{ 'articles.state.val'|trans({}, 'articles') }}" />
+                
+            {% elseif statutArticle ==4  %}
+                <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'articles.state.pub'|trans({}, 'articles') }}" title="{{ 'articles.state.pub'|trans({}, 'articles') }}" />
+                
+            {% elseif statutArticle ==5 %}
+                <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'articles.state.unpub'|trans({}, 'articles') }}" title="{{ 'articles.state.unpub'|trans({}, 'articles') }}" />
+                
+            {% elseif statutArticle == 6 %}
+                <img src="{{ asset('img/admin-img/bloquerSmall.png')}}"  alt="{{ 'articles.state.rejected'|trans({}, 'articles') }}" title="{{ 'articles.state.rejected'|trans({}, 'articles') }}" />
+                                 
+                
+            {% endif %}                 
+                
+        </td>
+
+{% endmacro %}        
+        
+        
+{% macro statutlisteavecnom(article) %}
+
+        <td class="statutArtList">
+             
+                
+            {% if article.statutArticle ==1  %}
+                <img src="{{ asset('img/admin-img/menus-16.png')}}"  alt="{{ 'articles.state.redact'|trans({}, 'articles') }}" title="{{ 'articles.state.redact'|trans({}, 'articles') }} " />
+                {{'articles.state.redact'|trans({}, 'articles')}}
+            {% elseif article.statutArticle ==2 %}
+                <img src="{{ asset('img/admin-img/soumettreSmall.png')}}"  alt="{{ 'articles.state.sub'|trans({}, 'articles') }}" title="{{ 'articles.state.sub'|trans({}, 'articles') }}" />
+                {{ 'articles.state.sub'|trans({}, 'articles') }}
+            {% elseif article.statutArticle ==3 %}
+                <img src="{{ asset('img/admin-img/validerSmall.png')}}"  alt="{{ 'articles.state.val'|trans({}, 'articles') }}" title="{{ 'articles.state.val'|trans({}, 'articles') }}" />
+                {{ 'articles.state.val'|trans({}, 'articles') }}
+            {% elseif article.statutArticle ==4  %}
+                <img src="{{ asset('img/admin-img/publierSmall.png')}}"  alt="{{ 'articles.state.pub'|trans({}, 'articles') }}" title="{{ 'articles.state.pub'|trans({}, 'articles') }}" />
+                {{ 'articles.state.pub'|trans({}, 'articles') }}
+            {% elseif article.statutArticle ==5 %}
+                <img src="{{ asset('img/admin-img/depublierSmall.png')}}"  alt="{{ 'articles.state.unpub'|trans({}, 'articles') }}" title="{{ 'articles.state.unpub'|trans({}, 'articles') }}" />
+                {{ 'articles.state.unpub'|trans({}, 'articles') }}
+            {% elseif article.statutArticle == 6 %}
+                <img src="{{ asset('img/admin-img/bloquerSmall.png')}}"  alt="{{ 'articles.state.rejected'|trans({}, 'articles') }}" title="{{ 'articles.state.rejected'|trans({}, 'articles') }}" />
+                {{ 'articles.state.rejected'|trans({}, 'articles') }}                  
+                
+            {% endif %}                 
+                
+        </td>
+
+{% endmacro %}      
+                
+{% macro popupaddarticle(listeRubrique)  %}
+      
+    <div id="form_a_container" style="display:none;">
+              <form id="form_addArticle">
+                <div class="clr"></div>
+                 <p id="form_rubrique_container">
+                     <span class="colorBleu"><label>{{ 'articles.selectRubrique'|trans({}, 'articles')}}<label></span> 
+                                 <select id="rubrique" name="rubrique">
+                                     {% for rb in listeRubrique %}
+                                         <option value="{{rb.getId}}">{{rb.getNomRubrique}}</option>
+                                     {% endfor %}    
+                                 </select>          
+                 </p> 
+              </form>   
+    </div>  
+        
+    <script language="javascript" >
+
+          function ajouterArticle(locale){
+              var args = {modal: true, autoOpen: false, title: ($('#titreajoutmsg').html()), width:400,height:200};
+              $('#form_a_container').dialog(args);
+              var rubrique;
+              rubrique  = $("#rubrique").val();
+
+                  $('#form_a_container').dialog({
+
+                      buttons: {
+                              "OK": function() {
+
+                                   $.ajax({
+                                      type: "POST",
+                                      url: "{{ path('utb_admin_addArticle')}}",
+                                      data: {formdata:$("#form_addArticle").serialize(),locale:locale},
+                                      cache: false,
+                                      success: function(data){
+                                           var resJson = jQuery.parseJSON(data);
+                                           window.location = resJson.url;                                      }
+                                  });                             
+                              },                   
+                              "Cancel": function() {
+                                  $(this).dialog("close");
+                              }
+                      }
+                  })             
+                 $('#form_a_container').dialog('open');          
+          }
+     </script>   
+     
+     <div id="titreajoutmsg" style="display:none;">{{ 'confirmation.titreajoutmsg'|trans({}, 'articles') }}</div> 
+        
+{% endmacro %}  
+     
+{% macro msgjquerytranslate() %}
+ 
+    {# suppression de rubriques #}
+  <div id="msgconfirmmodif" style="display:none;">{{ 'confirmation.modification'|trans({}, 'articles') }}</div>   
+
+  <div id="titreconfirmmodif" style="display:none;">{{ 'confirmation.titremodif'|trans({}, 'articles') }}</div> 
+
+  <div id="impossiblesupmodif" style="display:none;"> {{ 'confirmation.impossiblemodif'|trans({}, 'articles') }}</div> 
+
+  <div id="reussitesupmodif" style="display:none;"> {{ 'confirmation.succesmodif'|trans({}, 'articles') }} </div> 
+
+  <div id="vide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+
+  <div id="sivide" style="display:none;"> {{ 'confirmation.sivide'|trans({}, 'articles') }} </div> 
+  
+  {# suppression de articles #}
+  <div id="msgconfirmsup" style="display:none;">
+       {{ 'confirmation.suppression'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsup" style="display:none;">
+       {{ 'confirmation.titresup'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesup" style="display:none;"> 
+       {{ 'confirmation.impossiblesup'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesup" style="display:none;"> 
+     {{ 'confirmation.successup'|trans({}, 'articles') }} 
+  </div> 
+  
+  {# corbeille de articles #}
+  <div id="msgconfirmcorb" style="display:none;">
+     {{ 'confirmation.corbeille'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmcorb" style="display:none;">
+     {{ 'confirmation.titrecorb'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblecorb" style="display:none;"> 
+    {{ 'confirmation.impossiblecorb'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitecorb" style="display:none;"> 
+    {{ 'confirmation.succescorb'|trans({}, 'articles') }}
+  </div> 
+
+  {# validation des articles #}
+  <div id="msgconfirmval" style="display:none;">
+    {{ 'confirmation.valider'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmval" style="display:none;">
+    {{ 'confirmation.titreval'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossibleval" style="display:none;">
+    {{ 'confirmation.impossibleval'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussiteval" style="display:none;"> 
+    {{ 'confirmation.succesval'|trans({}, 'articles') }} 
+  </div> 
+
+  {# archivage d'articles #}
+  <div id="msgconfirmarch" style="display:none;">      
+    {{ 'confirmation.archiver'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmarch" style="display:none;">
+    {{ 'confirmation.titrearch'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="impossiblearch" style="display:none;"> 
+    {{ 'confirmation.impossiblearch'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitearch" style="display:none;"> 
+    {{ 'confirmation.succesarch'|trans({}, 'articles') }}
+      </div> 
+
+  {# publier d'articles #}
+  <div id="msgconfirmpub" style="display:none;">
+    {{ 'confirmation.publier'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmpub" style="display:none;">
+    {{ 'confirmation.titrepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblepub" style="display:none;"> 
+    {{ 'confirmation.impossiblepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitepub" style="display:none;">
+    {{ 'confirmation.succespub'|trans({}, 'articles') }} 
+      </div> 
+    
+
+  {# dépublier d'articles #}
+  <div id="msgconfirmdepub" style="display:none;">
+    {{ 'confirmation.depublier'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmdepub" style="display:none;">
+    {{ 'confirmation.titredepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossibledepub" style="display:none;"> 
+    {{ 'confirmation.impossibledepub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitedepub" style="display:none;"> 
+    {{ 'confirmation.succesdepub'|trans({}, 'articles') }} 
+  </div> 
+  
+  
+   {# soumission d'articles #}
+  <div id="msgconfirmsub" style="display:none;">
+    {{ 'confirmation.soumettre'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsub" style="display:none;">
+    {{ 'confirmation.titresub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesub" style="display:none;"> 
+    {{ 'confirmation.impossiblesub'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesub" style="display:none;"> 
+    {{ 'confirmation.successub'|trans({}, 'articles') }} 
+  </div>  
+     
+   {# Restauration des articles #} 
+  <div id="msgconfirmrestoreone" style="display:none;">
+    {{ 'confirmation.restorationone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmrestoreone" style="display:none;">
+    {{ 'confirmation.titrerestoreone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblerestoreone" style="display:none;"> 
+    {{ 'confirmation.impossiblerestoreone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussiterestoreone" style="display:none;"> 
+    {{ 'confirmation.succesrestoreone'|trans({}, 'articles') }} 
+  </div> 
+    
+  
+  
+  <div id="msgconfirmsupdoc" style="display:none;">
+    {{ 'confirmation.suppressiondoc'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsupdoc" style="display:none;">
+    {{ 'confirmation.titresupdoc'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesupdoc" style="display:none;"> 
+    {{ 'confirmation.impossiblesupdoc'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesupdoc" style="display:none;"> 
+    {{ 'confirmation.successupdoc'|trans({}, 'articles') }} 
+  </div>    
+     
+  
+  <div id="msgconfirmcorbone" style="display:none;">
+     {{ 'confirmation.corbeilleone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmcorbone" style="display:none;">
+     {{ 'confirmation.titrecorbone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblecorbone" style="display:none;"> 
+    {{ 'confirmation.impossiblecorbone'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitecorbone" style="display:none;"> 
+    {{ 'confirmation.succescorbone'|trans({}, 'articles') }}
+  </div>     
+ 
+  
+  <div id="msgconfirmsupimg" style="display:none;">
+    {{ 'confirmation.suppressionimg'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsupimg" style="display:none;">
+    {{ 'confirmation.titresupimg'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesupimg" style="display:none;"> 
+    {{ 'confirmation.impossiblesupimg'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesupimg" style="display:none;"> 
+    {{ 'confirmation.successupimg'|trans({}, 'articles') }} 
+  </div>    
+  
+    {# soumettre un article #}
+   <div id="msgconfirmsubone" style="display:none;">
+    {{ 'confirmation.soumettreone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsubone" style="display:none;">
+    {{ 'confirmation.titresubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesubone" style="display:none;"> 
+    {{ 'confirmation.impossiblesubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesubone" style="display:none;"> 
+    {{ 'confirmation.successubone'|trans({}, 'articles') }} 
+  </div>  
+  
+    {# depublier un article #}
+  <div id="msgconfirmdepubone" style="display:none;">
+    {{ 'confirmation.depublierone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmdepubone" style="display:none;">
+    {{ 'confirmation.titredepubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossibledepubone" style="display:none;"> 
+    {{ 'confirmation.impossibledepubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitedepubone" style="display:none;"> 
+    {{ 'confirmation.succesdepubone'|trans({}, 'articles') }} 
+  </div> 
+  
+  
+    {# validation des articles #}
+  <div id="msgconfirmvalone" style="display:none;">
+    {{ 'confirmation.validerone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmvalone" style="display:none;">
+    {{ 'confirmation.titrevalone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblevalone" style="display:none;">
+    {{ 'confirmation.impossiblevalone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitevalone" style="display:none;"> 
+    {{ 'confirmation.succesvalone'|trans({}, 'articles') }} 
+  </div> 
+
+  {# archivage d'articles #}
+  <div id="msgconfirmarchone" style="display:none;">      
+    {{ 'confirmation.archiverone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmarchone" style="display:none;">
+    {{ 'confirmation.titrearchone'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="impossiblearchone" style="display:none;"> 
+    {{ 'confirmation.impossiblearchone'|trans({}, 'articles') }}
+      </div> 
+
+  <div id="reussitearchone" style="display:none;"> 
+    {{ 'confirmation.succesarchone'|trans({}, 'articles') }}
+      </div> 
+
+  {# publier d'articles #}
+  <div id="msgconfirmpubone" style="display:none;">
+    {{ 'confirmation.publierone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmpubone" style="display:none;">
+    {{ 'confirmation.titrepubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblepubone" style="display:none;"> 
+    {{ 'confirmation.impossiblepubone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitepubone" style="display:none;">
+    {{ 'confirmation.succespubone'|trans({}, 'articles') }} 
+   </div>
+  
+    {# suppression d'un article #}
+  <div id="msgconfirmsupone" style="display:none;">
+    {{ 'confirmation.suppressionone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmsupone" style="display:none;">{{ 'confirmation.titresupone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblesupone" style="display:none;"> 
+    {{ 'confirmation.impossiblesupone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussitesupone" style="display:none;"> 
+    {{ 'confirmation.successupone'|trans({}, 'articles') }} 
+  </div> 
+  
+     {# suppression d'un article #}
+   <div id="errorperson" style="display:none;"> 
+    {{ 'confirmation.errorperson'|trans({}, 'articles') }} 
+  </div> 
+  
+  
+    {# rejet d'un article #}
+  <div id="msgconfirmrejone" style="display:none;">
+    {{ 'confirmation.rejetone'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmrejone" style="display:none;">{{ 'confirmation.titrerejone'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussiterejone" style="display:none;"> 
+    {{ 'confirmation.succesrejone'|trans({}, 'articles') }} 
+  </div> 
+  
+    {# rejet d'un article #}
+  <div id="msgconfirmrej" style="display:none;">
+    {{ 'confirmation.rejet'|trans({}, 'articles') }}
+  </div>   
+
+  <div id="titreconfirmrej" style="display:none;">{{ 'confirmation.titrerej'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="impossiblerej" style="display:none;"> 
+    {{ 'confirmation.impossiblerej'|trans({}, 'articles') }}
+  </div> 
+
+  <div id="reussiterej" style="display:none;"> 
+    {{ 'confirmation.succesrej'|trans({}, 'articles') }} 
+  </div>   
+  
+  
+{% endmacro %}    
+  
+{% macro decochetoutbox() %} 
+  
+  <script language="javascript" >      
+       $(document).ready(function(){ 
+            $(":checkbox").attr('checked', false);            
+       });   
+  </script> 
+  
+{% endmacro %}  
+  
+  
+  
+{% macro entete_article_avec_action() %}  
+  
+    <tr>
+        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+        <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.actions'|trans({}, 'articles') }}</th>
+    </tr>  
+  
+{% endmacro %}     
+    
+{% macro entete_recherche_avec_action() %}  
+  
+    <tr>
+        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+        <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.actions'|trans({}, 'articles') }}</th>
+    </tr>  
+  
+{% endmacro %}     
+    
+{% macro entete_article_sans_action() %}  
+  
+    <tr>
+        <th><input type="checkbox" class="checkall" name="checkall"/></th>
+        <th>{{ 'articles.liste.titre'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.statut'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.rubrique'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.auteur'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.date'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.langue'|trans({}, 'articles') }}</th>
+        <th>{{ 'articles.liste.num'|trans({}, 'articles') }}</th>
+    </tr>  
+  
+{% endmacro %}     
+    
+{% macro stat_alerte(listestatistiques, tableau ) %}
+  						<!-- COLONNE GAUCHE-->
+<div class="colRight">  
+            {#{dump(listestatistiques)}#}
+    {% if (  listestatistiques is not null) and ( (listestatistiques[0].valeur>0) or (listestatistiques[1].valeur > 0))   
+          and 
+            ( (listestatistiques[0].num in tableau ) or (listestatistiques[1].num in tableau)  )%}
+          
+        <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-alert.png')}}"  alt="Rubriques" title="Alerte" /></div>
+    {% endif %}
+    <div class="alertMessageArt">     
+        {% for stat in listestatistiques %}                                                         
+
+            {% if (stat.valeur is not null) and (stat.valeur >0) and (stat.num in tableau) %} 
+               <h3>
+                ({{stat.valeur}})&nbsp;
+                    <a href="{{ path(stat.route,stat.params) }}"> {{ stat.libelle|raw }} </a> 
+               </h3>
+            {% endif %}
+
+        {% endfor %}      
+    </div> 
+            
+ </div>
+                                              
+{% endmacro %}    
+                                                
+                                                
+{% macro elementOk() %}
+      <script language="javascript" >                                           
+        function Message(){
+          
+            $('#process_tpl').html($('#elementinexistant').html());
+
+            var args = {modal: true, autoOpen: false, title: ($('#titreconfirmarchone').html())}; 
+
+            $('#process_tpl').dialog(args);
+            $('#process_tpl').dialog({
+                 buttons: { 			                  
+                          "OK": function() {
+                              $(this).dialog("close");
+                          }
+                  }
+            })    
+            $("#process_tpl").dialog('open'); 
+            return false;
+        }                  
+      </script>
+      
+      <div id="elementinexistant" style="display:none;"> 
+          {{ 'elementinexistant'|trans({}, 'message') }} 
+      </div>      
+      
+{% endmacro %}          
+      
+      
+{% macro retour_accueil() %}   
+    {{ render(controller('utbClientBundle:Auth:login', {'locale':locale})) }}     
+{% endmacro %}        

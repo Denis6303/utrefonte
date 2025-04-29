@@ -1,0 +1,41 @@
+{# src/utb/ParamsCompteBundle/Resources/views/show.html.twig #}
+{#{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+    {{ parent() }} - Modification du compte
+{% endblock %}
+
+{% block client_centre_body %}
+
+    <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">Modification du compte</h2>
+    <h4 style="font-weight:normal;font-style: italic;text-align: right;"><span style="color: blue;"> * </span>{{'client.obligatoire'|trans({}, 'messages')}}</h4>
+ #}   
+<form action="{{ path('efacture_export_compte_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+    <input type="hidden" name="_method" value="PUT" />
+    <div class="FrmAbonne">
+        {{ form_errors(edit_form.compte) }}
+        <label>Compte </label>
+        {{ form_widget(edit_form.compte) }}
+        <div class="clr"></div>
+    </div> 
+    <div class="FrmAbonne">
+        {{ form_errors(edit_form.lib) }}
+        <label>Libellé</label>
+        {{ form_widget(edit_form.lib) }}
+        <div class="clr"></div>
+    </div> 
+    {#<div class="FrmAbonne champsGrp AjoutDUnAbonne">
+        {{ form_widget(edit_form) }}
+
+        compte
+        <div class="clear"></div>
+    </div>#}
+    <input type="submit" class="boutonSubmit" value="Modifier" name="op" id="j_bouton">
+    <a href="#" onClick="$.modal.close();" ><input type="button" class="annulerBut " value="Annuler" > </a>
+    <div class="clr"></div>
+
+</form>
+<script>
+    $('.numeric').numeric();
+</script>
+{#
+{% endblock %}#}

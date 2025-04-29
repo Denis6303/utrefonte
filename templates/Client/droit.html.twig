@@ -1,0 +1,108 @@
+{# src/utb/ClientBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %} 
+<ul class="filariane bleuLink">
+        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" />{{'client.tb.titre'|trans({},'messages') }}</a></li>
+        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+        <li>{{'droit.titre'|trans({},'droit') }}</li>
+</ul>
+
+		<!--Début du box compte-->
+		
+<h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'droit.titre'|trans({},'droit') }}</h2>
+
+<form method="POST" id="listDroitForm">
+    <table class="infoCompte noLeftBorder noGras">
+        <!-- Entete -->
+          <tr >
+              <th></th>
+          {% for profile in listeProfiles %}
+                  <th style="/*background:#eee*/">{{profile.getLibProfil}}</th>
+          {% endfor %}
+          </tr>
+        <!-- fin Entete -->
+        <!--tbody-->
+        {% for module, act in actions %}
+        <tr >
+              <td class="titreList2">
+                  {% set tab = module|split('|') %}
+                      <div class=""><b>{{tab.0}}</b><hr/></div>
+                  {% for a in act %}
+                      <div  {% if loop.index is even %} style="background:#F3F4EE;margin-top:5px;padding:4px 0px 4px 15px; height: 40px;" {% else %} style="padding:4px 0px 4px 15px;  height: 40px;" {% endif %}>{{a.DescriptionAction}}</div>
+                  {% endfor %}
+              </td>
+              {% for profile in listeProfiles %}
+
+                <td  style="padding-top:25px;">
+                     {% for prof,modu in actionsByProfil %}
+                        {% for md,ac in modu %}
+                        {% set m = md|split('|') %}
+                        {% if profile.getId==prof %} 
+                            {% if m.0==tab.0 %}
+                            <div>&nbsp;</div>
+                            {% endif %}                                            
+                            {% for val in ac %}
+                                 {% if ac==act %}   
+                                    {% set atab = val.idAction|split('|') %}
+                                    <div {% if loop.index is even %} style="background:#F3F4EE;margin-top:5px;padding:4px 0px;  height: 40px;" {% else %} style="padding:4px 0px;  height: 40px;" {% endif %}><input type="checkbox" name="action_module_{{m.1}}_{{profile.getId}}[]" value="{{atab.0}}" {% if atab.1==1 %} checked="checked" {% endif %} id="" class=""></div>
+                                {% endif %} 
+                            {% endfor %}
+                        {% endif %}    
+                        {% endfor %}
+                     {% endfor %}
+                </td>
+              {% endfor %}
+        </tr>
+        {% if not loop.last %}
+          <tr >
+              <th></th>
+          {% for profile in listeProfiles %}
+                  <th style="/*background:#eee*/">{{profile.getLibProfil}}</th>
+          {% endfor %}
+          </tr>    
+       {%endif%}
+        {% endfor %}
+       
+        <!--tbody-->
+     </table>
+  <div class="">
+            <input value="{{'droit.form.sauveguarder'|trans({},'droit') }}" id="submit" class="boutonSubmit" /><span id="wait"></span>
+            <div class="clr"></div>
+  </div>
+ </form>       
+
+
+<script>
+      $("#submit").click(function(){
+          var html = "";
+          html += "<span style=\"float:right; position:relative; top:5px;\"><img src='{{ asset('img/client-img/icon-25-loading.gif') }}' /></span>";  
+        $("#wait").html(html);
+        doDroitsProcess( $("#listDroitForm").serialize()  ); 
+      });
+
+      function doDroitsProcess( data ){
+          $.ajax({
+              type: "POST",
+              url: "{{path('utb_client_updateDroits')}}",
+              data: {formdata:data},
+              cache: false,
+              success: function(data){
+                              var resJson = jQuery.parseJSON(data);
+                              if( resJson.result == "success")
+                                      //loadListeDroits(resJson.idprofil);
+                                          window.location = "{{path('utb_client_droit')}}";
+                              else
+                                      alert("Erreur durant le traitement. Veuillez réessayer svp.");
+              }
+          });	
+      }	
+
+</script> 
+
+                   
+{% endblock %}

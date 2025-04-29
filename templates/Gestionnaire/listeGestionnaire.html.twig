@@ -1,0 +1,75 @@
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+{% block title %}
+  {{ parent() }} - Mes Gestionnaires
+{% endblock %}
+  
+{% block client_centre_body %}
+                        <!-- **************************************************** CENTRE + DROITE ********************************************** -->
+        <div class="paddingBottom20p">
+                <ul class="filariane bleuLink">
+                        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+                        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li><a href="{{ path("utb_client_mesComptes",{'locale':locale}) }}">{{'compte.titre'|trans({},'compte') }}</a></li>
+                        <li><img src="{{asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li>{{ 'gestionnaire.titre'|trans({}, 'abonnes')}}</li>
+                </ul>
+
+                <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{ 'gestionnaire.titre'|trans({}, 'abonnes')}}</h2>
+                <div class="marginBottom10p">
+                        <div class="head1"><h3 class="title3 icon-gestion">{{ 'gestionnaire.nom'|trans({}, 'abonnes')}}</h3></div>
+                        <div class="head2"><h3 class="title3 icon-comptes">{{ 'gestionnaire.compte'|trans({}, 'abonnes')}}</h3></div>
+                        <div class="clear"></div>
+                </div>
+                                
+                {% if (listeGestionnaire != null)  and (listeGestionnaire|length)>0 %}
+                {% for gestionnaire in listeGestionnaire %}
+                <div class="boxWithLeftBar bgGrisatr1 paddingTop10p marginBottom20p">
+                        <div class="head1">
+                                <div class="leftPartIn">
+                                        <h4 class="title3">{{gestionnaire[0].getNomPrenom()}}</h4>
+                                        <p>{{gestionnaire[0].getAdresseUtilisateur()|raw}}</p>
+
+                                        <div class="sectIn">
+                                        <strong>{{ 'abonnes.form.tel'|trans({}, 'abonnes')}}</strong><br/> 
+                                        {{gestionnaire[0].getTelUtilisateur()|raw}}
+                                        </div>
+                                        <div class="sectIn">
+                                        <strong>{{ 'abonnes.form.cel'|trans({}, 'abonnes')}}</strong><br/>     
+                                        {{gestionnaire[0].getCelUtilisateur()|raw}}
+                                        </div>
+                                        <div class="clr"></div>
+                                        <div class="icon-mail"><a href="{{ path("utb_client_envoimessagerieabonne",{'locale':locale,'type':1}) }}" class="bleuLink" >{{'gestionnaire.ecrire'|trans({},'abonnes') }}</a></div>
+                                </div>
+                        </div>
+                        
+                            <div class="head2">
+                                    <div class="rightPartIn">                                   
+                                            {% for compte in gestionnaire[1] %}
+                                        {#{ dump(compte[0].getNumeroCompte()) }}    -  ---  -  {{ dump(compte[0].getAbonne().getId()) }#}
+                                                <table class="bgGrisatr2">
+                                                        <tr> <td>{{ 'abonnes.form.numCompte'|trans({}, 'abonnes')}}</td> <td style="text-align: right;"><a href="{{ path('utb_client_detail_compte_abonne',{'locale':locale,'idCompte':compte[0].getNumeroCompte(),'idAbonne':compte[0].getAbonne().getId()})}}"> {{compte[0].getNumeroCompte()}}</a>   </td> </tr>
+
+                                                           <tr> <td style="">{{ 'abonnes.form.solde'|trans({}, 'abonnes')}}</td> 
+                                                                {% if compte[1] is not null %}
+                                                                    <td {% if compte[1].getCoef() < 0 %} class="bleuLogo rightPosition red-text" {% else %} class="bleuLogo rightPosition strong" {% endif %} style="text-align: right;">
+                                                                     {% if ( compte[1]|length>0 ) and (compte[1].getMontant() != null ) %}
+																	    {#{compte[1].getCoef()}#}  
+                                                                        {{(compte[1].getMontant()*compte[1].getCoef())|number_format(0, '', ' ')}}                                                           
+                                                                     {% else %}
+                                                                        -
+                                                                     {% endif %}
+                                                                    </td> 
+                                                                {% endif %}
+                                                           </tr>                                                                                        
+                                                </table>
+                                            {% endfor %}
+                                    </div>
+                            </div>
+                        
+                        <div class="clear"></div>
+                </div>
+                {% endfor %}
+                {% endif%}
+        </div>
+        <!-- **************************************************** FIN DYNAMQUE ZONES ON SYMFONY ********************************************** -->
+{% endblock %}

@@ -1,0 +1,59 @@
+{# src/utb/ClientBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbClientBundle::layoutClient.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Accueil
+{% endblock %}	
+			
+{% block client_centre_body %}  
+		<ul class="filariane bleuLink">
+                        <li><a href="{{ path("utb_client_accueil",{'locale':locale,'typePre':1}) }}"><img src="{{ asset('img/client-img/pointer.png')}}" alt="" /> {{'client.tb.titre'|trans({},'messages') }}</a></li>
+                        <li><img src="{{ asset('img/client-img/icon-rightdirect.png')}}" alt="" /></li>
+                        <li>{{'action.ajout'|trans({},'autres')}}</li>
+                </ul>
+
+		<!-- Début du box compte -->
+                <h2 class="miniTitle title2 title-WithTopBar hover-title-WithTopBar">{{'action.ajout'|trans({},'autres')}}</h2>      
+					
+				
+                <form class="" action="{{ path('utb_client_ajoutaction',{'locale':locale}) }}" method="post" {{ form_enctype(form) }} >
+                        
+                    <div class="FrmAbonne">
+                        {{ form_errors(form.libAction) }}
+                          <label>{{ 'actions.form.nom'|trans({}, 'actions') }}</label>
+                           {{ form_widget(form.libAction) }}
+                      
+                        <div class="clr"></div>
+                    </div>
+                    <div class="FrmAbonne">
+                            {{ form_errors(form.descriptionAction) }}
+                            <label>{{ 'actions.form.desc'|trans({}, 'actions') }} </label>
+                            {{ form_widget(form.descriptionAction) }}
+                            <div class="clr"></div>
+                   </div>
+                    <div class="FrmAbonne selectType">
+                            {{ form_errors(form.controleur) }}
+                            <label>{{ 'actions.form.controleur'|trans({}, 'actions') }}</label>
+                            {{ form_widget(form.controleur) }}
+                            <div class="clr"></div>
+                                                        
+                   </div>
+                    <div class="FrmAbonne selectType">
+                            {{ form_errors(form.module) }}
+                            <label>{{ 'actions.form.module'|trans({}, 'actions') }} </label>
+                            {{ form_widget(form.module) }}
+                            <div class="clr"></div>
+                                                        
+                     </div>
+                    <div>
+                    <input type="submit" value="{{'client.ajouter'|trans({},'messages') }}" name="op" id="j_bouton" class="boutonSubmit">
+                    <a  href="{{ path('utb_client_listeaction',{'locale':locale}) }}"><input type="button" class="annulerBut back" value="{{'client.annuler'|trans({},'messages') }}" name="" id="" ></a>
+                    <div class="clr"></div>
+                    </div>
+                </form>
+		
+		<!--Fin du box compte-->
+
+     
+{% endblock %}
+		

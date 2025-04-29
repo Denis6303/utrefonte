@@ -1,0 +1,256 @@
+
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'opinions.liste.grandtitrepg'|trans({}, 'opinions') }}
+{% endblock %}
+
+  {% block administration_body %} 
+
+<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+<div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+    <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.accueil'|trans}}</a> > <a href="{{path('utb_admin_listesondage', {'locale': locale})}}">{{ 'admin.layout.sondage'|trans}} </a> > <a href="{{path('utb_admin_listeopinion', {'locale': locale})}}">{{'opinions.ajout.titre1'|trans({}, 'opinions')}}</a>  > {{'admin.list'|trans()}}
+</div>
+
+<div class="span-25">			<!-- Contien les menus -->
+    <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+        <div class="span-18">
+            <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-45-user.png')}}" alt="Sondages" title="" /></div>
+            <div class="titreModule titreModuleShort colorBleu"><h1>{{ 'opinions.liste.titrepg'|trans({}, 'opinions') }}<h1></div>	
+                        <div class="clr"></div>
+                        </div>
+
+
+
+                        <div class="span-6 last">
+
+                        
+                            <div class="boutonGestion">
+                                
+                                {% if locale=="en"%}
+                                    {% set lelocale = "fr"%}
+                                {% elseif locale=="fr"%}
+                                    {% set lelocale = "en"%}
+                                {% endif%}                                
+                                <div><a href="{{path('utb_admin_ajoutopinion', {'idsondage':id,'locale':lelocale})}}"><img src="{{ asset('img/admin-img/ajouter.png')}}" alt="{{ 'admin.ajouter'|trans}}" title="{{ 'admin.ajouter'|trans}}" /></div>
+                            {{ 'admin.ajouter'|trans}}</a>
+                                        
+                            </div>
+                       
+{#                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/modifier.png')}}" alt="Modifier" title="{{ 'admin.modifier'|trans}}" /></div>
+                            {{ 'admin.modifier'|trans}}</a>
+                            </div>#}
+{#
+                            <div class="boutonGestion">
+                                <div><a href=""><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="{{ 'admin.activer'|trans}}" /></div>
+                            {{ 'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                <div><a href=""><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="{{ 'admin.desactiver'|trans}}" /></div>
+                            {{ 'admin.desactiver'|trans}}</a>
+                            </div>
+
+
+                            <div class="ecartBoutons">&nbsp;</div>
+                            
+                             <div class="boutonGestion">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getSondagesID(),1); return false;"><img src="{{ asset('img/admin-img/publier.png')}}" alt="Publier" title="Mettre en Ligne" /></div>
+                                    {{'admin.activer'|trans}}</a>
+                            </div>
+                            <div class="boutonGestion btGestMoy">
+                                    <div><a href="javascript:void(0);" onclick="gererEtatAll( getSondagesID(),0); return false;"><img src="{{ asset('img/admin-img/depublier.png')}}" alt="Dé-Publier" title="Mettre Hors Ligne" /></div>
+                                    {{'admin.desactiver'|trans}}</a>
+                            </div>
+                            <div class="ecartBoutons">&nbsp;</div>  #}                          
+                            
+
+                            <div class="boutonGestion">
+                                <div><a href="javascript:void(0);" onclick="corbeilleAll( getSondagesID()); return false;"><img src="{{ asset('img/admin-img/icon-48-deny.png')}}" alt="{{ 'admin.corbeille'|trans}}" title=" {{ 'admin.corbeille'|trans}}" /></div>
+                             {{ 'admin.supprimer'|trans}}</a>
+                            </div>
+                            <div class="clr"></div>
+                        </div>					<!--  FIN allBoutonsGestion -->
+                        <div class="clr"></div>
+                        </div>						<!--  FIN toulbar 3 -->
+                        </div>				<!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+
+
+
+                        <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                            <div class="MarginBottomBox"></div>
+
+                            <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                         {# STATISTIQUES #}    
+                                         {{ information.stats(listestat) }}                                     
+                                    
+                                </div>			<!-- Fin COLONNE COLLEFT-->
+                            </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+                            <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                <div class="colRight">						<!-- COLONNE DROITE-->
+
+
+                                    <div class="colorCadreArrondi coinsArrondis bgGris">
+                                        <div class="colRightContentPadding">	<!-- CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+						{#	<div class="filtersArticles">
+								<input type="text"> <input type="submit" value="OK">
+								<select class="filterStatus">
+									<option>{{ 'opinions.liste.statut'|trans({}, 'opinions') }} </option>
+									<option>{{ 'opinions.liste.actif'|trans({}, 'opinions') }}</option>
+									<option>{{ 'opinions.liste.inactif'|trans({}, 'opinions') }}</option>
+								
+								</select>
+								<select class="filterRubrique">
+									<option>{{ 'opinions.liste.statut'|trans({}, 'opinions') }}</option>
+									<option>Administrateur</option>{#options opinions issus dune bd 
+									<option>Redacteur</option>
+									<option>Gestionnaire</option>
+								</select>
+
+								<div class="clr"></div>
+							</div>		#}				<!-- FIN filtersArticles-->
+
+                                                <table class="listMenusCateg listArticlesRub">
+                                                    <tr>
+                                                        <th><input type="checkbox" class="checkall" name="checkall" /></th>
+                                                        <th>{{'opinions.form.nom'|trans({}, 'opinions')}}</th>
+                                                        <th colspan="2"></th>
+                                                    </tr>	
+                                                               {% for opinion in listeopinion %}                                                            
+
+                                                           
+                                                    <tr {% if loop.index is divisibleby(2)%}  class="bgGris" {% else %} class="bgblanc"  {% endif %}>
+                                                        <td><input type="checkbox" name="opinion[]"  rel="opinion_c" value="{{opinion.id}}"/></td>
+                                                        <td class="libService">              
+                                                                     {{opinion.reponse }}
+                                                            </td>                                                  
+                                                            {#<td>              
+                                                                <a href="{{ path('utb_admin_suppropinion', {'id': opinion.id,'locale': locale}) }}" onclick="return confirm('Confirmez vous la suppression ?');">{{ 'admin.supprimer'|trans}}</a> 
+                                                            </td>             
+
+                                                                
+                                                                        <td> % if opinion.etatCadre == 0 %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': opinion.id,'etat': 1,'locale': locale}) }}">{{ 'admin.activer'|trans}}</a> 
+                                                                        {% else %}
+                                                                    <a href="{{ path('utb_admin_gererCadre', {'id': opinion.id,'etat': 0,'locale': locale}) }}">{{ 'admin.desactiver'|trans}}</a> 
+                                                                        {% endif %</td>#}   
+                                                                 
+
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_ajoutlangueopinion', {'id': opinion.id,'idsondage':id,'locale': 'en'}) }}">
+
+                                                                      Lang
+                                                                    </a> 
+                                                                </td> 
+                                                                
+                                                                <td>              
+                                                                    <a href="{{ path('utb_admin_modifopinion', {'id': opinion.id,'locale': locale}) }}">
+
+                                                                      <img src="{{ asset('img/admin-img/btmodifier.png')}}" alt="Modifier" title="Modifier" />
+                                                                    </a> 
+                                                                </td> 
+                                                                
+                                                                
+                                                            </tr>
+
+    {% else %}
+                                                                    <tr>
+                                                                        <td colspan="4">{{ 'opinions.none'|trans({}, 'opinions') }} </td>       
+                                                                    </tr>       
+    {% endfor %}
+                                                                </table>
+
+
+
+                                                            </div>		<!-- FIN colRightContentPadding  CREE LES MARGES GAUCH ET DROITE DAN LA COLONNE CENTRALE-->
+                                                        </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                                    </div>		<!--  FIN COL RIGHT -->
+                                                </div>			<!--  FIN  SPAN - 19 -->
+
+                                            </div>				<!--  FIN SPAN - 25 -->
+                                            
+ <script language="javascript" >
+     
+        $(".checkall").click(function(){
+            $(this).closest("table").find("input[type=checkbox]").prop("checked", this.checked);
+       });     
+       
+       function getSondagesID(){
+           
+            var opinion_id = "";
+            
+            $(":input[rel=opinion_c]:checked").each(function(){
+		opinion_id = opinion_id.concat( "|" + $(this).val() );
+                //actions_id = "1|2|3";
+            });   
+            
+            return opinion_id;
+       }
+       
+       var html = "<div style='text-align:center;'><img src='{{ asset('img/wait.gif') }}' /></div>"; 
+       var htmldefault3 = "{{ 'opinions.supprimer.confirmation'|trans}}"; 
+       var htmldefault2 = "{{ 'opinions.statut.confirmation'|trans}}"; 
+ 
+    
+       function corbeilleAll( opinionId ){
+          if( opinionId.length == 0 ){              
+              $('#process_tpl').html("{{ 'admin.natdoc.cocher'|trans}}");
+          var args = {modal: true, autoOpen: false, title: ('{{ 'opinions.supprimer.confirmation'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: { 			                  
+			"OK": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+              return false;
+          }           
+          
+          $('#process_tpl').html(htmldefault3);
+          var args = {modal: true, autoOpen: false, title: ('{{ 'opinions.supprimer.confirmation'|trans}}')};
+          $('#process_tpl').dialog(args);
+           $('#process_tpl').dialog({
+		buttons: {
+ 			"OK": function() {                    
+                            $('#process_tpl').html(html);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ path('utb_admin_corbeilleopinion')}}",
+                                data: {opinionIds:opinionId},
+                                cache: false,
+                                success: function(data) {
+                                    var answer = jQuery.parseJSON(data);
+                                    if( answer.result=="erreurstatut"){
+                                        $('#process_tpl').html("{{ 'opinions.supprimer.impossible'|trans}}");
+                                    }
+                                    else{
+                                        $('#process_tpl').html("{{ 'opinions.supprimer.reussie'|trans}}");
+                                    }
+                                    window.location.reload();
+                                }
+                            });
+                            
+			},                   
+			"Cancel": function() {
+                            $(this).dialog("close");
+			}
+		}
+            })    
+            $("#process_tpl").dialog('open'); 
+          
+       } 
+       
+   
+ 
+</script>                                            
+<div id="process_tpl" style="display:none;"></div>                                            
+  {% endblock %}
+
+                                            

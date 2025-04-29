@@ -1,0 +1,196 @@
+{# src/utb/SiteBundle/Resources/views/layoutSite.html.twig #}
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - Réseaux agences
+{% endblock %}
+  
+{% block public_body %}
+  
+   <div class="span-24">
+    {% set i=0 %}                            
+        {% for sousrubrique in listesousrub %}
+      
+
+          {% set i=i+1 %}
+
+           {% if i == 1 %}           
+               <h2 class=" listItem3 title1 leftSpace rightSpace">{{ sousrubrique.nomRubrique  }}</h2>                                 
+               {% set j=0 %}
+                    <div class="all-boxInterieur-type2">
+                        {% for article in articlereseau[sousrubrique.id] %}
+
+                        {% for larticle in article %}
+                          {% if (article is not null) and (larticle|length>0) %}
+
+                            <div class="boxInterieur-type2 borderBotStyle bgHoverBox bgBlanc">
+                                     <div class="cnt-boxInterieur-type2">
+                                            <div class="image-boxInterieur-type2">
+                                               {% if larticle.urlMedia =="default_.png" %}
+                                                {% else %}
+                                                    <img src="{{ asset('upload/articles/'~larticle.urlMedia)}}" alt="Image Illustrative" title="Image Illustrative" />
+                                                {% endif %}
+                                            </div>
+                                            <div class="descr-boxInterieur-type2">
+                                                    <h3 class="title3 bleuLink">{{larticle.titreArticle}}</h3>
+                                                    <div class=""> 
+                                                        {{larticle.descriptionArticle|raw}}
+                                                    </div>
+                                            </div>
+                                            <div class="clr"> </div>
+                                    </div>
+                          
+                            </div> 
+                           
+                          {% endif%}
+                     
+                            {% set j=j+1 %}
+                           {% endfor %}
+                                <div class="clr"></div>                  
+                        {% endfor %}
+                           </div> 
+               </div>                    
+  {% else %}
+                               <div class="span-24 bgBlanc marginBottom20p paddingTopBot10p">                                  
+                                   
+                                    <div class="span-17">
+                                            <div class="regionAgence leftSpace rightSpaceMin">
+                                            <h2 class=" listItem3 title1">{{ sousrubrique.nomRubrique  }}</h2>
+                                                <div id="acordion">
+                                               {% set j=0 %}   
+                                               {% for article in articlereseau[sousrubrique.id] %}
+                                                  {% for larticle in article %}
+                                                   {% if (article is not null) and (article|length>0) %}
+                                                           
+                                                    <h3 class="bleuLogo">{#<span class="icon-plus bleuLogo">+</span>#}{{larticle.titreArticle}}</h3>
+                                                    
+                                                    <div>{{larticle.descriptionArticle|raw}}</div>
+                                                                                                    
+
+                                                   {% endif %}
+                                                   {% set j=j+1 %}
+                                               {% endfor %} 
+                                            {% endfor %}
+                                                </div>
+                                            </div>		<!-- FIN div.rightSpace-->
+                                     </div>		<!-- FIN div.span-6 LAST -->                                            
+                                        <div class="span-7 last">
+                                                <div class="rightSpace"> <!-- PHP / A NE PAS BOUCLER-->
+
+                                                        <div class="rightBox actus-rightBox marginBottom20p">	<!-- AVIS ET ACTUs-->
+                                                                <h2 class="red-text title-WithTopBar bar-bordeau capitaLetter">{{ 'agence.avis'|trans({}, 'site') }}</h2>
+                                                                <div class="carousel-actus" >
+                                                                        <ul >
+                                                                            {% for actualite in listeactualite %}                                                    
+                                                                                    <li style="height: 80px;">
+                                                                                            <div class="one-actusavis">	<!-- une actualité/avis-->
+                                                                                                    <img src="{{asset('upload/articles/'~actualite.urlMedia)}}" alt="" title="" style="width: 100px;"/>
+                                                                                                    <p class="actusavis-descrp">
+                                                                                                            <span class="actusavis-date">{{actualite.articleDateAjout|date("d/m/Y")}}</span><br/>
+                                                                                                            <a class="actusavis-titre bleuLogo LkUnderline" href="{{ path('utb_site_article',{'id': actualite.id,'locale':locale}) }}">{{actualite.titreArticle}}</a>
+                                                                                                            <!-- S'ilm y a description, mettre ca ici-->
+                                                                                                    </p>	<!-- FIN p.actusavis-descrp-->
+                                                                                            </div>
+                                                                                    </li>
+                                                                            {% endfor  %}
+                                                                        </ul>
+                                                                </div>
+                                                                <div class="butNavigDocs butNavigActusAvis">
+                                                                        <span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="Prevew" title="Document Précédent" /></span>
+                                                                        <span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="Next" title="Document Suivant" /></span>
+                                                                </div>
+                                                                <a class="blueLink" href="{{ path("utb_site_rubrique",{'locale': locale,'id': 2, 'type':7})}}">{{ 'agence.voir'|trans({}, 'site') }} </a>
+                                                        </div>		<!-- FIN right Box-->                            
+                                                        <div class="rightBox coinsArrondis border-ciel marginBottom20p">
+                                                                <div class="rightBox-cnt boxTw1">
+                                                                        <img src="{{asset('img/site-img/icon-tpe.png')}}" alt="" title="" /><h2 class="red-text capitaLetter">{{ 'agence.termi'|trans({}, 'site') }}</h2>
+                                                                        <div class="clr"></div>
+                                                                        <p>{{ 'agence.payez'|trans({}, 'site') }}</p>
+                                                                        <div class="divButmoore">
+                                                                                <a class="btmoore coinsArrondis" href="{{ path("utb_site_rubrique",{'locale': locale,'id': 17, 'type':6})}}"><span>{{ 'agence.local'|trans({}, 'site') }}</span><span></span></a>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        <div class="rightBox coinsArrondis border-ciel marginBottom20p">
+                                                                <div class="rightBox-cnt boxTw1 boxTw2">
+                                                                        <h2 class="red-text capitaLetter">{{ 'agence.gui'|trans({}, 'site') }}</h2>
+                                                                        <p>{{ 'agence.ret'|trans({}, 'site') }}</p>
+                                                                        <img src="{{asset('img/site-img/icon-prdsrv-findGAB.png')}}" alt="" title="" />
+                                                                        <div class="clr"></div>
+                                                                        <div class="divButmoore">
+                                                                                <a class="btmoore coinsArrondis" href="{{ path("utb_site_rubrique",{'locale': locale,'id': 16, 'type':6})}}"><span>{{ 'agence.gab'|trans({}, 'site') }}</span><span></span></a>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        {% if listefaq|length>0 %}
+                                                            <div class="rightBox random-faq coinsArrondis border-bleuLogo marginBottom20p">
+                                                                    <h2><img src="{{asset('img/site-img/faq.jpg')}}" alt="" /><span class="hide">{{ 'agence.faq'|trans({}, 'site') }}</span></h2>
+                                                                    <div class="rightBox-cnt Tjustify">
+                                                                          {% for lfaq in listefaq %}
+                                                                            <h3 class="center title4">{{lfaq.titreArticle}}</h3>
+                                                                            {{lfaq.descriptionArticle|raw}}
+                                                                          {% endfor %}
+                                                                    </div>
+                                                                    <div class="rightPosition bleuLink"><a href="{{ path("utb_admin_resultatFAQ",{'locale': locale,'id': 0, 'page':1})}}">{{ 'agence.vfaq'|trans({}, 'site') }}</a></div>
+                                                            </div>
+                                                       {% endif %}
+                                                </div>		<!-- FIN div.rightSpace-->
+                                        </div>		<!-- FIN div.span-6 LAST --> 
+                                     </div>
+                               {% endif%} 
+                                          
+                       {% endfor %}                                                                                		
+  {% endblock %}
+  {#
+        <!-- Horaires  -->
+                <div class="span-24 paddingTopBot10p marginBottom20p borderBotStyle bgBlanc">
+                    <div class="rubriquePGarde leftSpace rightSpace marginBottom10p">
+                        <h1 class="boxSection-titre title-WithLeftBar gris-text">Nos Horaires</h1><div class="clr"></div>
+                    </div>
+                    <div class="othersPrdSrv leftSpace rightSpace">                            
+                        <div style="margin-bottom:15px;">
+
+                            <table class="horaire">
+                                <tbody>
+                                    <tr>
+                                        <th><h3 >Jour de la semaine</h3></th>
+                                <th><h3 >Heure d'ouverture</h3></th>
+                                <th><h3 >Heure de fermerture</h3></th>
+                                </tr>
+                                <tr >
+                                    <th colspan="3" style="text-align:center;" class="souligne">Heures d'ouvertures des agences de Lomé</th>
+                                </tr>
+                                <tr>
+                                    <td>Lundi à Vendredi</td>
+                                    <td>07H 45</td>
+                                    <td>16H 30 </td> 
+                                </tr>
+                                <tr>
+                                    <td>Samedi</td>
+                                    <td>08H 00</td>
+                                    <td>13H 30 </td> 
+                                </tr>
+                                <tr >
+                                    <th colspan="3" style="text-align:center;">Heures d'ouverture des agences du Réseau Préfecture</th>
+                                </tr>
+                                <tr>
+                                    <td>Lundi à Vendredi</td>
+                                    <td>07H 45</td>
+                                    <td>16H 30 </td> 
+                                </tr>
+                                <tr>
+                                    <td>Samedi</td>
+                                    <td>08H 00</td>
+                                    <td>13H 30 </td> 
+                                </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>	
+                </div>
+                <!-- Fin Horaires  -->
+ #}
+
+  

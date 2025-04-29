@@ -1,0 +1,35 @@
+                <ul id="nav">
+                    
+                    {% for keyP,mP in listeLiens %} 
+                        
+                      {% set tab = mP.url|split('|') %}
+
+                           {% if mP.imageMenu== "menus_page_speciale.png" or mP.imageMenu == "menus_accueil.png"  or mP.url == "utb_admin_resultatFAQ" %}
+                                    {% if mP.imageMenu == "menus_accueil.png"%}
+                                        <li {% if idrub==0 %} class="actifHomePage"{% else %}class="iconHomeToolBar"{% endif %}>
+                                                <a href="{{ path(mP.url,{'locale': locale})}}" title="{{mP.libelle}}">
+                                                </a>                                              
+                                    {% else %}
+                                          <li>
+                                                <a href="{{ path(mP.url,{'locale': locale})}}" title="{{mP.libelle}}">
+                                                  {{mP.libelle}}     
+                                                </a>                                                   
+                                               
+                                    {% endif %}
+                                          
+                                {% elseif mP.imageMenu == "menus_lien.png" %}
+                                    <li>         
+                                        <a href="{{ "http//"~mP.url}}" title="{{mP.libelle}}">
+                                                {{mP.libelle}}
+                                        </a>                                             
+                                {% else %}  
+                                  <li >   
+                                      
+                                        <a {% if tab.2 == idrub %}class="activemenu" {% else %}{% endif %} href="{{ path(tab.0,{'locale': locale,'id':tab.2, 'type':tab.1,'typecate': 0, 'date':0})}}" title="{{mP.libelle}}">  
+                                                {{mP.libelle}}
+                                        </a>                                            
+                                {% endif %}                      
+                                 </li>      
+                     {% endfor %}
+								<div class="clr"> </div>								 
+                </ul>

@@ -1,0 +1,128 @@
+{% extends "utbSiteBundle::layoutSite.html.twig" %}
+
+{% block title %}
+  {{ parent() }} - {{larubrique[0].nomRubrique}}
+{% endblock %}
+
+{% block public_body %}
+
+                            {% set arttitre= ""%}
+                            {% set artdescription= ""%}  
+
+<div class="span-24 marginBottom20p paddingTopBot20p borderBotStyle bgBlanc">
+                    {% for article in listearticle %}
+                       {% if loop.last %}
+                            {% set arttitre= article.titreArticle%}
+                            {% set artdescription= article.descriptionArticle%}
+                       {% endif  %}
+
+
+                              {% if loop.index0 ==2    %}
+{#                              Bloc Dirigeant#}
+    <div class="span-24">
+        <div class="leftSpace rightSpace ">
+            <div class="Tjustify listeDirigeant">
+                <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                                                    {% if article.urlMedia =="default_.png" or  article.urlMedia =="" %}
+                                                    {% else %}
+                <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="Image Illustrative" style=" /*padding-bottom:10px;*/"/>
+                                                    {% endif %}
+                                                    {% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}     
+            </div>  
+
+
+                              {% else %} 
+                                {% if (loop.index0 == 0)   %} 
+{#                                            Bloc decouverte utb#}
+            <div class="span-24">
+                <div class="leftSpace rightSpace">
+                    <div class="Tjustify listeDirigeant marginBottom20p">
+                        <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                        <div class="decouverte">   
+                                                          {% if article.urlMedia =="default_.png" or  article.urlMedia =="" %}
+                                                          {% else %}
+                            <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="Image Illustrative" class="decouverte"/>
+                                                          {% endif %}
+                            <div>
+                                <div class="paddingTop20p textedecouverte">{% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}</div>     
+
+
+                                 {% endif %}                                        
+                                 {% if (loop.index0 ==1)   %} 
+{#                                     Bloc adresse#}
+                                <div class="  marginTop20p marginBottom20p" style="float: left; width: 440px;"> 
+                                    <h1 class="titlePage title1 bleuLogo">{{article.titreArticle}}</h1>
+                                    <div class="siege bgGrisatr2 boxAdress borderBotStyle marginBottom20p" >
+                                        <div class="left" style="margin-left: 60px; margin-top: 5px;"> {% if article.introTexteArticle !=""%}{{article.introTexteArticle|raw}} {%else%}{{article.descriptionArticle|raw}}{% if article.descriptionArticle !=""%}{%endif%}{%endif%}</div> 
+                                        <div class="" >
+                                                          {% if article.urlMedia =="default_.png" or  article.urlMedia =="" %}
+                                                          {% else %}
+                                            <img src="{{ asset('upload/articles/'~article.urlMedia)}}"  title="Image Illustrative" style="float:right; padding-bottom:10px; width:165px; height:105px; margin-top: 20px;"  />
+                                                          {% endif %}                                                    
+
+                                        </div>
+                                        <div class="clr"></div>
+                                    </div>
+
+
+                                    <div class="boxDocuments marginTop10p marginBottom20p" style="/*margin-left: 35px;*/ height: 60px;">
+                                        <h1 class="titlePage title1 bleuLogo">{{ 'presentation.publi'|trans({}, 'site') }}</h1><div class="mhr"><hr></div><div class="clr"></div>
+                                        <div class="boxDocuments-cnt">
+                                            <div class="carousel-docs">
+
+                                                <ul>
+                                                              {% for publication in listepublication  %} 
+                                                    <a href="{{ asset('upload/articles/'~publication.urlMedia)}}">
+                                                        <li style=" height: 40px;">
+                                                            <div class="oneDoc">	<!-- un document-->
+                                                                <img src="{{asset('img/site-img/icon-docpdf2.png')}}" alt="" title="" />
+                                                                <p class="oneDoc-titre"><span class="oneDoc-date">{{publication.articleDateAjout|date("d/m/Y")}}</span><a class="" href="{{ asset('upload/articles/'~publication.urlMedia)}}" target="_blank">{{publication.titreArticle}}</a></p>
+                                                                <div class="clr"></div>
+
+                                                            </div>
+                                                        </li>                                                                
+                                                    </a>  
+                                                               {% endfor  %}      
+
+                                                </ul>
+                                            </div>
+                                        </div><!-- div.content-brlastannonces-->
+                                        <div class="boxDocuments-foot">
+                                            <div class="butNavigDocs">
+                                                <span class="prevItem"><img src="{{asset('img/site-img/icon-down.png')}}" alt="Prevew" title="{{ 'presentation.prec'|trans({}, 'site') }}" /></span>
+                                                <span class="nextItem"><img src="{{asset('img/site-img/icon-top.png')}}" alt="Next" title="{{ 'presentation.suiv'|trans({}, 'site') }}" /></span>
+                                            </div>
+                                            <!-- <div class="divButmoore">
+                                                     <a class="btmoore coinsArrondis " href="{{ path("utb_site_rubrique",{'locale': locale,'id': 4, 'type':4,'typecate': 0, 'date':0})}}"><span>Voir toutes nos publications</span><span></span></a>
+                                             </div> -->
+                                            <div class="clr"></div>
+                                        </div>
+
+
+                                        <div class="clr"></div>
+                                    </div>                                    
+                                </div>
+
+
+
+
+                                <div class="clear"> </div>
+                            </div>       
+                        </div>
+                    </div>
+                              {% endif %}
+                              {% endif %}                                        
+
+                              {% if loop.index0 == 1 %}
+                </div> 
+            </div>   
+
+                              {% elseif loop.index0 == 2 %}
+
+        </div>
+
+    </div>        
+                              {% endif %}                                 
+                    {#% endif %#}
+                    {% endfor %}	
+	{% endblock %}

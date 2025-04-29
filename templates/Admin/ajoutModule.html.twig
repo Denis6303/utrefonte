@@ -1,0 +1,159 @@
+{% extends "utbAdminBundle::layoutAdmin.html.twig" %}
+{% block title %}
+  {{ parent() }} - {{ 'modules.ajout.grandtitrepg'|trans({}, 'modules') }}
+{% endblock %}
+
+  {% block administration_body %} 
+    <div class="span-25" id="toolbar1" >			<!-- Première Barre HORIZONTALE NOIRE, Menu principal de l'admin   -->
+                <div class="logoHomePage">
+                    <a href="#" title=""> <img src="{{ asset('img/admin-img/home.png') }}" alt="{{ 'admin.layout.titrelogo'|trans}}" title="{{ 'admin.layout.titrelogo'|trans}}"></a>
+                </div>
+                <ul id="toolbarMenu">
+                   <li class=""><a href="{{path('utb_admin_accueil', {'locale': locale})}}" title="{{ 'admin.layout.tb'|trans}}">{{ 'admin.layout.tb'|trans}}</a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titreart'|trans}}">{{ 'admin.layout.menu.articles'|trans}}</a></li>
+                    <li class=""><a href="{{path('utb_admin_listerubrique',{'locale': locale})}}" title="{{ 'admin.layout.menu.titrerub'|trans}}">{{ 'admin.layout.menu.rubriques'|trans}} </a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titremenu'|trans}}">{{ 'admin.layout.menu.menus'|trans}}</a></li>					
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titremessag'|trans}}">{{ 'admin.layout.menu.messagerie'|trans}}</a></li>
+                    <li class=""><a href="{{path('utb_admin_listedimension', {'locale': locale})}}" title="{{ 'admin.layout.menu.titrecadre'|trans}}">{{ 'admin.layout.menu.cadre'|trans}} </a></li>
+                    <li class=""><a href="{{path('ajouter_utilisateur', {'locale': locale})}}" title="{{ 'admin.layout.menu.titreusers'|trans}}">{{ 'admin.layout.menu.users'|trans }} </a></li>
+                    <li class="actif"><a href="{{path('utb_admin_listeaction', {'locale': locale})}}" title="">{{ 'admin.layout.menu.titremaint'|trans }} </a></li>
+                    <li class=""><a href="#" title="{{ 'admin.layout.menu.titreplan'|trans }}">{{ 'admin.layout.menu.plan'|trans }} </a></li>
+                </ul> 
+                <div class="clr"></div>				
+            </div>									<!-- FIN MENU PRINCIPAL BAR HORIZONTALE NOIRE -->
+
+            <div class="span-25" id="toolbar2">					<!-- Deuxième barre HORIZONTALE Grise, Menu d'accès rapide et recherche -->
+              <ul id="toolbarMenuRapid">
+                  <li class=""><a href="{{path('utb_admin_listeaction', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listeaction'|trans }}</a></li>
+                  <li class=""><a href="{{path('utb_admin_ajoutaction', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajouteraction'|trans }}</a></li>    
+                  <li class=""><a href="{{path('utb_admin_listecontroleur', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listecontroleur'|trans }}</a></li>
+                  <li class=""><a href="{{path('utb_admin_ajoutcontroleur', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajoutercontroleur'|trans }}</a></li>
+		  <li class=""><a href="{{path('utb_admin_ajoutmodule', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.ajoutermodule'|trans }} </a></li>
+                  <li class=""><a href="{{path('utb_admin_listemodule', {'locale': locale})}}" title="">{{ 'admin.layout.sousmenu.listemodule'|trans }}</a></li>
+                  <li class=""><a href="" title="">{{ 'admin.layout.sousmenu.archives'|trans }}</a></li>
+		  <li class=""><a href="" title="">{{ 'admin.layout.sousmenu.corbeille'|trans }}</a></li>
+              </ul>  
+                <div class="recherche">
+                    <input type="text" placeholder="{{ 'admin.layout.rechercher'|trans}}" />
+                    <a href="#"> <img src="{{ asset('img/admin-img/loupe.png') }}" alt="Go" title="{{ 'admin.layout.rechercher'|trans}}" /> </a>
+                    <div class="clr"></div>
+                </div>
+                <div class="clr"></div>
+            </div>				<!-- FIN MENU RAPIDE BAR HORIZONTALE GRISE -->
+
+            <div class="span-25 colorBleu" id="filAriane">	<!-- Fil d'ariane conducteur Tableau de bord > Gestion article > Modifier -->
+                <a href="{{path('utb_admin_accueil')}}"> {{ 'admin.layout.tb'|trans}}</a> > <a href="{{path('utb_admin_listemodule', {'locale': locale})}}">Module</a> > <a href="#">{{ 'admin.layout.sousmenu.ajoutermodule'|trans }}</a>
+            </div>
+
+  <div class="span-25">			<!-- Contien les menus -->
+      <div id="toolbar3" class="coinsArrondisMin colorCadreArrondi bgGris">	<!-- Barre de titre + bton Actions-->
+          <div class="span-10">
+              <div class="logoModulePage"><img src="{{ asset('img/admin-img/icon-48-jupdate-uptodate.png')}}" alt="Module" title="Gestion des Utilisateurs" /></div>
+              <div class="titreModule colorBleu"><h1>{{ 'modules.ajout.titre1'|trans({}, 'modules') }} <span>: {{ 'modules.ajout.titre2'|trans({}, 'modules') }}</span><h1></div>	
+                          <div class="clr"></div>
+                          </div>
+
+                          <div class="span-14 last">
+
+                              <div class="ecartBoutonsFirst">&nbsp;</div>
+
+                              <div class="boutonGestion">
+                                  <div><a href="javascript:document.getElementById('ajoutModule').submit()"><img src="{{ asset('img/admin-img/icon-48-apply.png')}}" alt="Valider" title="{{ 'admin.btnvalider'|trans}}" /></div>
+                                  {{ 'admin.btnvalider'|trans}}</a>
+                              </div>
+
+                              <div class="ecartBoutons">&nbsp;</div>
+
+                              <div class="boutonGestion">
+
+                                  <div><a href="" ><img src="{{ asset('img/admin-img/icon-48-cancel.png')}}" alt="{{ 'admin.annuler'|trans}}" title="{{ 'admin.annuler'|trans}}" /></div>
+                                  {{ 'admin.annuler'|trans}}</a>
+                              </div>
+                              <div class="clr"></div>
+                          </div>					<!--  FIN allBoutonsGestion -->
+                          <div class="clr"></div>
+                          </div>						<!--  FIN toulbar 3 -->
+                          </div> <!--  FIN SPAN - 25 Boutons de Gestion et Titre PAGE-->
+                          
+                          <div class="span-25">						<!-- COLONNE GAUCHE + COLONNE DROITE-->
+                              <div class="MarginBottomBox"></div>
+
+                              <div class="span-6">						<!-- COLONNE GAUCHE-->
+                                  <div class="colLeft">					<!-- COLONNE GAUCHE-->
+
+                                      <div class="MarginBottomBox coinsArrondis colorCadreArrondi bgGris" style="padding:1px;"><!-- un cadre dans la colonne gauche-->
+                                          <h3 class="colorBleu titreStats">{{ 'admin.stats'|trans}} </h3>
+                                          <div class="coinsArrondis backgrdIntCadreLeft bgBlanc">
+                                              <table class="tableStats">
+							<tr class="">
+								<td>{{ 'admin.totalart'|trans({}, 'messages') }}</td>
+								<td class="valStats">135</td>
+							</tr>
+							<tr class="bgGris">
+								<td>{{ 'admin.totalartligne'|trans({}, 'messages') }}</td>
+								<td class="valStats">41</td>
+							</tr>
+							<tr class="">
+								<td >{{ 'admin.totalarthorsligne'|trans({}, 'messages') }}</td>
+								<td class="valStats">25</td>
+							</tr>
+							<tr class="bgGris">
+								<td class="valDecalee">{{ 'admin.totalartsoumivalid'|trans({}, 'messages') }}</td>
+								<td class="valStats">25</td>
+							</tr>
+							<tr class="">
+								<td class="valDecalee">{{ 'admin.totalartattentevalid'|trans({}, 'messages') }}</td>
+								<td class="valStats">33</td>
+							</tr>
+							<tr class="bgGris">
+								<td class="valDecalee">{{ 'admin.totalartdepublie'|trans({}, 'messages') }}</td>
+								<td class="valStats">5</td>
+							</tr>
+							<tr class="">
+								<td>{{ 'admin.archivers'|trans}}</td>
+								<td class="valStats">14</td>
+							</tr>
+							<tr class="">
+								<td >{{ 'admin.supprimers'|trans}}</td>
+								<td class="valStats">17</td>
+							</tr>
+							</table>
+                                          </div>
+                                      </div>
+
+
+
+                                  </div>			<!-- Fin COLONNE COLLEFT-->
+                              </div>				<!-- Fin COLONNE GAUCHE span 6-->
+
+
+                              <div class="span-19 last">						<!-- COLONNE DROITE-->
+                                  <div class="colRight">						<!-- COLONNE DROITE-->
+
+                                      <div class="MarginBottomBox colorCadreArrondi coinsArrondis bgGris">
+                                          <div class="colRightContentPadding">
+                                              <div class="FrmAjoutArt colorCadreArrondi bgBlanc">
+                                                  <div class="MarginBottomBox">
+                                                      <form action=" {{ path("utb_admin_ajoutmodule",{'locale':locale}) }} " method="post" {{ form_enctype(form) }} id="ajoutModule">
+                                                                {{ form_errors(form.libModule) }}
+                                                                <span class="colorBleu">{{ form_label(form.libModule, "Nom du module") }}</span> 
+								{{ form_widget(form.libModule) }}
+                                                                <div class="ecartLabel">&nbsp;</div>
+                                                          </form>
+                                                      <div class="clr"></div>
+                                                  </div>
+
+                                              </div>
+
+
+                                          </div>			<!-- FIN colRightContentPadding-->
+                                      </div>			<!-- FIN colorCadreArrondi coinsArrondis bgGris-->
+
+                                  </div>		<!--  FIN COL RIGHT -->
+                              </div>			<!--  FIN  SPAN - 19 -->
+
+                          </div>				<!--  FIN SPAN - 25 -->
+  
+  
+
+  {% endblock %}
