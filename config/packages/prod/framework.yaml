@@ -1,0 +1,27 @@
+framework:
+    cache:
+        app: cache.adapter.redis
+        system: cache.adapter.system
+        directory: '%kernel.cache_dir%/pools'
+        default_redis_provider: redis://localhost
+    session:
+        handler_id: session.handler.redis
+        gc_probability: 0
+    php_errors:
+        log: true
+    router:
+        cache_dir: '%kernel.cache_dir%/router'
+    validation:
+        cache_dir: '%kernel.cache_dir%/validation'
+    serializer:
+        cache_dir: '%kernel.cache_dir%/serializer'
+    annotations:
+        cache_dir: '%kernel.cache_dir%/annotations'
+    http_cache:
+        enabled: true
+        debug: false
+        private_headers: ['Authorization', 'Cookie']
+        allow_reload: false
+        allow_revalidate: false
+        stale_while_revalidate: 2
+        stale_if_error: 60 
