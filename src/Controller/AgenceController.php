@@ -5,8 +5,6 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Agence;
 use App\Entity\AgenceType;
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -15,25 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use App\Service\AccessControl;
 
-
 class AgenceController extends AbstractController
-    private EntityManagerInterface $entityManager;
-    private AccessControl $accessControl;
-    private RequestStack $requestStack;
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        AccessControl $accessControl,
-        RequestStack $requestStack,
-        TranslatorInterface $translator
-    ) {
-        $this->entityManager = $entityManager;
-        $this->accessControl = $accessControl;
-        $this->requestStack->getCurrentRequest()Stack = $requestStack;
-        $this->translator = $translator;
-    }
-
 {
     private EntityManagerInterface $entityManager;
     private AccessControl $accessControl;
@@ -48,497 +28,66 @@ class AgenceController extends AbstractController
     ) {
         $this->entityManager = $entityManager;
         $this->accessControl = $accessControl;
-        $this->requestStack->getCurrentRequest()Stack = $requestStack;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
-    } {
-
-    private $response ;
-    public function __construct() {
-        $this->response = new Response;
-        $this->response->headers->addCacheControlDirective('no-cache', true);
-        $this->response->headers->addCacheControlDirective('max-age', 0);
-        $this->response->headers->addCacheControlDirective('must-revalidate', true);
-        $this->response->headers->addCacheControlDirective('no-store', true);
-    } 
-    /**
-     * Methode permettant d'ajouter une agence - Espace client
-     * 
-     * 
-     * @var
-     * 
-     * Les Variables
-     * 
-     * $uneagence: Instance de la classe Agence pour l'ajout
-     * 
-     * 
-     * @param <string> $locale Variable passee pour gerer le multilingue sur le site
-     * 
-     * @return <string> return le twig ajoutAgence.html.twig avec les variables $locale,$listestat
-     *  
-     */
-    public function ajoutAgenceAction(): Response(string $locale): Response {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        /*if (!in_array('ajoutAgenceAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        $uneagence = new Agence();
-
-        $form = $this->createForm($this->createForm(AgenceType::class), $uneagence);
-
-        $request = $request;
-
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $uneagence = $form->getData();
-
-            $siexiste = $this->entityManager
-                    ->getRepository("utbClientBundle/Agence")
-                    ->getSiAgenceExiste($id = 0, $locale, $uneagence->getLibAgence());
-            
-            $sideleted = $this->entityManager
-                    ->getRepository("utbClientBundle:Agence")
-                    ->getSiAgenceDeleted($id = 0, $locale, $uneagence->getLibAgence());
-
-            if ($siexiste != 0) {
-
-                $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'existedeja');
-
-                return $this->redirect($this->generateUrl("utb_client_listeagence", array('locale' => $locale,), $this->response));
-            }
-            else{
-                if ($sideleted != 0) {
-                    $uneagence->setSuppr(0);
-                }
-                $em->persist($uneagence);
-            
-            }
-            $em->flush();
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'success');
-
-
-            return $this->redirect($this->generateUrl('utb_client_listeagence', ['locale' => $locale,]));
-        }
-        return $this->render('utbClientBundle/Agence/ajoutAgence.html.twig', array(
-                    'form' => $form->createView(), 'locale' => $locale, //'infos'=>$boxinfos,
-        ),$this->response);
     }
 
-    /**
-     * Methode permettant d'avoir la liste des agences - Espace client
-     * 
-     * 
-     * @var
-     * 
-     * Les Variables
-     * 
-     * $listeagence: Liste des instances de la classe Agence
-     * 
-     * 
-     * @param <string> $locale Variable passee pour gerer le multilingue sur le site
-     * 
-     * @return <string> return le twig listeAgence.html.twig 
-     *  
-     */
-    public function listeAgenceAction(): Response(string $locale, $ajoutprof, $page): Response {
+    #[Route('/{_locale}/agence/ajout', name: 'agence_ajout')]
+    public function ajoutAgence(Request $request): Response
+    {
+        $agence = new Agence();
+        $form = $this->createForm(AgenceType::class, $agence);
+        $form->handleRequest($request);
 
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->persist($agence);
+            $this->entityManager->flush();
 
-        $listeActions = $currentConnete["listeActions_abonne"];
-        //var_dump($currentConnete["listeActions_abonne"]);exit;
-
-       /* if (!in_array('listeAgenceAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        /*$listeagence = $this->entityManager
-                ->getRepository('utbClientBundle/StatistiqueClient')
-                ->getStatAgenceLocale($locale, $type = 0);*/
-        
-        $liste = $em->getRepository("utbClientBundle/Agence")->findAll();
-        /* total des résultats */
-        $total = count($liste);
-        $articles_per_page = $this->container->get->getParameter('max_articles_on_listepage');
-        $last_page = ceil($total / $articles_per_page);
-        $previous_page = $page > 1 ? $page - 1 : 1;
-        $next_page = $page < $last_page ? $page + 1 : $last_page;
-
-        $entities = $em->getRepository("utbClientBundle:Agence")->getListeAgence($total, $page, $articles_per_page);
-
-        return $this->render('utbClientBundle/Agence/listeAgence.html.twig', array(
-                    'listeAgence' => $entities, 
-                    'locale' => $locale,
-                    'last_page' => $last_page,
-                    'previous_page' => $previous_page,
-                    'current_page' => $page,
-                    'next_page' => $next_page,
-                    'total' => $total),$this->response);
-    }
-
-    /**
-     * Methode permettant de supprimer un profil  - Espace client
-     * 
-     * 
-     * @var
-     * 
-     * Les Variables
-     * 
-     * $uneagence: Instance de la classe Agence a supprimer
-     * 
-     * $unUser: Instance de la classe User relative au profil $uneagence.S'assure si le profil contient un user
-     * 
-     * 
-     * @param <string> $locale Variable passee pour gerer le multilingue sur le site
-     * @param <string> $id identifiant du profil 
-     * 
-     * @return <string> return le twig listeAgence.html.twig 
-     *  
-     */
-    public function supprAgenceAction(): Response(int $id, string $locale): Response {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        //var_dump($currentConnete["listeActions_abonne"]);exit;
-
-        /*if (!in_array('supprAgenceAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        $uneagence = $em->getRepository("utbClientBundle:Agence")->find($id);
-
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', 'utilisateur');
-
-        /* Enfin on supprime le categorie ... */
-        /* ... et on redirige vers la page d'administration des profils */
-        $unUtilisateur = $this->entityManager
-                ->getRepository('utbClientBundle/Utilisateur')
-                ->findAgence($id);
-
-        //$undroit = new droit();
-
-        if ($unUtilisateur == null) {
-            //$undroit->setAgence($uneagence);
-            /* Enfin on supprime le profil... */
-            $uneagence->setSuppr(1);
-            //$em->remove($uneagence);                      
-            $em->flush($uneagence);
-
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'Agence supprimé avec succès');
-            return $this->redirect($this->generateUrl('utb_client_listeagence', array(
-                                'locale' => $locale)));        /* ... et on redirige vers la page d'administration des categorie */
-        } else {
-
-            $listeagence = $this->entityManager
-                    ->getRepository("utbClientBundle/Agence")
-                    ->findAllByLocale($locale);
-            return $this->render('utbClientBundle/Agence/listeAgence.html.twig', array('listeagence' => $listeagence, 'locale' => $locale,),$this->response);
-        }
-    }
-
-    /*
-     * $locale=fr est mis pr donner une valeur par defaut à $locale;
-     *  sans quoi l'activation|désactivation ne marche pas;
-     *  pcke $locale est aussi utilisée ds infoUtilisateur.
-     */
-
-    function gererAllAgenceAction(string $locale = "fr") {
-
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        //var_dump($currentConnete["listeActions_abonne"]);exit;
-
-        /*if (!in_array('gererAllAgenceAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', 'utilisateur');
-        $request = $this->requestStack->getCurrentRequest();
-        $profilIds = $request->request->get('idprofil');
-
-        $etat = $request->request->get('etatprofil');
-
-        $profilIds = explode("|", $profilIds);
-        //$utilisateur = $this->security->getToken()->getUtilisateur()->getId();
-        //boucle sur les ids articles
-        foreach ($profilIds as $key => $value) {
-            if (!empty($value)) {
-                $uneagence = $em->getRepository("utbClientBundle:Agence")->find($value);
-
-                $unUtilisateur = $em->getRepository("utbClientBundle:Utilisateur")->findAll();
-
-                if ($uneagence->getId() == 1) {
-                    return new Response(json_encode(array("result" => "administrateur")));
-                } else {
-                    foreach ($unUtilisateur as $keyuser => $valueuser) {
-                        if ($valueuser->getAgence()->getId() == $value) {
-
-                            $lutil = $em->getRepository("utbClientBundle:Utilisateur")->find($valueuser->getId());
-                            //Desactive ou Active (valeur de $etat, 0 ou 1) tous les utilisateurs ayant ce profil
-                            $lutil->setEtatUtilisateur($etat);
-                            $em->persist($lutil);
-                        }
-                    }
-                }
-
-                //Désactivation  
-
-                $uneagence->setEtatAgence($etat);
-                $em->persist($uneagence);
-                $em->flush();
-            }
-        }
-        //$em->flush();   
-        return new Response(json_encode(array("result" => "success")));
-    }
-
-    /**
-     * Methode permettant de modifier un profil - Espace client
-     * 
-     * 
-     * @var
-     * 
-     * Les Variables
-     * 
-     * $uneagence: Instance de la classe Agence a modifier
-     * 
-     * @param <integer> $id     Identifiant  du profil
-     * @param <string>  $locale, Variable passee pour gerer le multilingue sur le site
-     * 
-     * @return <string> return sur le twig modifAgence
-     *  
-     */
-    public function modifierAgenceAction(): Response(int $id, string $locale): Response {
-
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        //var_dump($currentConnete["listeActions_abonne"]);exit;
-
-        /*if (!in_array('modifierAgenceAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        // Récupération du profil 
-        $uneagence = $em->getRepository("utbClientBundle:Agence")->find($id);
-
-        // Création d'un forumaire pour lequel on spécifie qu'il doit correspondre avec une entité profil 
-        $form = $this->createForm($this->createForm(AgenceType::class), $uneagence);
-
-        // On récupère les données du formulaire si il a déjà été passé 
-        $request = $this->requestStack->getCurrentRequest();
-
-
-        // On traite les données passées en méthode POST 
-
-        if ($request->getMethod() == 'POST') {
-
-            // On applique les données récupérées au formulaire */
-            $form->handleRequest($request);
-
-            //var_dump($uneagence->getLibAgence());exit;
-            /* Si le formulaire est valide, on valide et on redirige vers la liste des profils */
-            if ($form->isValid()) {
-                $em->persist($uneagence);
-                $em->flush();
-                $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'modifsuccess');
-
-                return $this->redirect($this->generateUrl("utb_client_listeagence"));
-            }
-        }
-        return $this->render('utbClientBundle/Agence/modifAgence.html.twig', array(
-                    'form' => $form->createView(), 'id' => $id, 'locale' => $locale),$this->response);
-    }
-
-    /**
-     * Methode permettant de supprimer definitivement des agences selectionnes - Backoffice
-     * 
-     * @var
-     * 
-     * Les Variables
-     * 
-     * $usersIds: Tableau regoupants les Ids des instances de la classe Agence selectionnes
-     * 
-     * $unuser: Instance de la classe Agence a supprimer definitivement
-     * 
-     * @return <json> return etat du traitement effectue
-     *  
-     */
-    function supprAllagencesAction(): Response {
-
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager; //on recupere le service qui gère l'authentification = $this->Auth.Manager;//on recupere le service qui gère l'authentification
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentID = $authManager->getCurrentId(); //comment récupérer L'id de l'abonne courrant
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-        //on verifie si l'abonnee est connecté. sil ne l'est pas on le dirige à la page de connexion
-        if (!$authManager->isLogged())
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        //var_dump($currentConnete["listeActions_abonne"]);exit;
-
-        /*if (!in_array('supprAllprofilsAction', $listeActions)) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }*/
-
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', 'utilisateur');
-
-        $request = $this->requestStack->getCurrentRequest();
-        $usersIds = $request->request->get('ds');
-        $usersIds = explode("|", $usersIds);
-
-        foreach ($usersIds as $key => $value) {
-
-            if (!empty($value)) {
-                    $unuser = $em->getRepository("utbClientBundle:Agence")->find($value);
-                    /* Enfin on supprime l agence... */
-                    $em->remove($unuser);         
-            }
+            $this->addFlash('success', $this->translator->trans('agence.created_success'));
+            return $this->redirectToRoute('agence_list');
         }
 
-        $em->flush();
-        return new Response(json_encode(array("result" => "success")));
+        return $this->render('agence/ajout.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
+    #[Route('/{_locale}/agence/liste', name: 'agence_list')]
+    public function listeAgence(): Response
+    {
+        $agences = $this->entityManager->getRepository(Agence::class)->findAll();
 
-    public function infoUtilisateur(): Response($em, $authManager, $currentConnete, $user, string $locale): Response {
-        //$currentConnete = $authManager->getFlash("utb_client_data");
-        if (isset($currentConnete["id_abonne"]) && $currentConnete["id_abonne"] != "") {
-            $id_abonne = $currentConnete["id_abonne"];
-            $type_user = $currentConnete["type_user"];
-            $nomPrenom = $currentConnete["nomPrenom_abonne"];
-            $profil = $currentConnete["profil_abonne"];
-            $last_connexion = $currentConnete["last_connexion"];
-            $listeActions = $currentConnete["listeActions_abonne"];
-            $subabonne = $currentConnete["sousAbonne"];
-            
-            $maxIdleTime = $this->container->get->getParameter('maxIdleTime');
-            $session = $this->requestStack->getCurrentRequest()Stack->getSession();
-            if (time() - $session->getMetadataBag()->getLastUsed() > $maxIdleTime) {
-                /*         * *******  Maj historique ********** */
-                    $histo = null;
-                    $unuser = null;
-                    $unabonne = null;
-                    $idhisto = 0;
-                    $currentConnete = $authManager->getFlash("utb_client_data");
-                    //var_dump();exit;
-                    if (isset($currentConnete["id_abonne"])) {
-                        $em = $this->entityManager;
-
-                        if ($currentConnete["type_user"] == "abonne") {
-                            $unabonne = $em->getRepository('utbClientBundle:Abonne')->find($currentConnete["id_abonne"]);
-                            $idhisto = $em->getRepository('utbClientBundle:HistoriqueConnexion')->getMaxHistorique($unabonne->getId(), 0);
-                            if (isset($idhisto) && ($idhisto != 0)) {
-                                $histo = $em->getRepository("utbClientBundle:HistoriqueConnexion")->find($idhisto);
-                            }
-                        }
-
-                        if ($currentConnete["type_user"] == "utilisateur") {
-                            $unuser = $em->getRepository("utbClientBundle:Utilisateur")->find($currentConnete['id_abonne']);
-                            $idhisto = $em->getRepository('utbClientBundle:HistoriqueConnexion')->getMaxHistorique($unuser->getId(), 1);
-                            if (isset($idhisto) && ($idhisto != 0)) {
-                                $histo = $em->getRepository("utbClientBundle:HistoriqueConnexion")->find($idhisto);
-                            }
-                        }
-
-                        if ($histo != null) {
-
-                            $lafin = new \Datetime();
-                            $ledebut = $histo->getDateDeb();
-                            $laduree = $lafin->diff($ledebut);
-                            $laduree->format('%h heures %i minutes %s secondes');
-                            $histo->setDateFin($lafin);
-                            $histo->setDuree($laduree->format('%h h %i min %s sec'));
-                            $em->persist($histo);
-                            $em->flush();
-                        }
-                    }
-                    
-                    $_SESSION["utb_client_data"] = array();                
-
-            }
-            
-        }else
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-
-        //transformation de $type_user en variable globale
-        $this->requestStack->getCurrentRequest()Stack->getSession()->set('_locale', $locale); // gautier 404
-        $this->requestStack->getCurrentRequest()->attributes->set('id_abonne', $id_abonne);
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', $type_user);
-        $this->requestStack->getCurrentRequest()->attributes->set('nomPrenom', $nomPrenom);
-        $this->requestStack->getCurrentRequest()->attributes->set('profil', $profil);
-        $this->requestStack->getCurrentRequest()->attributes->set('last_connexion', $last_connexion);
-        $this->requestStack->getCurrentRequest()->attributes->set('listeActions', $listeActions);
-        $this->requestStack->getCurrentRequest()->attributes->set('sousAbonne', $subabonne);
-
-        $listeMessageNonLu = $this->message.Manager;
-        $nbrelu = $listeMessageNonLu->getNombreMsgNonLuUtil($em, $id_abonne);
-        $this->requestStack->getCurrentRequest()->attributes->set('nbreluutil', $nbrelu);
-        //Info non lu abonne
-        $listeMessageNonLu = $this->message.Manager;
-        $nbrelu = $listeMessageNonLu->getNombreMsgNonLuAbonne($em, $id_abonne);
-
-        $this->requestStack->getCurrentRequest()->attributes->set('nbrelu', $nbrelu);
-
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', $user);
-        
-        
+        return $this->render('agence/liste.html.twig', [
+            'agences' => $agences,
+        ]);
     }
 
+    #[Route('/{_locale}/agence/{id}/supprimer', name: 'agence_delete')]
+    public function supprAgence(Agence $agence): Response
+    {
+        $this->entityManager->remove($agence);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', $this->translator->trans('agence.deleted_success'));
+        return $this->redirectToRoute('agence_list');
+    }
+
+    #[Route('/{_locale}/agence/{id}/modifier', name: 'agence_edit')]
+    public function modifierAgence(Request $request, Agence $agence): Response
+    {
+        $form = $this->createForm(AgenceType::class, $agence);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+
+            $this->addFlash('success', $this->translator->trans('agence.updated_success'));
+            return $this->redirectToRoute('agence_list');
+        }
+
+        return $this->render('agence/modifier.html.twig', [
+            'form' => $form->createView(),
+            'agence' => $agence,
+        ]);
+    }
 }
