@@ -1,41 +1,18 @@
 <?php
 
-namespace App\Repository;
+namespace App\Entity;
 
-use App\Entity\NatureDoc;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 
 /**
- * @extends ServiceEntityRepository<NatureDoc>
+ * 
+ * NatureDocRepository pour la gestion des requetes liees aux NatureDocs
  *
- * @method NatureDoc|null find($id, $lockMode = null, $lockVersion = null)
- * @method NatureDoc|null findOneBy(array $criteria, array $orderBy = null)
- * @method NatureDoc[]    findAll()
- * @method NatureDoc[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @author Ace3i <mail@ace3i.com>
+ * @copyright 2013 Ace3i
+ * @link      http://www.utb.tg
+ * 
  */
-class NatureDocRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, NatureDoc::class);
-    }
-
-    public function save(NatureDoc $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(NatureDoc $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-} 
+class NatureDocRepository extends EntityRepository {
+    
+}
