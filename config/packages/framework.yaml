@@ -1,16 +1,55 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-    #csrf_protection: true
+    csrf_protection: true
+    http_method_override: false
+    handle_all_throwables: true
+    
+    # Session configuration
+    session:
+        handler_id: null
+        cookie_secure: auto
+        cookie_samesite: lax
+        storage_factory_id: session.storage.factory.native
+        gc_maxlifetime: 3600
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # Enabled features
+    http_client: true
+    mailer: true
+    notifier: true
+    
+    # Cache configuration
+    cache:
+        app: cache.adapter.filesystem
+        system: cache.adapter.system
+        directory: '%kernel.cache_dir%/pools'
+        default_redis_provider: '%env(REDIS_URL)%'
+        default_memcached_provider: '%env(MEMCACHED_URL)%'
+        pools:
+            doctrine.result_cache_pool:
+                adapter: cache.app
+            doctrine.system_cache_pool:
+                adapter: cache.system
 
-    #esi: true
-    #fragments: true
+    # Error handling
+    php_errors:
+        log: true
+        throw: true
+
+    # Assets configuration
+    assets:
+        json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
+        version_strategy: 'App\Asset\VersionStrategy\HashVersionStrategy'
+
+    # Validation
+    validation:
+        email_validation_mode: html5
+        enable_annotations: true
 
 when@test:
     framework:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+        profiler:
+            collect: false

@@ -8,7 +8,9 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'fos_user')]
@@ -18,51 +20,53 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
-    protected $id;
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'nameUser', type: 'string', length: 50)]
+    #[Assert\NotBlank(message: 'Please enter your name', groups: ['Registration', 'Profile'])]
+    private ?string $nameUser = null;
+
+    /**
+     * Encrypted password. Must not be persisted.
+     */
+    #[Assert\NotBlank(message: 'Please enter your password confirm')]
+    private ?string $cpassword = null;
+
+    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil')]
+    private ?Profil $profil = null;
+
+    #[ORM\OneToMany(targetEntity: MessageReponse::class, mappedBy: 'user')]
+    private Collection $messagereponses;
+
+    #[ORM\Column(name: 'urlphoto', type: 'string', length: 170, nullable: true)]
+    private ?string $urlPhoto = null;
+
+    #[Assert\File(maxSize: '6000000', mimeTypes: ['image/gif', 'image/jpeg', 'image/png'])]
+    #[Assert\NotBlank]
+    private ?File $photo = null;
+
+    private string $uploadDir = 'upload/photos/';
 
     public function __construct()
     {
         $this->messagereponses = new ArrayCollection();
     }
 
-    #[ORM\Column(name: 'nameUser', type: 'string', length: 50)]
-    #[Assert\NotBlank(message: 'Please enter your name', groups: ['Registration', 'Profile'])]
-    private $nameUser;
-
-    /**
-     * Encrypted password. Must not be persisted.
-     */
-    #[Assert\NotBlank(message: 'Please enter your password confirm')]
-    private $cpassword;
-
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: 'users')]
-    #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil')]
-    private $profil;
-
-    #[ORM\OneToMany(targetEntity: MessageReponse::class, mappedBy: 'user')]
-    private $messagereponses;
-
-    #[ORM\Column(name: 'urlphoto', type: 'string', length: 170, nullable: true)]
-    private $urlPhoto;
-
-    #[Assert\File(maxSize: '6000000', mimeTypes: ['image/gif', 'image/jpeg', 'image/png'])]
-    #[Assert\NotBlank]
-    public $photo;
-
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
-    public function preUpload()
+    public function preUpload(): void
     {
-        if (null !== $this->photo) {
+        if ($this->photo instanceof UploadedFile) {
             $this->urlPhoto = sha1(uniqid(mt_rand(), true)) . '.' . $this->photo->guessExtension();
         }
     }
 
     #[ORM\PostPersist]
     #[ORM\PostUpdate]
-    public function upload()
+    public function upload(): void
     {
-        if (null === $this->photo) {
+        if (!$this->photo instanceof UploadedFile) {
             return;
         }
 
@@ -71,30 +75,32 @@ class User
         unset($this->photo);
     }
 
-    public function removeUpload($photo) {
-      
+    public function removeUpload(string $photo): void
+    {
+        if (file_exists($photo)) {
             unlink($photo);
-    
-    }    
-    
-    public function getAbsolutePath(): ?string {
-        return null === $this->urlPhoto ? null : $this->getUploadRootDir() . '' . $this->urlPhoto;
+        }
     }
 
-    public function getWebPath(): ?string {
-        return null === $this->urlPhoto ? null : $this->getUploadDir() . '' . $this->urlPhoto;
+    public function getAbsolutePath(): ?string
+    {
+        return $this->urlPhoto ? $this->getUploadRootDir() . '/' . $this->urlPhoto : null;
     }
 
-    public function getUploadRootDir(): ?string {
-        // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__ . '/../../../../web/' . $this->getUploadDir();
+    public function getWebPath(): ?string
+    {
+        return $this->urlPhoto ? $this->getUploadDir() . '/' . $this->urlPhoto : null;
     }
 
-    public function getUploadDir(): ?string {
-        // on se débarrasse de « __DIR__ » afin de ne pas avoir de problème lorsqu'on affiche
-        // le document/image dans la vue.
-        return 'upload/photos/';
-    }    
+    public function getUploadRootDir(): string
+    {
+        return $this->getParameter('kernel.project_dir') . '/public/' . $this->getUploadDir();
+    }
+
+    public function getUploadDir(): string
+    {
+        return $this->uploadDir;
+    }
 
     public function getId(): ?int
     {
@@ -167,5 +173,16 @@ class User
     public function getUrlPhoto(): ?string
     {
         return $this->urlPhoto;
+    }
+
+    public function setPhoto(?File $photo): self
+    {
+        $this->photo = $photo;
+        return $this;
+    }
+
+    public function getPhoto(): ?File
+    {
+        return $this->photo;
     }
 }
