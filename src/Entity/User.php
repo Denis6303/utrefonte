@@ -11,11 +11,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'fos_user')]
 #[ORM\HasLifecycleCallbacks]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
@@ -25,6 +27,15 @@ class User
     #[ORM\Column(name: 'nameUser', type: 'string', length: 50)]
     #[Assert\NotBlank(message: 'Please enter your name', groups: ['Registration', 'Profile'])]
     private ?string $nameUser = null;
+
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $username = null;
+
+    #[ORM\Column(type: 'string')]
+    private ?string $password = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     /**
      * Encrypted password. Must not be persisted.
@@ -184,5 +195,55 @@ class User
     public function getPhoto(): ?File
     {
         return $this->photo;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function eraseCredentials(): void
+    {
+        $this->cpassword = null;
     }
 }
