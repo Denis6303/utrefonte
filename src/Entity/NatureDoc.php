@@ -2,373 +2,194 @@
 
 namespace App\Entity;
 
+use App\Repository\NatureDocRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;      // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer Media si nécessaire
+// use App\Entity\Media;
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="naturedoc")]
- * #[ORM\Entity](repositoryClass="App\Entity\NatureDocRepository")
- * @ORM\HasLifecycleCallbacks
- *
+ * Entité représentant la nature ou le type d'un document/média.
  */
-class NatureDoc {
+#[ORM\Entity(repositoryClass: NatureDocRepository::class)]
+#[ORM\Table(name: 'naturedoc')]
+#[ORM\HasLifecycleCallbacks] // Conserver pour les callbacks de date
+class NatureDoc
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idnaturedoc', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private, type hint ?int
 
-    function __construct() {
-        //$this->etat = 0;
+    #[ORM\Column(name: 'libnaturedoc', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé est requis.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100, // Correspond à la longueur ORM
+        minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libNatureDoc = null; // Type hint ?string
+
+    /**
+     * Statut de la nature du document (0-6?).
+     */
+    #[ORM\Column(name: 'statutnaturedoc', type: Types::INTEGER, nullable: true)] // Gardé nullable
+    #[Assert\Range(min: 0, max: 6, notInRangeMessage: "Le statut doit être compris entre {{ min }} et {{ max }}.")] // Plus approprié que Regex
+    private ?int $statutNatureDoc = 0; // Initialisé dans PrePersist, type hint ?int
+
+    // --- Champs de suivi (Utilisateurs) ---
+    // !! Recommandation : Remplacer par des relations ManyToOne vers User/Utilisateur !!
+    #[ORM\Column(name: 'naturedocajoutpar', type: Types::INTEGER, nullable: true)]
+    private ?int $natureDocAjoutPar = null;
+
+    #[ORM\Column(name: 'naturedocmodifpar', type: Types::INTEGER, nullable: true)]
+    private ?int $natureDocModifPar = null;
+
+    #[ORM\Column(name: 'naturedocactivepar', type: Types::INTEGER, nullable: true)]
+    private ?int $natureDocActivePar = null;
+
+    #[ORM\Column(name: 'naturedocdesactivepar', type: Types::INTEGER, nullable: true)]
+    private ?int $natureDocDesactivePar = null;
+
+    // --- Champs de suivi (Dates) ---
+    #[ORM\Column(name: 'naturedocdateajout', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PrePersist, rendu nullable pour éviter erreur avant flush
+    private ?DateTimeImmutable $natureDocDateAjout = null; // Type hint DateTimeImmutable
+
+    #[ORM\Column(name: 'naturedocdatemodif', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PreUpdate
+    private ?DateTimeImmutable $natureDocDateModif = null; // Type hint DateTimeImmutable
+
+    #[ORM\Column(name: 'naturedocdatedesactive', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $natureDocDateDesactive = null; // Type hint DateTimeImmutable
+
+    #[ORM\Column(name: 'naturedocdateactive', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $natureDocDateActive = null; // Type hint DateTimeImmutable
+
+    // --- Relation ---
+    /**
+     * Médias ayant cette nature.
+     * 'natureDoc' est la propriété dans Media qui référence cette entité (mappedBy).
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(mappedBy: 'natureDoc', targetEntity: Media::class, cascade: ['persist'])] // Vérifiez mappedBy='natureDoc', cascade à adapter
+    private Collection $medias;
+
+
+    public function __construct()
+    {
+        $this->medias = new ArrayCollection();
+        // Initialisation des dates/statut dans PrePersist/PreUpdate
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idnaturedoc", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\PrePersist]
+    public function setTimestampsOnCreate(): void // Renommé, ajout type void
+    {
+        if ($this->natureDocDateAjout === null) {
+            $this->natureDocDateAjout = new DateTimeImmutable();
+        }
+        if ($this->statutNatureDoc === null) { // Définit le statut initial
+            $this->statutNatureDoc = 1; // 1 = Actif par défaut? A adapter. L'ancien code mettait 0.
+        }
+        // On pourrait définir natureDocAjoutPar ici si l'utilisateur est connu
+    }
 
-    /**
-     * @var string $libNatureDoc
-     * #[ORM\Column(name="libnaturedoc",type="string",length=100)]
-     * #[Assert\NotBlank(message="Libellé requis!")]
-     * @Assert\MinLength(2)
-     */
-    private $libNatureDoc;
+    #[ORM\PreUpdate]
+    public function setTimestampsOnUpdate(): void
+    {
+        $this->natureDocDateModif = new DateTimeImmutable();
+         // On pourrait définir natureDocModifPar ici si l'utilisateur est connu
+    }
 
-    /**
-     * @var Media $medias
-     * #[ORM\OneToMany(targetEntity: App\Entity\Media::class, mappedBy="naturedoc" )]
-     * 
-     */
-    private $medias;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var integer $natureDocAjoutPar
-     * #[ORM\Column(name="naturedocajoutpar" , type="integer" , nullable=true)]
-     *   
-     */
-    private $natureDocAjoutPar;
-
-    /**
-     * @var integer $natureDocModifPar
-     * #[ORM\Column(name="naturedocmodifpar" , type="integer", nullable=true)]
-     *   
-     */
-    private $natureDocModifPar;
-
-    /**
-     * @var integer $natureDocActivePar
-     * #[ORM\Column(name="naturedocactivepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $natureDocActivePar;
-
-    /**
-     * @var integer $natureDocDesactivePar
-     * #[ORM\Column(name="naturedocdesactivepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $natureDocDesactivePar;
-
-    /**
-     * @var datetime $natureDocDateAjout
-     * #[ORM\Column(name="naturedocdateajout" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $natureDocDateAjout;
-
-    /**
-     * @var datetime $natureDocDateModif
-     * #[ORM\Column(name="naturedocdatemodif" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $natureDocDateModif;
-
-    /**
-     * @var datetime $natureDocDateDesactive
-     * #[ORM\Column(name="naturedocdatedesactive" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $natureDocDateDesactive;
-
-    /**
-     * @var datetime $natureDocDateActive
-     * #[ORM\Column(name="naturedocdateactive" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $natureDocDateActive;
-
-    /**
-     * @var integer $statutNatureDoc
-     * #[ORM\Column(name="statutnaturedoc" , type="integer", nullable=true)]
-     * @Assert\Regex(pattern="/^[0-6]$/", message="la valeur doit être comprise entre 0 et 6")  
-     */
-    private $statutNatureDoc;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
 
-    /**
-     * Set libNatureDoc
-     *
-     * @param string $libNatureDoc
-     * @return NatureDoc
-     */
-    public function setLibNatureDoc(string $libNatureDoc): self {
-        $this->libNatureDoc = $libNatureDoc;
-
-        return $this;
-    }
-
-    /**
-     * Get libNatureDoc
-     *
-     * @return string 
-     */
-    public function getLibNatureDoc(): ?string {
+    public function getLibNatureDoc(): ?string
+    {
         return $this->libNatureDoc;
     }
 
-    /**
-     * Set natureDocAjoutPar
-     *
-     * @param integer $natureDocAjoutPar
-     * @return NatureDoc
-     */
-    public function setNatureDocAjoutPar(string $natureDocAjoutPar): self {
-        $this->natureDocAjoutPar = $natureDocAjoutPar;
-
+    public function setLibNatureDoc(string $libNatureDoc): self
+    {
+        $this->libNatureDoc = $libNatureDoc;
         return $this;
     }
 
-    /**
-     * Get natureDocAjoutPar
-     *
-     * @return integer 
-     */
-    public function getNatureDocAjoutPar(): ?string {
-        return $this->natureDocAjoutPar;
-    }
-
-    /**
-     * Set natureDocModifPar
-     *
-     * @param integer $natureDocModifPar
-     * @return NatureDoc
-     */
-    public function setNatureDocModifPar(string $natureDocModifPar): self {
-        $this->natureDocModifPar = $natureDocModifPar;
-
-        return $this;
-    }
-
-    /**
-     * Get natureDocModifPar
-     *
-     * @return integer 
-     */
-    public function getNatureDocModifPar(): ?string {
-        return $this->natureDocModifPar;
-    }
-
-    /**
-     * Set natureDocActivePar
-     *
-     * @param integer $natureDocActivePar
-     * @return NatureDoc
-     */
-    public function setNatureDocActivePar(string $natureDocActivePar): self {
-        $this->natureDocActivePar = $natureDocActivePar;
-
-        return $this;
-    }
-
-    /**
-     * Get natureDocActivePar
-     *
-     * @return integer 
-     */
-    public function getNatureDocActivePar(): ?string {
-        return $this->natureDocActivePar;
-    }
-
-    /**
-     * Set natureDocDateAjout
-     *
-     * @param \DateTime $natureDocDateAjout
-     * @return NatureDoc
-     */
-    public function setNatureDocDateAjout(string $natureDocDateAjout): self {
-        $this->natureDocDateAjout = $natureDocDateAjout;
-
-        return $this;
-    }
-
-    /**
-     * Get natureDocDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getNatureDocDateAjout(): ?string {
-        return $this->natureDocDateAjout;
-    }
-
-    /**
-     * Set natureDocDateModif
-     *
-     * @param \DateTime $natureDocDateModif
-     * @return NatureDoc
-     */
-    public function setNatureDocDateModif(string $natureDocDateModif): self {
-        $this->natureDocDateModif = $natureDocDateModif;
-
-        return $this;
-    }
-
-    /**
-     * Get natureDocDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getNatureDocDateModif(): ?string {
-        return $this->natureDocDateModif;
-    }
-
-    /**
-     * Set natureDocDateActive
-     *
-     * @param \DateTime $natureDocDateActive
-     * @return NatureDoc
-     */
-    public function setNatureDocDateActive(string $natureDocDateActive): self {
-        $this->natureDocDateActive = $natureDocDateActive;
-
-        return $this;
-    }
-
-    /**
-     * Get natureDocDateActive
-     *
-     * @return \DateTime 
-     */
-    public function getNatureDocDateActive(): ?string {
-        return $this->natureDocDateActive;
-    }
-
-    /**
-     * Add medias
-     *
-     * @param \App\Entity\Media $medias
-     * @return NatureDoc
-     */
-    public function addMedia(\App\Entity\Media $medias) {
-        $this->medias[] = $medias;
-
-        return $this;
-    }
-
-    /**
-     * Remove medias
-     *
-     * @param \App\Entity\Media $medias
-     */
-    public function removeMedia(\App\Entity\Media $medias) {
-        $this->medias->removeElement($medias);
-    }
-
-    /**
-     * Get medias
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMedias(): ?string {
-        return $this->medias;
-    }
-
-    /**
-     * @ORM\PrePersist()
-     * 
-     */
-    public function preAjout() {
-
-        $this->natureDocDateAjout = new \DateTime();
-        $this->statutNatureDoc = 0;
-    }
-
-    /**
-     * Set statutNatureDoc
-     *
-     * @param integer $statutNatureDoc
-     * @return NatureDoc
-     */
-    public function setStatutNatureDoc(string $statutNatureDoc): self {
-        $this->statutNatureDoc = $statutNatureDoc;
-
-        return $this;
-    }
-
-    /**
-     * Get statutNatureDoc
-     *
-     * @return integer 
-     */
-    public function getStatutNatureDoc(): ?string {
+    public function getStatutNatureDoc(): ?int // Type retour corrigé
+    {
         return $this->statutNatureDoc;
     }
 
-    /**
-     * Set natureDocDesactivePar
-     *
-     * @param integer $natureDocDesactivePar
-     * @return NatureDoc
-     */
-    public function setNatureDocDesactivePar(string $natureDocDesactivePar): self {
-        $this->natureDocDesactivePar = $natureDocDesactivePar;
-
+    public function setStatutNatureDoc(?int $statutNatureDoc): self // Type param corrigé, accepte null
+    {
+        $this->statutNatureDoc = $statutNatureDoc;
         return $this;
     }
 
+    // Getters/Setters pour les champs *Par (types corrigés)
+    public function getNatureDocAjoutPar(): ?int { return $this->natureDocAjoutPar; }
+    public function setNatureDocAjoutPar(?int $id): self { $this->natureDocAjoutPar = $id; return $this; }
+    public function getNatureDocModifPar(): ?int { return $this->natureDocModifPar; }
+    public function setNatureDocModifPar(?int $id): self { $this->natureDocModifPar = $id; return $this; }
+    public function getNatureDocActivePar(): ?int { return $this->natureDocActivePar; }
+    public function setNatureDocActivePar(?int $id): self { $this->natureDocActivePar = $id; return $this; }
+    public function getNatureDocDesactivePar(): ?int { return $this->natureDocDesactivePar; }
+    public function setNatureDocDesactivePar(?int $id): self { $this->natureDocDesactivePar = $id; return $this; }
+
+    // Getters/Setters pour les champs Date* (types corrigés)
+    // Setters pour dates auto-gérées sont retirés
+    public function getNatureDocDateAjout(): ?DateTimeImmutable { return $this->natureDocDateAjout; }
+    public function getNatureDocDateModif(): ?DateTimeImmutable { return $this->natureDocDateModif; }
+    public function getNatureDocDateDesactive(): ?DateTimeImmutable { return $this->natureDocDateDesactive; }
+    public function setNatureDocDateDesactive(?DateTimeImmutable $date): self { $this->natureDocDateDesactive = $date; return $this; } // Gardé si défini manuellement
+    public function getNatureDocDateActive(): ?DateTimeImmutable { return $this->natureDocDateActive; }
+    public function setNatureDocDateActive(?DateTimeImmutable $date): self { $this->natureDocDateActive = $date; return $this; } // Gardé si défini manuellement
+
+
+    // --- Gestion de la collection Medias ---
+
     /**
-     * Get natureDocDesactivePar
-     *
-     * @return integer 
+     * @return Collection<int, Media>
      */
-    public function getNatureDocDesactivePar(): ?string {
-        return $this->natureDocDesactivePar;
+    public function getMedias(): Collection // Type retour corrigé
+    {
+        return $this->medias;
     }
 
-    /**
-     * Set natureDocDateDesactive
-     *
-     * @param \DateTime $natureDocDateDesactive
-     * @return NatureDoc
-     */
-    public function setNatureDocDateDesactive(string $natureDocDateDesactive): self {
-        $this->natureDocDateDesactive = $natureDocDateDesactive;
-
+    public function addMedia(Media $media): self // Type param corrigé
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+            // Mettre à jour le côté propriétaire (ManyToOne dans Media)
+            $media->setNatureDoc($this); // Assurez-vous que setNatureDoc existe dans Media
+        }
         return $this;
     }
 
-    /**
-     * Get natureDocDateDesactive
-     *
-     * @return \DateTime 
-     */
-    public function getNatureDocDateDesactive(): ?string {
-        return $this->natureDocDateDesactive;
+    public function removeMedia(Media $media): self // Type param corrigé
+    {
+        if ($this->medias->removeElement($media)) {
+            // Mettre le côté propriétaire à null (si la relation est nullable dans Media)
+            if ($media->getNatureDoc() === $this) { // Assurez-vous que getNatureDoc existe
+                $media->setNatureDoc(null);
+            }
+        }
+        return $this;
     }
 
+    // La méthode preAjout a été renommée et intégrée dans les callbacks PrePersist/PreUpdate
+
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->libNatureDoc ?? 'NatureDoc #' . $this->id;
+    }
 }

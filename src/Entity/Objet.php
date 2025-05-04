@@ -2,253 +2,182 @@
 
 namespace App\Entity;
 
+use App\Repository\ObjetRepository; // Importer le Repository
+use Doctrine\DBAL\Types\Types;     // Importer Types
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo; // Importer Gedmo
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use DateTimeImmutable; // Utiliser les objets immuables
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="objet")]
- * #[ORM\Entity](repositoryClass="App\Entity\ObjetRepository")
- * @ORM\HasLifecycleCallbacks
- * 
+ * Entité représentant un Objet (potentiellement un objet de message, un type d'élément...).
  */
-class Objet {
+#[ORM\Entity(repositoryClass: ObjetRepository::class)]
+#[ORM\Table(name: 'objet')]
+#[ORM\HasLifecycleCallbacks] // Conserver pour les dates
+class Objet
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idobjet', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private, type hint ?int
 
-    function __construct() {
-        
+    /**
+     * Libellé de l'objet (traduisible).
+     * @var string|null
+     */
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'libobjet', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé de l'objet ne peut être vide.", groups: ['translatable_validation'])] // Valider si besoin par langue
+    #[Assert\Length(
+        min: 2,
+        max: 100, // Correspond à la longueur ORM
+        minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libObjet = null; // Type hint ?string
+
+    /**
+     * Description de l'objet.
+     */
+    #[ORM\Column(name: 'descriptionobjet', type: Types::TEXT, nullable: true)] // Changé en TEXT, nullable
+    // Pas d'Assert\NotBlank car nullable, pas de MinLength par défaut sur Text
+    private ?string $descriptionObjet = null; // Type hint ?string
+
+    /**
+     * État de l'objet (ex: actif/inactif).
+     */
+    #[ORM\Column(name: 'etatobjet', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull] // Un booléen doit être défini
+    private ?bool $etatObjet = true; // Initialisé à true (actif) par défaut, type hint ?bool
+
+    // --- Champs de suivi (Utilisateurs) ---
+    // !! Recommandation : Remplacer par des relations ManyToOne vers User/Utilisateur !!
+    #[ORM\Column(name: 'objetajoutpar', type: Types::INTEGER, nullable: true)] // Rendu nullable
+    private ?int $objetAjoutPar = null;
+
+    #[ORM\Column(name: 'objetmodifpar', type: Types::INTEGER, nullable: true)]
+    private ?int $objetModifPar = null;
+
+    // --- Champs de suivi (Dates) ---
+    #[ORM\Column(name: 'objetdateajout', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PrePersist, rendu nullable
+    private ?DateTimeImmutable $objetDateAjout = null; // Type hint DateTimeImmutable
+
+    #[ORM\Column(name: 'objetdatemodif', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PreUpdate
+    private ?DateTimeImmutable $objetDateModif = null; // Type hint DateTimeImmutable
+
+
+    /**
+     * Locale utilisée pour les traductions Gedmo (non mappée).
+     * @var string|null
+     */
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+
+    public function __construct()
+    {
+        $this->etatObjet = true; // Actif par défaut
+        // Les dates sont initialisées via PrePersist/PreUpdate
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idobjet", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\PrePersist]
+    public function setTimestampsOnCreate(): void
+    {
+        if ($this->objetDateAjout === null) {
+            $this->objetDateAjout = new DateTimeImmutable();
+        }
+        // On pourrait définir objetAjoutPar ici
+    }
 
-    /**
-     * @var string $libObjet
-     * @Gedmo\Translatable
-     * #[ORM\Column(name="libobjet",type="string",length=100)]
-     * #[Assert\NotBlank(message="Le libellé du objet ne peut être vide")]
-     * @Assert\MinLength(2)
-     */
-    private $libObjet;
+    #[ORM\PreUpdate]
+    public function setTimestampsOnUpdate(): void
+    {
+        $this->objetDateModif = new DateTimeImmutable();
+        // On pourrait définir objetModifPar ici
+    }
 
-    /**
-     * @var text $descriptionObjet
-     * #[ORM\Column(name="descriptionobjet",type="string")]
-     */
-    private $descriptionObjet;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var integer $objetAjoutPar
-     * #[ORM\Column(name="objetajoutpar" , type="integer")]
-     *   
-     */
-    private $objetAjoutPar;
-
-    /**
-     * @var integer $objetModifPar
-     * #[ORM\Column(name="objetmodifpar" , type="integer", nullable=true)]
-     *   
-     */
-    private $objetModifPar;
-
-    /**
-     * @var datetime $objetDateAjout
-     * #[ORM\Column(name="objetdateajout" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $objetDateAjout;
-
-    /**
-     * @var datetime $objetDateModif
-     * #[ORM\Column(name="objetdatemodif" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $objetDateModif;
-
-
-
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    private $locale;
-    
-    /**
-     * @var integer $etatObjet
-     * #[ORM\Column(name="etatobjet",type="integer" )]
-     *   
-     */    
-    private $etatObjet;
-
-    
-    public function setTranslatableLocale(string $locale): self {
-        $this->locale = $locale;
-    }    
-    
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
 
-    /**
-     * Set libObjet
-     *
-     * @param string $libObjet
-     * @return Objet
-     */
-    public function setLibObjet(string $libObjet): self {
-        $this->libObjet = $libObjet;
+    // Pas de setter pour l'ID
 
-        return $this;
-    }
-
-    /**
-     * Get libObjet
-     *
-     * @return string 
-     */
-    public function getLibObjet(): ?string {
+    public function getLibObjet(): ?string
+    {
         return $this->libObjet;
     }
 
-    /**
-     * Set descriptionObjet
-     *
-     * @param string $descriptionObjet
-     * @return Objet
-     */
-    public function setDescriptionObjet(string $descriptionObjet): self {
-        $this->descriptionObjet = $descriptionObjet;
-
+    public function setLibObjet(string $libObjet): self
+    {
+        $this->libObjet = $libObjet;
         return $this;
     }
 
-    /**
-     * Get descriptionObjet
-     *
-     * @return string 
-     */
-    public function getDescriptionObjet(): ?string {
+    public function getDescriptionObjet(): ?string
+    {
         return $this->descriptionObjet;
     }
 
-    /**
-     * Set objetAjoutPar
-     *
-     * @param integer $objetAjoutPar
-     * @return Objet
-     */
-    public function setObjetAjoutPar(string $objetAjoutPar): self {
-        $this->objetAjoutPar = $objetAjoutPar;
-
+    public function setDescriptionObjet(?string $descriptionObjet): self // Accepte null
+    {
+        $this->descriptionObjet = $descriptionObjet;
         return $this;
     }
 
     /**
-     * Get objetAjoutPar
-     *
-     * @return integer 
+     * Retourne true si l'objet est actif.
      */
-    public function getObjetAjoutPar(): ?string {
-        return $this->objetAjoutPar;
-    }
-
-    /**
-     * Set objetModifPar
-     *
-     * @param integer $objetModifPar
-     * @return Objet
-     */
-    public function setObjetModifPar(string $objetModifPar): self {
-        $this->objetModifPar = $objetModifPar;
-
-        return $this;
-    }
-
-    /**
-     * Get objetModifPar
-     *
-     * @return integer 
-     */
-    public function getObjetModifPar(): ?string {
-        return $this->objetModifPar;
-    }
-
-    /**
-     * Set objetDateAjout
-     *
-     * @param \DateTime $objetDateAjout
-     * @return Objet
-     */
-    public function setObjetDateAjout(string $objetDateAjout): self {
-        $this->objetDateAjout = $objetDateAjout;
-
-        return $this;
-    }
-
-    /**
-     * Get objetDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getObjetDateAjout(): ?string {
-        return $this->objetDateAjout;
-    }
-
-    /**
-     * Set objetDateModif
-     *
-     * @param \DateTime $objetDateModif
-     * @return Objet
-     */
-    public function setObjetDateModif(string $objetDateModif): self {
-        $this->objetDateModif = $objetDateModif;
-
-        return $this;
-    }
-
-    /**
-     * Get objetDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getObjetDateModif(): ?string {
-        return $this->objetDateModif;
-    }
-
-    /**
-     * Set etatObjet
-     *
-     * @param integer $etatObjet
-     * @return Objet
-     */
-    public function setEtatObjet(string $etatObjet): self {
-        $this->etatObjet = $etatObjet;
-
-        return $this;
-    }
-
-    /**
-     * Get etatObjet
-     *
-     * @return integer 
-     */
-    public function getEtatObjet(): ?string {
+    public function isEtatObjet(): ?bool // Getter booléen
+    {
         return $this->etatObjet;
     }
 
+    /**
+     * Définit l'état de l'objet.
+     */
+    public function setEtatObjet(bool $etatObjet): self // Setter booléen
+    {
+        $this->etatObjet = $etatObjet;
+        return $this;
+    }
+
+     /**
+      * Get etatObjet (moins sémantique que isEtatObjet)
+      * @return boolean|null
+      */
+     public function getEtatObjet(): ?bool // Type retour corrigé
+     {
+         return $this->etatObjet;
+     }
+
+
+    // Getters/Setters pour les champs *Par (types corrigés)
+    public function getObjetAjoutPar(): ?int { return $this->objetAjoutPar; }
+    public function setObjetAjoutPar(?int $id): self { $this->objetAjoutPar = $id; return $this; } // Accepte null
+    public function getObjetModifPar(): ?int { return $this->objetModifPar; }
+    public function setObjetModifPar(?int $id): self { $this->objetModifPar = $id; return $this; } // Accepte null
+
+    // Getters pour les champs Date* (types corrigés)
+    // Setters retirés car gérés par callbacks
+    public function getObjetDateAjout(): ?DateTimeImmutable { return $this->objetDateAjout; }
+    public function getObjetDateModif(): ?DateTimeImmutable { return $this->objetDateModif; }
+
+
+    // --- Gestionnaire de locale Gedmo ---
+    public function setTranslatableLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->libObjet ?? 'Objet #' . $this->id;
+    }
 }

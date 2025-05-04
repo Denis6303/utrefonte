@@ -2,1057 +2,349 @@
 
 namespace App\Entity;
 
+use App\Repository\OperationcfonbRepository; // Assurez-vous que ce repository existe et que le namespace est correct
+use Doctrine\DBAL\Types\Types;               // Importer Types
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\Compte;
+// use App\Entity\Devise;
 
 /**
  * Operationcfonb
- *
- * #[ORM\Table(name="operationcfonb")]
- * #[ORM\Entity](repositoryClass="utb\ParamsCompteBundle\Entity\OperationcfonbRepository")
+ * Représente une opération bancaire issue d'un fichier format CFONB.
  */
+#[ORM\Entity(repositoryClass: OperationcfonbRepository::class)]
+#[ORM\Table(name: 'operationcfonb')]
+// Pas besoin de @ORM\HasLifecycleCallbacks si non utilisé
 class Operationcfonb
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'id', type: Types::INTEGER)] // name="id" est la valeur par défaut
+    private ?int $id = null; // Visibilité private, type hint ?int
 
-    function __construct() {
-        
-    }
+    #[ORM\Column(name: 'liboperation', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé de l'opération est requis.")]
+    #[Assert\Length(max: 100, maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères.")]
+    private ?string $libOperation = null; // Type hint ?string
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="id", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'datevaleur', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull(message: "La date de valeur est requise.")]
+    private ?DateTimeImmutable $dateValeur = null; // Type hint DateTimeImmutable
 
-    /**
-     * @var string $libOperation
-     * #[ORM\Column(name="liboperation",type="string",length=100)]
-     */
-    private $libOperation;
+    #[ORM\Column(name: 'dateoperation', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull(message: "La date d'opération est requise.")]
+    private ?DateTimeImmutable $dateOperation = null; // Type hint DateTimeImmutable
 
-    /**
-     * @var datetime $dateValeur
-     * #[ORM\Column(name="datevaleur",type="datetime",length=100)]
-     */
-    private $dateValeur;
+    #[ORM\Column(name: 'datecompta', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull(message: "La date comptable est requise.")]
+    private ?DateTimeImmutable $dateCompta = null; // Type hint DateTimeImmutable
 
     /**
-     * @var datetime $dateOperation
-     * #[ORM\Column(name="dateoperation",type="datetime",length=100)]
+     * Montant de l'opération. Utilisation de DECIMAL pour la précision monétaire.
      */
-    private $dateOperation;
+    #[ORM\Column(name: 'montant', type: Types::DECIMAL, precision: 14, scale: 2)] // Changé en DECIMAL, ajuster precision/scale
+    #[Assert\NotNull(message: "Le montant est requis.")]
+    #[Assert\Type(type: 'numeric', message: "Le montant doit être numérique.")]
+    // Ajouter Positive ou NotEqualTo(0) si nécessaire
+    private ?string $montant = null; // Type hint string car DECIMAL est souvent string
 
     /**
-     * @var datetime $dateCompta
-     * #[ORM\Column(name="datecompta",type="datetime",length=100)]
+     * Sens de l'opération (ex: 'C' ou 'D').
      */
-    private $dateCompta;    
-    
-    /**
-     * @var float $montant
-     * #[ORM\Column(name="montant",type="float")]
-     */
-    private $montant;
+    #[ORM\Column(name: 'sensoperation', type: Types::STRING, length: 2)]
+    #[Assert\NotBlank(message: "Le sens de l'opération est requis.")]
+    #[Assert\Length(max: 2)]
+    #[Assert\Choice(choices: ['C', 'D', 'CR', 'DR'], message: "Sens invalide.")] // Adapter les choix possibles
+    private ?string $sensOperation = null;
 
     /**
-     * @var Compte $compte
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Compte::class, inversedBy="operations", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="numerocompte", referencedColumnName="numerocompte")
-     * })
+     * Coefficient (utilité à déterminer).
      */
-    private $compte;
+    #[ORM\Column(name: 'coef', type: Types::INTEGER, nullable: true)] // Rendu nullable si possible
+    private ?int $coef = null;
 
     /**
-     * @var string $sensOperation
-     * #[ORM\Column(name="sensoperation",type="string",length=2)]
+     * Numéro de mouvement interne ou de référence.
      */
-    private $sensOperation;
+    #[ORM\Column(name: 'numeromvt', type: Types::STRING, length: 15)]
+    #[Assert\NotBlank(message: "Le numéro de mouvement est requis.")]
+    #[Assert\Length(max: 15)]
+    private ?string $numeroMvt = null;
 
     /**
-     * @var integer $coef
-     * #[ORM\Column(name="coef",type="integer")]
+     * Code interne de l'opération bancaire.
      */
-    private $coef;
+    #[ORM\Column(name: 'codoperation', type: Types::STRING, length: 5)]
+    #[Assert\NotBlank(message: "Le code opération est requis.")]
+    #[Assert\Length(max: 5)]
+    private ?string $codOperation = null;
 
     /**
-     * @var string $numeroMvt
-     * #[ORM\Column(name="numeromvt",type="string",length=15)]
+     * Période de référence (ex: '2023-10').
      */
-    private $numeroMvt;
+    #[ORM\Column(name: 'periode', type: Types::STRING, length: 10)]
+    #[Assert\NotBlank(message: "La période est requise.")]
+    #[Assert\Length(max: 10)]
+    // Optionnel: #[Assert\Regex(pattern: "/^\d{4}-\d{2}$/", message: "Format de période invalide (AAAA-MM).")]
+    private ?string $periode = null;
 
     /**
-     * @var Devise $devise
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Devise::class, inversedBy="operations", cascade={"persist","merge"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="iddevise", referencedColumnName="iddevise")
-     * })
+     * Indicateur de traitement (0=non traité, 1=traité).
      */
-    private $devise;
+    #[ORM\Column(name: 'traite', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $traite = false; // Non traité par défaut
 
     /**
-     * @var string $codOperation
-     * #[ORM\Column(name="codoperation",type="string",length=5)]
+     * ID du fichier (Chargement?) d'où provient l'opération. Relation serait mieux.
      */
-    private $codOperation;
+    #[ORM\Column(name: 'idfile', type: Types::INTEGER)]
+    #[Assert\NotNull(message: "L'ID du fichier est requis.")]
+    private ?int $idfile = null;
 
     /**
-     * @var string $periode
-     * #[ORM\Column(name="periode",type="string",length=10)]
+     * Solde après cette ligne d'opération (si fourni dans le fichier).
+     * Utiliser DECIMAL pour la précision.
      */
-    private $periode;
+    #[ORM\Column(name: 'soldeligne', type: Types::DECIMAL, precision: 14, scale: 2, nullable: true)] // Changé en DECIMAL, rendu nullable
+    #[Assert\Type(type: 'numeric', message: "Le solde doit être numérique.")]
+    private ?string $soldeEnLigne = null; // Type hint string
 
     /**
-     * @var integer $traite
-     * #[ORM\Column(name="traite",type="integer")]
+     * Indicateur d'opération journalière? (0/1).
      */
-    private $traite;
+    #[ORM\Column(name: 'chrgjr', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $journalier = false; // Défaut
 
     /**
-     * @var integer $idfile
-     * #[ORM\Column(name="idfile",type="integer")]
+     * Ordre de l'opération dans le fichier/journée.
      */
-    private $idfile;
-    
-    /**
-     * @var integer $soldeEnLigne
-     * #[ORM\Column(name="soldeligne",type="integer")]
-     */
-    private $soldeEnLigne;
-    
-    /**
-     * @var integer $journalier
-     * #[ORM\Column(name="chrgjr",type="integer")]
-     */
-    private $journalier;
-    
-    /**
-     * @var integer $ordre
-     * #[ORM\Column(name="ordre",type="integer")]
-     */
-    private $ordre;	
+    #[ORM\Column(name: 'ordre', type: Types::INTEGER)]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
+    private ?int $ordre = 0; // Défaut
+
+    // --- Champs Spécifiques CFONB (à conserver tels quels si nécessaires) ---
+
+    #[ORM\Column(name: 'mttafbw', type: Types::STRING, length: 14, nullable: true)]
+    #[Assert\Length(max: 14)]
+    private ?string $mttafbw = null;
+
+    #[ORM\Column(name: 'bnqcod', type: Types::STRING, length: 5, nullable: true)]
+    #[Assert\Length(max: 5)]
+    private ?string $codeBnq = null;
+
+    #[ORM\Column(name: 'guichet', type: Types::STRING, length: 5, nullable: true)]
+    #[Assert\Length(max: 5)]
+    private ?string $codeGui = null;
+
+    #[ORM\Column(name: 'ladevise', type: Types::STRING, length: 3, nullable: true)]
+    #[Assert\Length(max: 3)]
+    private ?string $codeDevise = null; // Nom déjà utilisé pour la relation, renommé pour éviter confusion
+
+    #[ORM\Column(name: 'motrej', type: Types::STRING, length: 2, nullable: true)]
+    #[Assert\Length(max: 2)]
+    private ?string $motrej = null;
+
+    #[ORM\Column(name: 'monori', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $monori = null;
+
+    #[ORM\Column(name: 'virgul', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $virgul = null;
+
+    #[ORM\Column(name: 'res21', type: Types::STRING, length: 4, nullable: true)]
+    #[Assert\Length(max: 4)]
+    private ?string $res21 = null;
+
+    #[ORM\Column(name: 'exocom', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $exocom = null;
+
+    #[ORM\Column(name: 'ind', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $ind = null;
+
+    #[ORM\Column(name: 'res22', type: Types::STRING, length: 2, nullable: true)]
+    #[Assert\Length(max: 2)]
+    private ?string $res22 = null;
+
+    #[ORM\Column(name: 'noecri', type: Types::STRING, length: 7, nullable: true)]
+    #[Assert\Length(max: 7)]
+    private ?string $noecri = null;
+
+    #[ORM\Column(name: 'cdafb', type: Types::STRING, length: 2, nullable: true)]
+    #[Assert\Length(max: 2)]
+    private ?string $cdafb = null;
+
+    #[ORM\Column(name: 'res23', type: Types::STRING, length: 2, nullable: true)]
+    #[Assert\Length(max: 2)]
+    private ?string $res23 = null;
+
+    #[ORM\Column(name: 'res13', type: Types::STRING, length: 2, nullable: true)]
+    #[Assert\Length(max: 2)]
+    private ?string $res13 = null;
+
+    #[ORM\Column(name: 'cdcoib', type: Types::STRING, length: 4, nullable: true)]
+    #[Assert\Length(max: 4)]
+    private ?string $cdcoib = null;
+
+    #[ORM\Column(name: 'sign', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $sign = null;
+
+    #[ORM\Column(name: 'cdexo', type: Types::STRING, length: 1, nullable: true)]
+    #[Assert\Length(max: 1)]
+    private ?string $cdexo = null;
+
+    // --- RELATIONS ---
 
     /**
-     * @var string $mttafbw
-     * #[ORM\Column(name="mttafbw",type="string",nullable=true,length=14)]
+     * Le compte bancaire concerné par l'opération.
+     * !! ATTENTION à referencedColumnName !! Vérifier si c'est bien 'numerocompte' ou 'idcompte'.
      */
-    private $mttafbw;
+    #[ORM\ManyToOne(targetEntity: Compte::class, inversedBy: 'operations')] // Assumer 'operations' dans Compte
+    #[ORM\JoinColumn(name: 'numerocompte', referencedColumnName: 'numerocompte', nullable: false)] // Gardé numerocompte, mais idcompte est plus probable
+    // Si c'est idcompte: #[ORM\JoinColumn(name: 'idcompte', referencedColumnName: 'idcompte', nullable: false)]
+    #[Assert\NotNull(message: "Le compte associé est obligatoire.")]
+    private ?Compte $compte = null; // Type hint ?Compte
 
     /**
-     * @var string $codeBnq
-     * #[ORM\Column(name="bnqcod",type="string",nullable=true,length=5)]
+     * La devise de l'opération.
      */
-    private $codeBnq;
-    
-    /**
-     * @var string $codeGui
-     * #[ORM\Column(name="guichet",type="string",nullable=true,length=5)]
-     */
-    private $codeGui;
-    
-    /**
-     * @var string $codeDevise
-     * #[ORM\Column(name="ladevise",type="string",nullable=true,length=3)]
-     */
-    private $codeDevise;    
-    
-    /**
-     * @var string $motrej
-     * #[ORM\Column(name="motrej",type="string",nullable=true,length=2)]
-     */
-    private $motrej;   
-    
-    /**
-     * @var string $monori
-     * #[ORM\Column(name="monori",type="string",nullable=true,length=1)]
-     */
-    private $monori;  
-    
-    /**
-     * @var string $virgul
-     * #[ORM\Column(name="virgul",type="string",nullable=true,length=1)]
-     */
-    private $virgul;    
-    
-    /**
-     * @var string $res21
-     * #[ORM\Column(name="res21",type="string",nullable=true,length=4)]
-     */
-    private $res21;     
-    
-    /**
-     * @var string $exocom
-     * #[ORM\Column(name="exocom",type="string",nullable=true,length=1)]
-     */
-    private $exocom;
-    
-    /**
-     * @var string $ind
-     * #[ORM\Column(name="ind",type="string",nullable=true,length=1)]
-     */
-    private $ind;
-	
-	 /**
-     * @var string $res22
-     * #[ORM\Column(name="res22",type="string",nullable=true,length=2)]
-     */
-    private $res22;    
-    
-    /**
-     * @var string $noecri
-     * #[ORM\Column(name="noecri",type="string",nullable=true,length=7)]
-     */
-    private $noecri; 
-	
-	 /**
-     * @var string $cdafb
-     * #[ORM\Column(name="cdafb",type="string",nullable=true,length=2)]
-     */
-    private $cdafb;    
-    
-    /**
-     * @var string $res23
-     * #[ORM\Column(name="res23",type="string",nullable=true,length=2)]
-     */
-    private $res23; 	
-    
-    /**
-     * @var string $res13
-     * #[ORM\Column(name="res13",type="string",nullable=true,length=2)]
-     */
-    private $res13; 	
-	
-    /**
-     * @var string $cdcoib
-     * #[ORM\Column(name="cdcoib",type="string",nullable=true,length=4)]
-     */
-    private $cdcoib; 		
-	
-    /**
-     * @var string $sign
-     * #[ORM\Column(name="sign",type="string",nullable=true,length=1)]
-     */
-    private $sign; 	
+    #[ORM\ManyToOne(targetEntity: Devise::class, inversedBy: 'operations', cascade: ['persist'])] // Merge retiré sauf besoin
+    #[ORM\JoinColumn(name: 'iddevise', referencedColumnName: 'iddevise', nullable: false)] // Rendu non nullable
+    #[Assert\NotNull(message: "La devise associée est obligatoire.")]
+    private ?Devise $devise = null; // Type hint ?Devise
 
-    /**
-     * @var string $cdexo
-     * #[ORM\Column(name="cdexo",type="string",nullable=true,length=1)]
-     */
-    private $cdexo; 
-	
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string
+
+    // Constructeur vide supprimé
+
+    // --- GETTERS & SETTERS --- (Types corrigés)
+
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set libOperation
-     *
-     * @param string $libOperation
-     * @return Operationcfonb
-     */
-    public function setLibOperation(string $libOperation): self
-    {
-        $this->libOperation = $libOperation;
-    
-        return $this;
-    }
-
-    /**
-     * Get libOperation
-     *
-     * @return string 
-     */
-    public function getLibOperation(): ?string
-    {
-        return $this->libOperation;
-    }
-
-    /**
-     * Set dateValeur
-     *
-     * @param \DateTime $dateValeur
-     * @return Operationcfonb
-     */
-    public function setDateValeur(string $dateValeur): self
-    {
-        $this->dateValeur = $dateValeur;
-    
-        return $this;
-    }
-
-    /**
-     * Get dateValeur
-     *
-     * @return \DateTime 
-     */
-    public function getDateValeur(): ?string
-    {
-        return $this->dateValeur;
-    }
-
-    /**
-     * Set dateOperation
-     *
-     * @param \DateTime $dateOperation
-     * @return Operationcfonb
-     */
-    public function setDateOperation(string $dateOperation): self
-    {
-        $this->dateOperation = $dateOperation;
-    
-        return $this;
-    }
-
-    /**
-     * Get dateOperation
-     *
-     * @return \DateTime 
-     */
-    public function getDateOperation(): ?string
-    {
-        return $this->dateOperation;
-    }
-
-    /**
-     * Set dateCompta
-     *
-     * @param \DateTime $dateCompta
-     * @return Operationcfonb
-     */
-    public function setDateCompta(string $dateCompta): self
-    {
-        $this->dateCompta = $dateCompta;
-    
-        return $this;
-    }
-
-    /**
-     * Get dateCompta
-     *
-     * @return \DateTime 
-     */
-    public function getDateCompta(): ?string
-    {
-        return $this->dateCompta;
-    }    
-    
-    /**
-     * Set montant
-     *
-     * @param float $montant
-     * @return Operationcfonb
-     */
-    public function setMontant(string $montant): self
-    {
-        $this->montant = $montant;
-    
-        return $this;
-    }
-
-    /**
-     * Get montant
-     *
-     * @return float 
-     */
-    public function getMontant(): ?string
-    {
-        return $this->montant;
-    }
-
-    /**
-     * Set sensOperation
-     *
-     * @param string $sensOperation
-     * @return Operationcfonb
-     */
-    public function setSensOperation(string $sensOperation): self
-    {
-        $this->sensOperation = $sensOperation;
-    
-        return $this;
-    }
-
-    /**
-     * Get sensOperation
-     *
-     * @return string 
-     */
-    public function getSensOperation(): ?string
-    {
-        return $this->sensOperation;
-    }
-
-    /**
-     * Set coef
-     *
-     * @param integer $coef
-     * @return Operationcfonb
-     */
-    public function setCoef(string $coef): self
-    {
-        $this->coef = $coef;
-    
-        return $this;
-    }
-
-    /**
-     * Get coef
-     *
-     * @return integer 
-     */
-    public function getCoef(): ?string
-    {
-        return $this->coef;
-    }
-
-    /**
-     * Set numeroMvt
-     *
-     * @param string $numeroMvt
-     * @return Operationcfonb
-     */
-    public function setNumeroMvt(string $numeroMvt): self
-    {
-        $this->numeroMvt = $numeroMvt;
-    
-        return $this;
-    }
-
-    /**
-     * Get numeroMvt
-     *
-     * @return string 
-     */
-    public function getNumeroMvt(): ?string
-    {
-        return $this->numeroMvt;
-    }
-
-    /**
-     * Set codOperation
-     *
-     * @param string $codOperation
-     * @return Operationcfonb
-     */
-    public function setCodOperation(string $codOperation): self
-    {
-        $this->codOperation = $codOperation;
-    
-        return $this;
-    }
-
-    /**
-     * Get codOperation
-     *
-     * @return string 
-     */
-    public function getCodOperation(): ?string
-    {
-        return $this->codOperation;
-    }
-
-    /**
-     * Set periode
-     *
-     * @param string $periode
-     * @return Operationcfonb
-     */
-    public function setPeriode(string $periode): self
-    {
-        $this->periode = $periode;
-    
-        return $this;
-    }
-
-    /**
-     * Get periode
-     *
-     * @return string 
-     */
-    public function getPeriode(): ?string
-    {
-        return $this->periode;
-    }
-
-    /**
-     * Set traite
-     *
-     * @param integer $traite
-     * @return Operationcfonb
-     */
-    public function setTraite(string $traite): self
-    {
-        $this->traite = $traite;
-    
-        return $this;
-    }
-
-    /**
-     * Get traite
-     *
-     * @return integer 
-     */
-    public function getTraite(): ?string
-    {
-        return $this->traite;
-    }
-
-    /**
-     * Set idfile
-     *
-     * @param integer $idfile
-     * @return Operationcfonb
-     */
-    public function setIdfile(string $idfile): self
-    {
-        $this->idfile = $idfile;
-    
-        return $this;
-    }
-
-    /**
-     * Get idfile
-     *
-     * @return integer 
-     */
-    public function getIdfile(): ?string
-    {
-        return $this->idfile;
-    }
-
-    /**
-     * Set soldeEnLigne
-     *
-     * @param integer $soldeEnLigne
-     * @return Operationcfonb
-     */
-    public function setSoldeEnLigne(string $soldeEnLigne): self
-    {
-        $this->soldeEnLigne = $soldeEnLigne;
-    
-        return $this;
-    }
-
-    /**
-     * Get soldeEnLigne
-     *
-     * @return integer 
-     */
-    public function getSoldeEnLigne(): ?string
-    {
-        return $this->soldeEnLigne;
-    }
-
-    /**
-     * Set journalier
-     *
-     * @param integer $journalier
-     * @return Operationcfonb
-     */
-    public function setJournalier(string $journalier): self
-    {
-        $this->journalier = $journalier;
-    
-        return $this;
-    }
-
-    /**
-     * Get journalier
-     *
-     * @return integer 
-     */
-    public function getJournalier(): ?string
-    {
-        return $this->journalier;
-    }
-
-    /**
-     * Set compte
-     *
-     * @param \App\Entity\Compte $compte
-     * @return Operationcfonb
-     */
-    public function setCompte(\App\Entity\Compte $compte = null)
-    {
-        $this->compte = $compte;
-    
-        return $this;
-    }
-
-    /**
-     * Get compte
-     *
-     * @return \App\Entity\Compte 
-     */
-    public function getCompte(): ?string
-    {
-        return $this->compte;
-    }
-
-    /**
-     * Set devise
-     *
-     * @param \App\Entity\Devise $devise
-     * @return Operationcfonb
-     */
-    public function setDevise(\App\Entity\Devise $devise = null)
-    {
-        $this->devise = $devise;
-    
-        return $this;
-    }
-
-    /**
-     * Get devise
-     *
-     * @return \App\Entity\Devise 
-     */
-    public function getDevise(): ?string
-    {
-        return $this->devise;
-    }
-
-    /**
-     * Set ordre
-     *
-     * @param integer $ordre
-     * @return Operationcfonb
-     */
-    public function setOrdre(string $ordre): self
-    {
-        $this->ordre = $ordre;
-    
-        return $this;
-    }
-
-    /**
-     * Get ordre
-     *
-     * @return integer 
-     */
-    public function getOrdre(): ?string
-    {
-        return $this->ordre;
-    }
-
-    /**
-     * Set mttafbw
-     *
-     * @param string $mttafbw
-     * @return Operationcfonb
-     */
-    public function setMttafbw(string $mttafbw): self
-    {
-        $this->mttafbw = $mttafbw;
-    
-        return $this;
-    }
-
-    /**
-     * Get mttafbw
-     *
-     * @return string 
-     */
-    public function getMttafbw(): ?string
-    {
-        return $this->mttafbw;
-    }
-
-    /**
-     * Set codeBnq
-     *
-     * @param string $codeBnq
-     * @return Operationcfonb
-     */
-    public function setCodeBnq(string $codeBnq): self
-    {
-        $this->codeBnq = $codeBnq;
-    
-        return $this;
-    }
-
-    /**
-     * Get codeBnq
-     *
-     * @return string 
-     */
-    public function getCodeBnq(): ?string
-    {
-        return $this->codeBnq;
-    }
-
-    /**
-     * Set codeGui
-     *
-     * @param string $codeGui
-     * @return Operationcfonb
-     */
-    public function setCodeGui(string $codeGui): self
-    {
-        $this->codeGui = $codeGui;
-    
-        return $this;
-    }
-
-    /**
-     * Get codeGui
-     *
-     * @return string 
-     */
-    public function getCodeGui(): ?string
-    {
-        return $this->codeGui;
-    }
-
-    /**
-     * Set codeDevise
-     *
-     * @param string $codeDevise
-     * @return Operationcfonb
-     */
-    public function setCodeDevise(string $codeDevise): self
-    {
-        $this->codeDevise = $codeDevise;
-    
-        return $this;
-    }
-
-    /**
-     * Get codeDevise
-     *
-     * @return string 
-     */
-    public function getCodeDevise(): ?string
-    {
-        return $this->codeDevise;
-    }
-
-    /**
-     * Set motrej
-     *
-     * @param string $motrej
-     * @return Operationcfonb
-     */
-    public function setMotrej(string $motrej): self
-    {
-        $this->motrej = $motrej;
-    
-        return $this;
-    }
-
-    /**
-     * Get motrej
-     *
-     * @return string 
-     */
-    public function getMotrej(): ?string
-    {
-        return $this->motrej;
-    }
-
-    /**
-     * Set monori
-     *
-     * @param string $monori
-     * @return Operationcfonb
-     */
-    public function setMonori(string $monori): self
-    {
-        $this->monori = $monori;
-    
-        return $this;
-    }
-
-    /**
-     * Get monori
-     *
-     * @return string 
-     */
-    public function getMonori(): ?string
-    {
-        return $this->monori;
-    }
-
-    /**
-     * Set virgul
-     *
-     * @param string $virgul
-     * @return Operationcfonb
-     */
-    public function setVirgul(string $virgul): self
-    {
-        $this->virgul = $virgul;
-    
-        return $this;
-    }
-
-    /**
-     * Get virgul
-     *
-     * @return string 
-     */
-    public function getVirgul(): ?string
-    {
-        return $this->virgul;
-    }
-
-    /**
-     * Set res21
-     *
-     * @param string $res21
-     * @return Operationcfonb
-     */
-    public function setRes21(string $res21): self
-    {
-        $this->res21 = $res21;
-    
-        return $this;
-    }
-
-    /**
-     * Get res21
-     *
-     * @return string 
-     */
-    public function getRes21(): ?string
-    {
-        return $this->res21;
-    }
-
-    /**
-     * Set exocom
-     *
-     * @param string $exocom
-     * @return Operationcfonb
-     */
-    public function setExocom(string $exocom): self
-    {
-        $this->exocom = $exocom;
-    
-        return $this;
-    }
-
-    /**
-     * Get exocom
-     *
-     * @return string 
-     */
-    public function getExocom(): ?string
-    {
-        return $this->exocom;
-    }
-
-    /**
-     * Set ind
-     *
-     * @param string $ind
-     * @return Operationcfonb
-     */
-    public function setInd(string $ind): self
-    {
-        $this->ind = $ind;
-    
-        return $this;
-    }
-
-    /**
-     * Get ind
-     *
-     * @return string 
-     */
-    public function getInd(): ?string
-    {
-        return $this->ind;
-    }
-
-    /**
-     * Set res22
-     *
-     * @param string $res22
-     * @return Operationcfonb
-     */
-    public function setRes22(string $res22): self
-    {
-        $this->res22 = $res22;
-    
-        return $this;
-    }
-
-    /**
-     * Get res22
-     *
-     * @return string 
-     */
-    public function getRes22(): ?string
-    {
-        return $this->res22;
-    }
-
-    /**
-     * Set noecri
-     *
-     * @param string $noecri
-     * @return Operationcfonb
-     */
-    public function setNoecri(string $noecri): self
-    {
-        $this->noecri = $noecri;
-    
-        return $this;
-    }
-
-    /**
-     * Get noecri
-     *
-     * @return string 
-     */
-    public function getNoecri(): ?string
-    {
-        return $this->noecri;
-    }
-
-    /**
-     * Set cdafb
-     *
-     * @param string $cdafb
-     * @return Operationcfonb
-     */
-    public function setCdafb(string $cdafb): self
-    {
-        $this->cdafb = $cdafb;
-    
-        return $this;
-    }
-
-    /**
-     * Get cdafb
-     *
-     * @return string 
-     */
-    public function getCdafb(): ?string
-    {
-        return $this->cdafb;
-    }
-
-    /**
-     * Set res23
-     *
-     * @param string $res23
-     * @return Operationcfonb
-     */
-    public function setRes23(string $res23): self
-    {
-        $this->res23 = $res23;
-    
-        return $this;
-    }
-
-    /**
-     * Get res23
-     *
-     * @return string 
-     */
-    public function getRes23(): ?string
-    {
-        return $this->res23;
-    }
-
-    /**
-     * Set res13
-     *
-     * @param string $res13
-     * @return Operationcfonb
-     */
-    public function setRes13(string $res13): self
-    {
-        $this->res13 = $res13;
-    
-        return $this;
-    }
-
-    /**
-     * Get res13
-     *
-     * @return string 
-     */
-    public function getRes13(): ?string
-    {
-        return $this->res13;
-    }
-
-    /**
-     * Set cdcoib
-     *
-     * @param string $cdcoib
-     * @return Operationcfonb
-     */
-    public function setCdcoib(string $cdcoib): self
-    {
-        $this->cdcoib = $cdcoib;
-    
-        return $this;
-    }
-
-    /**
-     * Get cdcoib
-     *
-     * @return string 
-     */
-    public function getCdcoib(): ?string
-    {
-        return $this->cdcoib;
-    }
-
-    /**
-     * Set sign
-     *
-     * @param string $sign
-     * @return Operationcfonb
-     */
-    public function setSign(string $sign): self
-    {
-        $this->sign = $sign;
-    
-        return $this;
-    }
-
-    /**
-     * Get sign
-     *
-     * @return string 
-     */
-    public function getSign(): ?string
-    {
-        return $this->sign;
-    }
-
-    /**
-     * Set cdexo
-     *
-     * @param string $cdexo
-     * @return Operationcfonb
-     */
-    public function setCdexo(string $cdexo): self
-    {
-        $this->cdexo = $cdexo;
-    
-        return $this;
-    }
-
-    /**
-     * Get cdexo
-     *
-     * @return string 
-     */
-    public function getCdexo(): ?string
+    public function getLibOperation(): ?string { return $this->libOperation; }
+    public function setLibOperation(string $lib): self { $this->libOperation = $lib; return $this; }
+
+    public function getDateValeur(): ?DateTimeImmutable { return $this->dateValeur; }
+    public function setDateValeur(DateTimeImmutable $date): self { $this->dateValeur = $date; return $this; }
+
+    public function getDateOperation(): ?DateTimeImmutable { return $this->dateOperation; }
+    public function setDateOperation(DateTimeImmutable $date): self { $this->dateOperation = $date; return $this; }
+
+    public function getDateCompta(): ?DateTimeImmutable { return $this->dateCompta; }
+    public function setDateCompta(DateTimeImmutable $date): self { $this->dateCompta = $date; return $this; }
+
+    public function getMontant(): ?string { return $this->montant; } // Retourne string pour DECIMAL
+    public function setMontant(string $montant): self { $this->montant = $montant; return $this; } // Prend string pour DECIMAL
+    public function getMontantAsFloat(): ?float { return $this->montant === null ? null : (float) $this->montant; }
+
+    public function getSensOperation(): ?string { return $this->sensOperation; }
+    public function setSensOperation(string $sens): self { $this->sensOperation = $sens; return $this; }
+
+    public function getCoef(): ?int { return $this->coef; }
+    public function setCoef(?int $coef): self { $this->coef = $coef; return $this; } // Accepte null
+
+    public function getNumeroMvt(): ?string { return $this->numeroMvt; }
+    public function setNumeroMvt(string $num): self { $this->numeroMvt = $num; return $this; }
+
+    public function getCodOperation(): ?string { return $this->codOperation; }
+    public function setCodOperation(string $cod): self { $this->codOperation = $cod; return $this; }
+
+    public function getPeriode(): ?string { return $this->periode; }
+    public function setPeriode(string $p): self { $this->periode = $p; return $this; }
+
+    public function isTraite(): ?bool { return $this->traite; } // Getter booléen
+    public function setTraite(bool $t): self { $this->traite = $t; return $this; } // Setter booléen
+
+    public function getIdfile(): ?int { return $this->idfile; }
+    public function setIdfile(int $id): self { $this->idfile = $id; return $this; }
+
+    public function getSoldeEnLigne(): ?string { return $this->soldeEnLigne; } // Retourne string pour DECIMAL
+    public function setSoldeEnLigne(?string $solde): self { $this->soldeEnLigne = $solde; return $this; } // Prend string, accepte null
+    public function getSoldeEnLigneAsFloat(): ?float { return $this->soldeEnLigne === null ? null : (float) $this->soldeEnLigne; }
+
+    public function isJournalier(): ?bool { return $this->journalier; } // Getter booléen
+    public function setJournalier(bool $j): self { $this->journalier = $j; return $this; } // Setter booléen
+
+    public function getOrdre(): ?int { return $this->ordre; }
+    public function setOrdre(int $o): self { $this->ordre = $o; return $this; }
+
+    public function getMttafbw(): ?string { return $this->mttafbw; }
+    public function setMttafbw(?string $m): self { $this->mttafbw = $m; return $this; } // Accepte null
+
+    public function getCodeBnq(): ?string { return $this->codeBnq; }
+    public function setCodeBnq(?string $c): self { $this->codeBnq = $c; return $this; } // Accepte null
+
+    public function getCodeGui(): ?string { return $this->codeGui; }
+    public function setCodeGui(?string $c): self { $this->codeGui = $c; return $this; } // Accepte null
+
+    public function getCodeDevise(): ?string { return $this->codeDevise; } // Nom différent de la relation
+    public function setCodeDevise(?string $c): self { $this->codeDevise = $c; return $this; } // Accepte null
+
+    public function getMotrej(): ?string { return $this->motrej; }
+    public function setMotrej(?string $m): self { $this->motrej = $m; return $this; } // Accepte null
+
+    public function getMonori(): ?string { return $this->monori; }
+    public function setMonori(?string $m): self { $this->monori = $m; return $this; } // Accepte null
+
+    public function getVirgul(): ?string { return $this->virgul; }
+    public function setVirgul(?string $v): self { $this->virgul = $v; return $this; } // Accepte null
+
+    public function getRes21(): ?string { return $this->res21; }
+    public function setRes21(?string $r): self { $this->res21 = $r; return $this; } // Accepte null
+
+    public function getExocom(): ?string { return $this->exocom; }
+    public function setExocom(?string $e): self { $this->exocom = $e; return $this; } // Accepte null
+
+    public function getInd(): ?string { return $this->ind; }
+    public function setInd(?string $i): self { $this->ind = $i; return $this; } // Accepte null
+
+    public function getRes22(): ?string { return $this->res22; }
+    public function setRes22(?string $r): self { $this->res22 = $r; return $this; } // Accepte null
+
+    public function getNoecri(): ?string { return $this->noecri; }
+    public function setNoecri(?string $n): self { $this->noecri = $n; return $this; } // Accepte null
+
+    public function getCdafb(): ?string { return $this->cdafb; }
+    public function setCdafb(?string $c): self { $this->cdafb = $c; return $this; } // Accepte null
+
+    public function getRes23(): ?string { return $this->res23; }
+    public function setRes23(?string $r): self { $this->res23 = $r; return $this; } // Accepte null
+
+    public function getRes13(): ?string { return $this->res13; }
+    public function setRes13(?string $r): self { $this->res13 = $r; return $this; } // Accepte null
+
+    public function getCdcoib(): ?string { return $this->cdcoib; }
+    public function setCdcoib(?string $c): self { $this->cdcoib = $c; return $this; } // Accepte null
+
+    public function getSign(): ?string { return $this->sign; }
+    public function setSign(?string $s): self { $this->sign = $s; return $this; } // Accepte null
+
+    public function getCdexo(): ?string { return $this->cdexo; }
+    public function setCdexo(?string $c): self { $this->cdexo = $c; return $this; } // Accepte null
+
+    // --- Relations Getters/Setters ---
+    public function getCompte(): ?Compte { return $this->compte; }
+    public function setCompte(Compte $c): self { $this->compte = $c; return $this; } // Non nullable
+
+    public function getDevise(): ?Devise { return $this->devise; }
+    public function setDevise(Devise $d): self { $this->devise = $d; return $this; } // Non nullable
+
+     // --- Méthode __toString ---
+    public function __toString(): string
     {
-        return $this->cdexo;
+        // Fournit une représentation textuelle simple de l'objet
+        $compteStr = $this->compte ? $this->compte->getNumeroCompte() : 'N/A';
+        return 'Op CFONB: ' . $this->libOperation . ' (' . $compteStr . ')' ?? 'OperationCFONB #' . $this->id;
     }
 }

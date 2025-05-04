@@ -2,304 +2,198 @@
 
 namespace App\Entity;
 
+use App\Repository\MessageRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;           // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\Internaute;
+// use App\Entity\Service;
+// use App\Entity\MessageReponse;
 
-/**
- * App\Entity
- *
- * #[ORM\Table(name="message")]
- * #[ORM\Entity](repositoryClass="App\Entity\MessageRepository")
- * @ORM\HasLifecycleCallbacks
- */
-class Message {
+#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Table(name: 'message')]
+class Message
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idmessage', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    function __construct() {
-        
+    #[ORM\Column(name: 'titremessage', type: Types::STRING, length: 150)] // Longueur augmentée si besoin
+    #[Assert\NotBlank(message: "Le titre du message est obligatoire.")]
+    #[Assert\Length(max: 150, maxMessage: "Le titre ne doit pas dépasser {{ limit }} caractères.")]
+    private ?string $titreMessage = null;
+
+    #[ORM\Column(name: 'contenu', type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Le contenu du message est obligatoire.")]
+    private ?string $contenu = null;
+
+    #[ORM\Column(name: 'dateenvoi', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull] // Initialisé dans constructeur
+    private ?DateTimeImmutable $dateEnvoi = null; // Changé en DateTimeImmutable
+
+    #[ORM\Column(name: 'corbeillemessage', type: Types::BOOLEAN)]
+    #[Assert\NotNull]
+    private ?bool $corbeilleMessage = false; // Initialisé dans constructeur
+
+    #[ORM\Column(name: 'messagelu', type: Types::BOOLEAN)]
+    #[Assert\NotNull]
+    private ?bool $messageLu = false; // Initialisé dans constructeur
+
+    // --- RELATIONS ---
+
+    /**
+     * L'Internaute expéditeur.
+     */
+    #[ORM\ManyToOne(targetEntity: Internaute::class, inversedBy: 'messages')]
+    #[ORM\JoinColumn(name: 'mailinternaute', referencedColumnName: 'mailinternaute', nullable: true)] // Gardé nullable si un message peut être système
+    private ?Internaute $internaute = null;
+
+    /**
+     * Le Service destinataire (ou lié).
+     */
+    #[ORM\ManyToOne(targetEntity: Service::class, inversedBy: 'messages')]
+    #[ORM\JoinColumn(name: 'idservice', referencedColumnName: 'idservice', nullable: true)] // Gardé nullable si non obligatoire
+    private ?Service $service = null;
+
+    /**
+     * Les réponses associées à ce message.
+     * 'message' est la propriété dans MessageReponse qui référence cette entité (mappedBy).
+     * @var Collection<int, MessageReponse>
+     */
+    #[ORM\OneToMany(mappedBy: 'message', targetEntity: MessageReponse::class, cascade: ['persist', 'remove'], orphanRemoval: true)] // cascade/orphanRemoval ajoutés
+    private Collection $messageReponses;
+
+
+    public function __construct()
+    {
+        $this->dateEnvoi = new DateTimeImmutable();
+        $this->messageReponses = new ArrayCollection();
+        $this->corbeilleMessage = false;
+        $this->messageLu = false;
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idmessage", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var string $titreMessage
-     * #[ORM\Column(name="titreMessage",type="string",length=100)]
-     * #[Assert\NotBlank(message="Le titre du message ne peut être vide! ")]
-     * @Assert\MinLength(2)
-     */
-    private $titreMessage;
-
-    /**
-     * @var text $contenuMessage
-     * #[ORM\Column(name="contenuMessage",type="text",nullable=true)]
-     * @Assert\MinLength(2)
-     */
-    private $contenuMessage;
-
-    /**
-     * @var Internaute $internaute
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Internaute::class, inversedBy="messages", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="mailinternaute", referencedColumnName="mailinternaute")
-     * })
-     */
-    private $internaute;
-
-    /**
-     * @var integer $corbeilleMessage
-     * #[ORM\Column(name="corbeilleMessage",type="integer")]
-     */
-    private $corbeilleMessage;
-
-    /**
-     * @var integer $messageLu
-     * #[ORM\Column(name="messageLu",type="integer")]
-     */
-    private $messageLu;
-
-    /**
-     * @var Service $service
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Service::class, inversedBy="messages", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idservice", referencedColumnName="idservice")
-     * })
-     */
-    private $service;
-
-    /**
-     * @var Objet $objet
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Objet::class, inversedBy="messages", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idobjet", referencedColumnName="idobjet")
-     * })
-     */
-    private $objet;
-
-    /**
-     * @var string $dateEnvoi
-     * #[ORM\Column(name="dateenvoi",type="datetime")]
-     * @Assert\MinLength(2)
-     */
-    private $dateEnvoi;
-
-    /**
-     * @var ArrayCollection MessageReponse $messagereponses
-     * #[ORM\OneToMany(targetEntity: App\Entity\MessageReponse::class, mappedBy="Message" )]
-     * 
-     */
-    private $messagereponses;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Nom et type retour standardisés
+    {
         return $this->id;
     }
 
-    /**
-     * Set titreMessage
-     *
-     * @param string $titreMessage
-     * @return Message
-     */
-    public function setTitreMessage(string $titreMessage): self {
-        $this->titreMessage = $titreMessage;
-
-        return $this;
-    }
-
-    /**
-     * Get titreMessage
-     *
-     * @return string 
-     */
-    public function getTitreMessage(): ?string {
+    public function getTitreMessage(): ?string
+    {
         return $this->titreMessage;
     }
 
-    /**
-     * Set contenuMessage
-     *
-     * @param text $contenuMessage
-     * @return Message
-     */
-    public function setContenuMessage(string $contenuMessage): self {
-        $this->contenuMessage = $contenuMessage;
-
+    public function setTitreMessage(string $titreMessage): self
+    {
+        $this->titreMessage = $titreMessage;
         return $this;
     }
 
-    /**
-     * Get contenuMessage
-     *
-     * @return text 
-     */
-    public function getContenuMessage(): ?string {
-        return $this->contenuMessage;
+    public function getContenu(): ?string
+    {
+        return $this->contenu;
     }
 
-    /**
-     * Set corbeilleMessage
-     *
-     * @param integer $corbeilleMessage
-     * @return Message
-     */
-    public function setCorbeilleMessage(string $corbeilleMessage): self {
-        $this->corbeilleMessage = $corbeilleMessage;
-
+    public function setContenu(string $contenu): self
+    {
+        $this->contenu = $contenu;
         return $this;
     }
 
-    /**
-     * Get corbeilleMessage
-     *
-     * @return integer 
-     */
-    public function getCorbeilleMessage(): ?string {
-        return $this->corbeilleMessage;
-    }
-
-    /**
-     * Set dateEnvoi
-     *
-     * @param \DateTime $dateEnvoi
-     * @return Message
-     */
-    public function setDateEnvoi(string $dateEnvoi): self {
-        $this->dateEnvoi = $dateEnvoi;
-
-        return $this;
-    }
-
-    /**
-     * Get dateEnvoi
-     *
-     * @return \DateTime 
-     */
-    public function getDateEnvoi(): ?string {
+    public function getDateEnvoi(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->dateEnvoi;
     }
 
-    /**
-     * Set internaute
-     *
-     * @param \App\Entity\Internaute $internaute
-     * @return Message
-     */
-    public function setInternaute(\App\Entity\Internaute $internaute = null) {
-        $this->internaute = $internaute;
+    // Setter retiré car défini à la construction
+    // public function setDateEnvoi(DateTimeImmutable $dateEnvoi): self
+    // {
+    //     $this->dateEnvoi = $dateEnvoi;
+    //     return $this;
+    // }
 
+    public function isCorbeilleMessage(): ?bool
+    {
+        return $this->corbeilleMessage;
+    }
+
+    public function setCorbeilleMessage(bool $corbeilleMessage): self
+    {
+        $this->corbeilleMessage = $corbeilleMessage;
         return $this;
     }
 
-    /**
-     * Get internaute
-     *
-     * @return \App\Entity\Internaute 
-     */
-    public function getInternaute(): ?string {
-        return $this->internaute;
-    }
-
-    /**
-     * Set service
-     *
-     * @param \App\Entity\Service $service
-     * @return Message
-     */
-    public function setService(\App\Entity\Service $service = null) {
-        $this->service = $service;
-
-        return $this;
-    }
-
-    /**
-     * Get service
-     *
-     * @return \App\Entity\Service 
-     */
-    public function getService(): ?string {
-        return $this->service;
-    }
-
-    /**
-     * Set objet
-     *
-     * @param \App\Entity\Objet $objet
-     * @return Message
-     */
-    public function setObjet(\App\Entity\Objet $objet = null) {
-        $this->objet = $objet;
-
-        return $this;
-    }
-
-    /**
-     * Get objet
-     *
-     * @return \App\Entity\Objet 
-     */
-    public function getObjet(): ?string {
-        return $this->objet;
-    }
-
-    /**
-     * Add messagereponses
-     *
-     * @param \App\Entity\MessageReponse $messagereponses
-     * @return Message
-     */
-    public function addMessagereponse(\App\Entity\MessageReponse $messagereponses) {
-        $this->messagereponses[] = $messagereponses;
-
-        return $this;
-    }
-
-    /**
-     * Remove messagereponses
-     *
-     * @param \App\Entity\MessageReponse $messagereponses
-     */
-    public function removeMessagereponse(\App\Entity\MessageReponse $messagereponses) {
-        $this->messagereponses->removeElement($messagereponses);
-    }
-
-    /**
-     * Get messagereponses
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMessagereponses(): ?string {
-        return $this->messagereponses;
-    }
-
-    /**
-     * Set messageLu
-     *
-     * @param integer $messageLu
-     * @return Message
-     */
-    public function setMessageLu(string $messageLu): self {
-        $this->messageLu = $messageLu;
-
-        return $this;
-    }
-
-    /**
-     * Get messageLu
-     *
-     * @return integer 
-     */
-    public function getMessageLu(): ?string {
+    public function isMessageLu(): ?bool
+    {
         return $this->messageLu;
     }
 
+    public function setMessageLu(bool $messageLu): self
+    {
+        $this->messageLu = $messageLu;
+        return $this;
+    }
+
+    public function getInternaute(): ?Internaute
+    {
+        return $this->internaute;
+    }
+
+    public function setInternaute(?Internaute $internaute): self
+    {
+        $this->internaute = $internaute;
+        return $this;
+    }
+
+    public function getService(): ?Service
+    {
+        return $this->service;
+    }
+
+    public function setService(?Service $service): self
+    {
+        $this->service = $service;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MessageReponse>
+     */
+    public function getMessageReponses(): Collection
+    {
+        return $this->messageReponses;
+    }
+
+    public function addMessageReponse(MessageReponse $messageReponse): self
+    {
+        if (!$this->messageReponses->contains($messageReponse)) {
+            $this->messageReponses->add($messageReponse);
+            $messageReponse->setMessage($this); // Mise à jour du côté propriétaire
+        }
+        return $this;
+    }
+
+    public function removeMessageReponse(MessageReponse $messageReponse): self
+    {
+        if ($this->messageReponses->removeElement($messageReponse)) {
+            // Mettre le côté propriétaire à null si nécessaire (géré par orphanRemoval si non null)
+            if ($messageReponse->getMessage() === $this) {
+                $messageReponse->setMessage(null);
+            }
+        }
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->titreMessage ?? 'Message #' . $this->id;
+    }
 }

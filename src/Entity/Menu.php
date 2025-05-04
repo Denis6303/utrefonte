@@ -2,331 +2,321 @@
 
 namespace App\Entity;
 
+use App\Repository\MenuRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;      // Importer Types
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo; // Importer Gedmo
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\Article;
+// use App\Entity\GroupeMenu;
 
 /**
- * #[ORM\Entity](repositoryClass="App\Entity\MenuRepository")
- * #[ORM\Table(name="menu")]
+ * Entité représentant un élément de menu.
  */
-class Menu {
+#[ORM\Entity(repositoryClass: MenuRepository::class)]
+#[ORM\Table(name: 'menu')]
+#[ORM\HasLifecycleCallbacks] // Ajouter si PreUpdate est utilisé
+class Menu
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idmenu', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    function __construct() {
-        $this->menuDateAjout = new \Datetime();
+    /**
+     * Libellé du menu (traduisible).
+     * @var string|null
+     */
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'libmenu', type: Types::STRING, length: 50)]
+    #[Assert\NotBlank(message: "Le libellé du menu ne peut être vide.", groups: ['translatable_validation'])] // Valider si besoin par langue
+    #[Assert\Length(
+        min: 2,
+        max: 50, // Correspond à la longueur ORM
+        minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libMenu = null;
+
+    /**
+     * Type de menu (ex: 1=Article, 2=Externe, 3=Groupeur...).
+     */
+    #[ORM\Column(name: 'typemenu', type: Types::INTEGER)]
+    #[Assert\NotNull(message: "Le type de menu est obligatoire.")]
+    // Optionnel: #[Assert\Choice(choices: [1, 2, 3], message: "Type de menu invalide.")]
+    private ?int $typeMenu = null;
+
+    /**
+     * URL externe si typeMenu = 2.
+     */
+    #[ORM\Column(name: 'urlexternemenu', type: Types::STRING, length: 255, nullable: true)] // Longueur augmentée, nullable
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "L'URL externe doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "L'URL externe ne doit pas dépasser {{ limit }} caractères."
+    )]
+    #[Assert\Url(message: "L'URL externe '{{ value }}' n'est pas une URL valide.", groups: ['external_link_check'])] // Valider seulement si typeMenu=2 (via groups)
+    private ?string $urlExterneMenu = null;
+
+    /**
+     * ID de l'utilisateur ayant ajouté. Relation ManyToOne serait mieux.
+     */
+    #[ORM\Column(name: 'menuajoutpar', type: Types::INTEGER, nullable: true)] // Rendu nullable
+    private ?int $menuAjoutPar = null;
+
+    #[ORM\Column(name: 'menudateAjout', type: Types::DATETIME_IMMUTABLE)] // Nom de colonne corrigé?
+    #[Assert\NotNull] // Initialisé dans constructeur
+    private ?DateTimeImmutable $menuDateAjout = null; // Changé en DateTimeImmutable
+
+    /**
+     * ID de l'utilisateur ayant modifié. Relation ManyToOne serait mieux.
+     */
+    #[ORM\Column(name: 'menumodifpar', type: Types::INTEGER, nullable: true)]
+    private ?int $menuModifPar = null;
+
+    #[ORM\Column(name: 'menudatemodif', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Changé en DATETIME_IMMUTABLE
+    private ?DateTimeImmutable $menuDateModif = null; // Sera défini dans PreUpdate
+
+
+    /**
+     * Locale utilisée pour les traductions Gedmo (non mappée).
+     * @var string|null
+     */
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+
+    // --- RELATIONS ---
+
+    /**
+     * Article lié (si typeMenu = 1).
+     */
+    #[ORM\ManyToOne(targetEntity: Article::class, inversedBy: 'menu')] // Note: inversedBy='menu' (singulier)? Vérifiez dans Article.
+    #[ORM\JoinColumn(name: 'idarticle', referencedColumnName: 'idarticle', nullable: true)] // Doit être nullable
+    private ?Article $article = null;
+
+    /**
+     * Groupe auquel ce menu appartient.
+     */
+    #[ORM\ManyToOne(targetEntity: GroupeMenu::class, inversedBy: 'menus')] // inversedBy='menus' (pluriel) semble correct
+    #[ORM\JoinColumn(name: 'idgroupemenu', referencedColumnName: 'idgroupemenu', nullable: true)] // Rendre nullable si un menu peut être orphelin
+    private ?GroupeMenu $groupeMenu = null;
+
+    /**
+     * Relation réflexive pour la hiérarchie des menus (Parent).
+     */
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'idparentmenu', referencedColumnName: 'idmenu', nullable: true)] // Utilise idmenu de cette entité
+    private ?Menu $parent = null; // Remplace l'ancien $idParentMenu (integer)
+
+    /**
+     * Relation réflexive pour la hiérarchie des menus (Enfants).
+     * @var Collection<int, Menu>
+     */
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $children;
+
+
+    public function __construct()
+    {
+        $this->menuDateAjout = new DateTimeImmutable();
+        $this->children = new ArrayCollection();
     }
 
-    /**
-     * @var Article $article
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Article::class, inversedBy="menus", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idarticle", referencedColumnName="idarticle")
-     * })
-     */
-    private $article;
-
-    /**
-     * @var GroupeMenu $groupeMenu
-     * #[ORM\ManyToOne(targetEntity: App\Entity\GroupeMenu::class, inversedBy="menus", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idgroupemenu", referencedColumnName="idgroupemenu")
-     * })
-     */
-    private $groupeMenu;
-
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idmenu", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @Gedmo\Translatable
-     * @var string $libMenu
-     * #[ORM\Column(name="libmenu",type="string",length=50)]
-     * #[Assert\NotBlank(message="Ce champ ne peut être vide")]
-     * @Assert\MinLength(2)
-     */
-    private $libMenu;
-
-    /**
-     * @var integer $typeMenu
-     * #[ORM\Column(name="typemenu",type="integer")]
-     * #[Assert\NotBlank()]
-     */
-    private $typeMenu;
-
-    /**
-     * @var integer $idParentMenu
-     * #[ORM\Column(name="idparentmenu",type="integer")]
-     * #[Assert\NotBlank()]
-     */
-    private $idParentMenu;
-
-    /**
-     * @var string $urlExterneMenu
-     * #[ORM\Column(name="urlexternemenu",type="string",length=80)]
-     * @Assert\MinLength(3)
-     */
-    private $urlExterneMenu;
-
-    /**
-     * @var integer $menuAjoutPar
-     * #[ORM\Column(name="menuajoutpar",type="integer", nullable=true)]
-     * #[Assert\NotBlank()]
-     */
-    private $menuAjoutPar;
-
-    /**
-     * @var datetime $menuDateAjout
-     * #[ORM\Column(name="menudateAjout",type="datetime")]
-     * #[Assert\NotBlank()]
-     */
-    private $menuDateAjout;
-
-    /**
-     * @var datetime $menuDateModif
-     * #[ORM\Column(name="menudatemodif",type="datetime", nullable=true)]
-     */
-    private $menuDateModif;
-
-    /**
-     * @var intger $menuModifPar
-     * #[ORM\Column(name="menumodifpar",type="integer", nullable=true)]
-     */
-    private $menuModifPar;
-
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    private $locale;
-
-    public function setTranslatableLocale(string $locale): self {
-        $this->locale = $locale;
+    #[ORM\PreUpdate]
+    public function setTimestampsOnUpdate(): void
+    {
+        $this->menuDateModif = new DateTimeImmutable();
+        // On pourrait aussi définir menuModifPar ici si l'utilisateur est accessible
     }
 
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    // --- GETTERS & SETTERS ---
+
+    public function getId(): ?int // Type retour standardisé
+    {
         return $this->id;
     }
 
-    /**
-     * Set libMenu
-     *
-     * @param string $libMenu
-     * @return Menu
-     */
-    public function setLibMenu(string $libMenu): self {
-        $this->libMenu = $libMenu;
-
-        return $this;
-    }
-
-    /**
-     * Get libMenu
-     *
-     * @return string 
-     */
-    public function getLibMenu(): ?string {
+    public function getLibMenu(): ?string
+    {
         return $this->libMenu;
     }
 
-    /**
-     * Set typeMenu
-     *
-     * @param integer $typeMenu
-     * @return Menu
-     */
-    public function setTypeMenu(string $typeMenu): self {
-        $this->typeMenu = $typeMenu;
-
+    public function setLibMenu(string $libMenu): self
+    {
+        $this->libMenu = $libMenu;
         return $this;
     }
 
-    /**
-     * Get typeMenu
-     *
-     * @return integer 
-     */
-    public function getTypeMenu(): ?string {
+    public function getTypeMenu(): ?int // Type retour corrigé
+    {
         return $this->typeMenu;
     }
 
-    /**
-     * Set idParentMenu
-     *
-     * @param integer $idParentMenu
-     * @return Menu
-     */
-    public function setIdParentMenu(string $idParentMenu): self {
-        $this->idParentMenu = $idParentMenu;
-
+    public function setTypeMenu(int $typeMenu): self // Type param corrigé
+    {
+        $this->typeMenu = $typeMenu;
         return $this;
     }
 
-    /**
-     * Get idParentMenu
-     *
-     * @return integer 
-     */
-    public function getIdParentMenu(): ?string {
-        return $this->idParentMenu;
-    }
-
-    /**
-     * Set urlExterneMenu
-     *
-     * @param string $urlExterneMenu
-     * @return Menu
-     */
-    public function setUrlExterneMenu(string $urlExterneMenu): self {
-        $this->urlExterneMenu = $urlExterneMenu;
-
-        return $this;
-    }
-
-    /**
-     * Get urlExterneMenu
-     *
-     * @return string 
-     */
-    public function getUrlExterneMenu(): ?string {
+    public function getUrlExterneMenu(): ?string
+    {
         return $this->urlExterneMenu;
     }
 
-    /**
-     * Set menuAjoutPar
-     *
-     * @param integer $menuAjoutPar
-     * @return Menu
-     */
-    public function setMenuAjoutPar(string $menuAjoutPar): self {
-        $this->menuAjoutPar = $menuAjoutPar;
-
+    public function setUrlExterneMenu(?string $urlExterneMenu): self // Accepte null
+    {
+        $this->urlExterneMenu = $urlExterneMenu;
         return $this;
     }
 
-    /**
-     * Get menuAjoutPar
-     *
-     * @return integer 
-     */
-    public function getMenuAjoutPar(): ?string {
+    public function getMenuAjoutPar(): ?int // Type retour corrigé
+    {
         return $this->menuAjoutPar;
     }
 
-    /**
-     * Set menuDateAjout
-     *
-     * @param \DateTime $menuDateAjout
-     * @return Menu
-     */
-    public function setMenuDateAjout(string $menuDateAjout): self {
-        $this->menuDateAjout = $menuDateAjout;
-
+    public function setMenuAjoutPar(?int $menuAjoutPar): self // Accepte null
+    {
+        $this->menuAjoutPar = $menuAjoutPar;
         return $this;
     }
 
-    /**
-     * Get menuDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getMenuDateAjout(): ?string {
+    public function getMenuDateAjout(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->menuDateAjout;
     }
 
-    /**
-     * Set menuDateModif
-     *
-     * @param \DateTime $menuDateModif
-     * @return Menu
-     */
-    public function setMenuDateModif(string $menuDateModif): self {
-        $this->menuDateModif = $menuDateModif;
+    // Setter pour menuDateAjout retiré (défini à la construction)
 
-        return $this;
-    }
-
-    /**
-     * Get menuDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getMenuDateModif(): ?string {
+    public function getMenuDateModif(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->menuDateModif;
     }
 
-    /**
-     * Set menuModifPar
-     *
-     * @param integer $menuModifPar
-     * @return Menu
-     */
-    public function setMenuModifPar(string $menuModifPar): self {
-        $this->menuModifPar = $menuModifPar;
+     // Setter pour menuDateModif retiré (défini par PreUpdate)
 
-        return $this;
-    }
-
-    /**
-     * Get menuModifPar
-     *
-     * @return integer 
-     */
-    public function getMenuModifPar(): ?string {
+    public function getMenuModifPar(): ?int // Type retour corrigé
+    {
         return $this->menuModifPar;
     }
 
-    /**
-     * Set article
-     *
-     * @param \App\Entity\Article $article
-     * @return Menu
-     */
-    public function setArticle(\App\Entity\Article $article = null) {
-        $this->article = $article;
-
+    public function setMenuModifPar(?int $menuModifPar): self // Accepte null
+    {
+        $this->menuModifPar = $menuModifPar;
         return $this;
     }
 
-    /**
-     * Get article
-     *
-     * @return \App\Entity\Article 
-     */
-    public function getArticle(): ?string {
+    // --- Relations ---
+
+    public function getArticle(): ?Article // Type retour corrigé
+    {
         return $this->article;
     }
 
-    /**
-     * Set groupeMenu
-     *
-     * @param \App\Entity\GroupeMenu $groupeMenu
-     * @return Menu
-     */
-    public function setGroupeMenu(\App\Entity\GroupeMenu $groupeMenu = null) {
-        $this->groupeMenu = $groupeMenu;
+    public function setArticle(?Article $article): self // Type param corrigé
+    {
+        $this->article = $article;
+        return $this;
+    }
 
+    public function getGroupeMenu(): ?GroupeMenu // Type retour corrigé
+    {
+        return $this->groupeMenu;
+    }
+
+    public function setGroupeMenu(?GroupeMenu $groupeMenu): self // Type param corrigé
+    {
+        $this->groupeMenu = $groupeMenu;
+        return $this;
+    }
+
+    // --- Hiérarchie (Parent/Enfants) ---
+
+    public function getParent(): ?self // Retourne un objet Menu ou null
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): self // Accepte un objet Menu ou null
+    {
+        $this->parent = $parent;
         return $this;
     }
 
     /**
-     * Get groupeMenu
-     *
-     * @return \App\Entity\GroupeMenu 
+     * @return Collection<int, Menu>
      */
-    public function getGroupeMenu(): ?string {
-        return $this->groupeMenu;
+    public function getChildren(): Collection
+    {
+        return $this->children;
     }
 
+    public function addChild(self $child): self // Accepte un objet Menu
+    {
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
+            $child->setParent($this); // Met à jour le côté propriétaire
+        }
+        return $this;
+    }
+
+    public function removeChild(self $child): self // Accepte un objet Menu
+    {
+        if ($this->children->removeElement($child)) {
+            // Mettre le côté propriétaire à null (important pour orphanRemoval)
+            if ($child->getParent() === $this) {
+                $child->setParent(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get idParentMenu (déprécié - utiliser getParent()->getId() si nécessaire)
+     * Conservé pour compatibilité potentielle, mais à éviter.
+     * @return integer|null
+     * @deprecated Use getParent() instead.
+     */
+    public function getIdParentMenu(): ?int
+    {
+        trigger_deprecation('app', '6.0', 'Method "%s()" is deprecated, use "getParent()->getId()" instead.', __METHOD__);
+        return $this->parent?->getId();
+    }
+
+    /**
+     * Set idParentMenu (déprécié - utiliser setParent() avec un objet Menu)
+     * @param integer|null $idParentMenu
+     * @return Menu
+     * @deprecated Use setParent() instead.
+     */
+    public function setIdParentMenu(?int $idParentMenu): self
+    {
+         trigger_deprecation('app', '6.0', 'Method "%s()" is deprecated, use "setParent()" instead.', __METHOD__);
+        // Cette méthode ne peut pas fonctionner correctement sans injecter l'EntityManager
+        // pour trouver le Menu parent par ID. Il est préférable de ne pas l'utiliser.
+        // Pour la compatibilité la plus simple, on pourrait la laisser ne rien faire
+        // ou lever une exception.
+        // throw new \LogicException('Setting parent by ID is deprecated and not supported directly. Use setParent(Menu $parent).');
+        return $this; // Ne fait rien pour éviter les erreurs mais signale la dépréciation.
+    }
+
+
+    // --- Gestionnaire de locale Gedmo ---
+    public function setTranslatableLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->libMenu ?? 'Menu #' . $this->id;
+    }
 }

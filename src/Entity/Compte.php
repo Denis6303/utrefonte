@@ -2,376 +2,133 @@
 
 namespace App\Entity;
 
+use App\Repository\CompteRepository; // Importer le Repository
+use Doctrine\DBAL\Types\Types; // Importer Types pour les types de colonnes
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+// Les imports pour TypeCompte et Abonne sont implicites s'ils sont dans le même namespace,
+// mais il est bon de les ajouter si ce n'est pas le cas.
+// use App\Entity\TypeCompte;
+// use App\Entity\Abonne;
 
-/**
- * #[ORM\Entity]
- * #[ORM\Entity](repositoryClass="App\Entity\CompteRepository")
- * #[ORM\Table(name="compte")]
- */
-class Compte {
+#[ORM\Entity(repositoryClass: CompteRepository::class)]
+#[ORM\Table(name: 'compte')]
+class Compte
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idcompte', type: Types::INTEGER)] // Utilisation de Types::INTEGER
+    private ?int $idCompte = null;
 
-    public function __construct() {
-        
-    }
+    #[ORM\Column(name: 'numerocompte', type: Types::STRING, length: 20, unique: true)] // Un numéro de compte devrait être unique
+    #[Assert\NotBlank(message: "Le numéro de compte est obligatoire.")]
+    #[Assert\Length(
+        max: 20,
+        maxMessage: "Le numéro de compte ne doit pas dépasser {{ limit }} caractères."
+    )]
+    // Ajoutez d'autres assertions si nécessaire (ex: Regex pour le format)
+    private ?string $numeroCompte = null;
 
-    /**
-     * 
-     * @var string $numeroCompte
-     * #[ORM\Id]
-     * #[ORM\Column(name="numerocompte", type="string",length=20)]	
-     */
-    private $numeroCompte;
+    #[ORM\Column(name: 'libellecompte', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé du compte est obligatoire.")]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libelleCompte = null;
 
-    /**
-     * #[ORM\Column(name="datecreation", type="datetime")]
-     * @var string $dateCreation 
-     */
-    private $dateCreation;
-
-    /**
-     * @var integer $etatCompte
-     * #[ORM\Column(name="etatcompte", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $etatCompte;
-
-    /**
-     * @var TypeCompte $typeCompte
-     * #[ORM\ManyToOne(targetEntity: App\Entity\TypeCompte::class, inversedBy="comptes", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idtypecompte", referencedColumnName="idtypecompte")
-     * })
-     */
-    private $typeCompte;
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     /**
-     * @var CategorieCompte $categorieCompte
-     * #[ORM\ManyToOne(targetEntity: App\Entity\CategorieCompte::class, inversedBy="comptes", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="codecategorie", referencedColumnName="codecategorie")
-     * })
+     * Relation vers le Type de Compte.
+     * Supposons qu'un compte DOIT avoir un type.
+     * 'comptes' est la propriété dans TypeCompte qui référence cette entité (inversedBy).
      */
-    private $categorieCompte;
+    #[ORM\ManyToOne(targetEntity: TypeCompte::class, inversedBy: 'comptes')] // Ajout de inversedBy
+    #[ORM\JoinColumn(name: 'idtypecompte', referencedColumnName: 'idtypecompte', nullable: false)] // Rendu non nullable
+    #[Assert\NotNull(message: "Le type de compte est obligatoire.")] // Validation ajoutée
+    private ?TypeCompte $typeCompte = null;
 
     /**
-     * @var integer $facturation
-     * #[ORM\Column(name="facturation", type="integer")]
-     * #[Assert\NotBlank()]  
+     * Relation vers l'Abonné propriétaire du compte.
+     * Supposons qu'un compte DOIT avoir un abonné.
+     * 'comptes' est la propriété dans Abonne qui référence cette entité (inversedBy).
      */
-    private $facturation;
+    #[ORM\ManyToOne(targetEntity: Abonne::class, inversedBy: 'comptes')] // Ajout de inversedBy
+    #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne', nullable: false)] // Rendu non nullable
+    #[Assert\NotNull(message: "L'abonné est obligatoire.")] // Validation ajoutée
+    private ?Abonne $abonne = null;
 
-    /**
-     * @var ArrayCollection Operation $operations
-     * #[ORM\OneToMany(targetEntity: App\Entity\Operation::class, mappedBy="compte" )]
-     * 
-     */
-    private $operations;
+    // Pas de constructeur nécessaire si pas d'initialisation spécifique
 
-    /**
-     * @var ArrayCollection SoldeCompte $soldeComptes
-     * #[ORM\OneToMany(targetEntity: App\Entity\SoldeCompte::class, mappedBy="compte" )]
-     * 
-     */
-    private $soldeComptes;	
-	
-    /**
-     * @var Fonds $fonds
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Fonds::class, inversedBy="comptes", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idfonds", referencedColumnName="idfonds")
-     * })
-     */
-    private $fonds;
-
-    /**
-     * @var Abonne $abonne
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Abonne::class, inversedBy="comptes", cascade={"persist","merge"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idabonne", referencedColumnName="idabonne")
-     * })
-     */
-    private $abonne;
-
-    /**
-     * 
-     * @var string $numRib
-     * #[ORM\Column(name="numrib", type="string",length=30,nullable=true)]	
-     */
-    private $numRib;
-
-
-    /**
-     * Set numeroCompte
-     *
-     * @param string $numeroCompte
-     * @return Compte
-     */
-    public function setNumeroCompte(string $numeroCompte): self
+    public function getIdCompte(): ?int
     {
-        $this->numeroCompte = $numeroCompte;
-    
-        return $this;
+        return $this->idCompte;
     }
 
-    /**
-     * Get numeroCompte
-     *
-     * @return string 
-     */
+    // Pas de setIdCompte car c'est un ID auto-généré
+
     public function getNumeroCompte(): ?string
     {
         return $this->numeroCompte;
     }
 
-    /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     * @return Compte
-     */
-    public function setDateCreation(string $dateCreation): self
+    public function setNumeroCompte(string $numeroCompte): self
     {
-        $this->dateCreation = $dateCreation;
-    
+        $this->numeroCompte = $numeroCompte;
         return $this;
     }
 
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime 
-     */
-    public function getDateCreation(): ?string
+    public function getLibelleCompte(): ?string
     {
-        return $this->dateCreation;
+        return $this->libelleCompte;
     }
 
-    /**
-     * Set etatCompte
-     *
-     * @param integer $etatCompte
-     * @return Compte
-     */
-    public function setEtatCompte(string $etatCompte): self
+    public function setLibelleCompte(string $libelleCompte): self
     {
-        $this->etatCompte = $etatCompte;
-    
+        $this->libelleCompte = $libelleCompte;
         return $this;
     }
 
-    /**
-     * Get etatCompte
-     *
-     * @return integer 
-     */
-    public function getEtatCompte(): ?string
+    public function getDescription(): ?string
     {
-        return $this->etatCompte;
+        return $this->description;
     }
 
-    /**
-     * Set facturation
-     *
-     * @param integer $facturation
-     * @return Compte
-     */
-    public function setFacturation(string $facturation): self
+    public function setDescription(?string $description): self
     {
-        $this->facturation = $facturation;
-    
+        $this->description = $description;
         return $this;
     }
 
-    /**
-     * Get facturation
-     *
-     * @return integer 
-     */
-    public function getFacturation(): ?string
-    {
-        return $this->facturation;
-    }
-
-    /**
-     * Set numRib
-     *
-     * @param string $numRib
-     * @return Compte
-     */
-    public function setNumRib(string $numRib): self
-    {
-        $this->numRib = $numRib;
-    
-        return $this;
-    }
-
-    /**
-     * Get numRib
-     *
-     * @return string 
-     */
-    public function getNumRib(): ?string
-    {
-        return $this->numRib;
-    }
-
-    /**
-     * Set typeCompte
-     *
-     * @param \App\Entity\TypeCompte $typeCompte
-     * @return Compte
-     */
-    public function setTypeCompte(\App\Entity\TypeCompte $typeCompte = null)
-    {
-        $this->typeCompte = $typeCompte;
-    
-        return $this;
-    }
-
-    /**
-     * Get typeCompte
-     *
-     * @return \App\Entity\TypeCompte 
-     */
-    public function getTypeCompte(): ?string
+    public function getTypeCompte(): ?TypeCompte
     {
         return $this->typeCompte;
     }
 
-    /**
-     * Set categorieCompte
-     *
-     * @param \App\Entity\CategorieCompte $categorieCompte
-     * @return Compte
-     */
-    public function setCategorieCompte(\App\Entity\CategorieCompte $categorieCompte = null)
+    // Le paramètre ne peut plus être null si nullable=false
+    public function setTypeCompte(TypeCompte $typeCompte): self
     {
-        $this->categorieCompte = $categorieCompte;
-    
+        $this->typeCompte = $typeCompte;
         return $this;
     }
 
-    /**
-     * Get categorieCompte
-     *
-     * @return \App\Entity\CategorieCompte 
-     */
-    public function getCategorieCompte(): ?string
-    {
-        return $this->categorieCompte;
-    }
-
-    /**
-     * Add operations
-     *
-     * @param \App\Entity\Operation $operations
-     * @return Compte
-     */
-    public function addOperation(\App\Entity\Operation $operations)
-    {
-        $this->operations[] = $operations;
-    
-        return $this;
-    }
-
-    /**
-     * Remove operations
-     *
-     * @param \App\Entity\Operation $operations
-     */
-    public function removeOperation(\App\Entity\Operation $operations)
-    {
-        $this->operations->removeElement($operations);
-    }
-
-    /**
-     * Get operations
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getOperations(): ?string
-    {
-        return $this->operations;
-    }
-
-    /**
-     * Add soldeComptes
-     *
-     * @param \App\Entity\SoldeCompte $soldeComptes
-     * @return Compte
-     */
-    public function addSoldeCompte(\App\Entity\SoldeCompte $soldeComptes)
-    {
-        $this->soldeComptes[] = $soldeComptes;
-    
-        return $this;
-    }
-
-    /**
-     * Remove soldeComptes
-     *
-     * @param \App\Entity\SoldeCompte $soldeComptes
-     */
-    public function removeSoldeCompte(\App\Entity\SoldeCompte $soldeComptes)
-    {
-        $this->soldeComptes->removeElement($soldeComptes);
-    }
-
-    /**
-     * Get soldeComptes
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getSoldeComptes(): ?string
-    {
-        return $this->soldeComptes;
-    }
-
-    /**
-     * Set fonds
-     *
-     * @param \App\Entity\Fonds $fonds
-     * @return Compte
-     */
-    public function setFonds(\App\Entity\Fonds $fonds = null)
-    {
-        $this->fonds = $fonds;
-    
-        return $this;
-    }
-
-    /**
-     * Get fonds
-     *
-     * @return \App\Entity\Fonds 
-     */
-    public function getFonds(): ?string
-    {
-        return $this->fonds;
-    }
-
-    /**
-     * Set abonne
-     *
-     * @param \App\Entity\Abonne $abonne
-     * @return Compte
-     */
-    public function setAbonne(\App\Entity\Abonne $abonne = null)
-    {
-        $this->abonne = $abonne;
-    
-        return $this;
-    }
-
-    /**
-     * Get abonne
-     *
-     * @return \App\Entity\Abonne 
-     */
-    public function getAbonne(): ?string
+    public function getAbonne(): ?Abonne
     {
         return $this->abonne;
+    }
+
+     // Le paramètre ne peut plus être null si nullable=false
+    public function setAbonne(Abonne $abonne): self
+    {
+        $this->abonne = $abonne;
+        return $this;
+    }
+
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        return $this->libelleCompte . ' (' . $this->numeroCompte . ')' ?? 'Compte #' . $this->idCompte;
     }
 }

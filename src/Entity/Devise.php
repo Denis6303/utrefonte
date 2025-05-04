@@ -2,326 +2,332 @@
 
 namespace App\Entity;
 
+use App\Repository\DeviseRepository; // Importer Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types; // Importer Types
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File; // Importer File
+use Symfony\Component\HttpFoundation\File\UploadedFile; // Importer UploadedFile
+use Symfony\Component\Validator\Constraints as Assert; // Importer Assert
 
-/**
- * #[ORM\Entity]
- * #[ORM\Entity](repositoryClass="App\Entity\DeviseRepository")
- * #[ORM\Table(name="devise")]
- * @ORM\HasLifecycleCallbacks 
- *
- */
-class Devise {
+#[ORM\Entity(repositoryClass: DeviseRepository::class)]
+#[ORM\Table(name: 'devise')]
+#[ORM\HasLifecycleCallbacks] // Conserver pour la gestion de l'icône (même si déconseillé ici)
+class Devise
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'iddevise', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private
 
-    public function __construct() {
-        $this->setAffiche = 0;
+    #[ORM\Column(name: 'codedevise', type: Types::STRING, length: 5, unique: true)] // Code devrait être unique
+    #[Assert\NotBlank(message: "Le code devise est obligatoire.")]
+    #[Assert\Length(
+        min: 3, max: 5, // Longueur standard pour codes ISO (ex: EUR, USD)
+        minMessage: "Le code devise doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le code devise ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $codeDevise = null;
+
+    #[ORM\Column(name: 'libdevise', type: Types::STRING, length: 40)]
+    #[Assert\NotBlank(message: "Le libellé est obligatoire.")]
+    #[Assert\Length(max: 40, maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères.")]
+    private ?string $libDevise = null;
+
+    /**
+     * Taux de change VENTE par rapport à la devise locale (ex: 1 EUR = X LOCAL).
+     * Utiliser DECIMAL pour la précision monétaire.
+     */
+    #[ORM\Column(name: 'valdeviselocal', type: Types::DECIMAL, precision: 15, scale: 5, nullable: true)] // DECIMAL(15,5) par exemple
+    #[Assert\Type(type: "numeric", message: "La valeur doit être numérique.")]
+    #[Assert\PositiveOrZero(message: "La valeur doit être positive ou zéro.")]
+    private ?string $valDeviseLocal = null; // Gardé en string pour correspondre à DECIMAL, mais pourrait être float
+
+    /**
+     * Taux de change ACHAT par rapport à la devise locale.
+     * Utiliser DECIMAL pour la précision monétaire.
+     */
+    #[ORM\Column(name: 'valdeviselocalachat', type: Types::DECIMAL, precision: 15, scale: 5, nullable: true)] // Rendue nullable pour cohérence, DECIMAL
+    #[Assert\Type(type: "numeric", message: "La valeur doit être numérique.")]
+    #[Assert\PositiveOrZero(message: "La valeur doit être positive ou zéro.")]
+    private ?string $valDeviseLocalAchat = null; // Gardé en string
+
+    /**
+     * Indique si c'est la devise locale de référence (une seule devrait l'être).
+     */
+    #[ORM\Column(name: 'locale', type: Types::BOOLEAN)]
+    #[Assert\NotNull]
+    private ?bool $siLocale = false; // Initialisé à false
+
+    /**
+     * Indique si la devise doit être affichée/utilisable.
+     */
+    #[ORM\Column(name: 'affiche', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $affiche = false; // Initialisé à false
+
+    /**
+     * Chemin relatif vers l'icône de la devise (drapeau).
+     */
+    #[ORM\Column(name: 'urlicone', type: Types::STRING, length: 255, nullable: true)] // Longueur augmentée
+    private ?string $urlIcone = null;
+
+    /**
+     * Propriété temporaire pour l'upload de l'icône. Non mappée.
+     * @var File|null
+     */
+    #[Assert\File(
+        maxSize: "2M", // Taille raisonnable pour une icône
+        mimeTypes: ["image/png", "image/jpeg", "image/gif", "image/svg+xml"], // Types MIME courants pour icônes/drapeaux
+        mimeTypesMessage: "Format d'image invalide. Types autorisés : {{ types }}."
+    )]
+    private ?File $icone = null;
+
+    /**
+     * @var Collection<int, Operation> Opérations liées à cette devise.
+     */
+    #[ORM\OneToMany(mappedBy: 'devise', targetEntity: Operation::class)] // Vérifier 'devise' dans Operation
+    private Collection $operations;
+
+    // --- Variable temporaire pour l'ancien nom de fichier ---
+    private ?string $tempIconeFilename = null;
+
+    public function __construct()
+    {
+        $this->affiche = false; // Initialisation correcte
+        $this->siLocale = false; // Initialisation explicite
+        $this->operations = new ArrayCollection();
+    }
+
+    // --- Gestion de l'icône (Fortement recommandé d'utiliser VichUploaderBundle) ---
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function handleIconBeforeSave(): void
+    {
+        if ($this->icone instanceof UploadedFile) {
+            // Si une icône existe déjà, stocker son nom pour suppression éventuelle
+            if ($this->urlIcone) {
+                $this->tempIconeFilename = $this->urlIcone;
+            }
+            $originalFilename = pathinfo($this->icone->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = preg_replace('/[^A-Za-z0-9_\-]/', '_', $originalFilename);
+            $extension = $this->icone->guessExtension() ?: $this->icone->getClientOriginalExtension();
+            $this->urlIcone = $safeFilename . '-' . uniqid() . '.' . $extension;
+        }
+        // Gestion si on veut juste supprimer l'icône (via un champ dédié dans le form par ex.)
+        // Si $this->urlIcone est null MAIS $this->tempIconeFilename ne l'est pas => suppression dans PostUpdate
+    }
+
+    #[ORM\PostPersist]
+    #[ORM\PostUpdate]
+    public function handleIconAfterSave(): void
+    {
+        // Déplacer le nouveau fichier uploadé
+        if ($this->icone instanceof UploadedFile) {
+            try {
+                $this->icone->move($this->getUploadRootDir(), $this->urlIcone);
+            } catch (\Symfony\Component\HttpFoundation\File\Exception\FileException $e) {
+                // Gérer l'erreur
+            }
+            $this->icone = null; // Nettoyer la propriété temporaire
+        }
+
+        // Supprimer l'ancienne icône si elle existait et est différente
+        if ($this->tempIconeFilename && $this->tempIconeFilename !== $this->urlIcone) {
+            $oldFilePath = $this->getUploadRootDir() . '/' . $this->tempIconeFilename;
+            if (file_exists($oldFilePath)) {
+                @unlink($oldFilePath);
+            }
+            $this->tempIconeFilename = null;
+        }
+    }
+
+    #[ORM\PreRemove]
+    public function storeIconFilenameForRemoval(): void
+    {
+        if ($this->urlIcone) {
+            $this->tempIconeFilename = $this->getAbsolutePath(); // Stocker chemin absolu
+        }
+    }
+
+    #[ORM\PostRemove]
+    public function handleIconDeletionAfterRemove(): void
+    {
+        if ($this->tempIconeFilename && file_exists($this->tempIconeFilename)) {
+            @unlink($this->tempIconeFilename);
+        }
     }
 
     /**
-     * #[ORM\Id]
-     * #[ORM\Column(name="iddevise", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
+     * Prépare la suppression du fichier icone lors d'une mise à jour.
+     * A appeler explicitement si un formulaire permet de décocher l'image.
      */
-    protected $id;
+    public function prepareRemoveIcone(): void
+    {
+        if ($this->urlIcone) {
+            $this->tempIconeFilename = $this->urlIcone; // Stocker nom relatif pour PostUpdate
+            $this->urlIcone = null;
+        }
+        $this->icone = null;
+    }
+
+
+    // --- Méthodes de chemin (Déconseillé - Injecter via service) ---
+
+    public function getAbsolutePath(): ?string
+    {
+        return $this->urlIcone ? $this->getUploadRootDir() . '/' . $this->urlIcone : null;
+    }
+
+    public function getWebPath(): ?string
+    {
+        return $this->urlIcone ? '/' . $this->getUploadDir() . '/' . $this->urlIcone : null;
+    }
 
     /**
-     * @var string $codeDevise
-     * #[ORM\Column(name="codeDevise", type="string",length=5)]
+     * !!! NE PAS UTILISER EN PRODUCTION SANS INJECTION DE PARAMÈTRE !!!
      */
-    private $codeDevise;
+    public function getUploadRootDir(): string
+    {
+        // Chemin vers le dossier public (Symfony 4+)
+        return __DIR__.'/../../public/' . $this->getUploadDir();
+        // Chemin Symfony < 4 (original)
+        // return __DIR__ . '/../../../../web/' . $this->getUploadDir();
+    }
 
-    /**
-     * @var string $libDevise
-     * #[ORM\Column(name="libdevise", type="string",length=40)]
-     */
-    private $libDevise;
+    protected function getUploadDir(): string
+    {
+        return 'upload/drapeaux'; // Relatif à public/
+    }
 
-    /**
-     * @var string $valDeviseLocal
-     * #[ORM\Column(name="valdeviselocal", type="string", nullable=true)]
-     */
-    private $valDeviseLocal;
-	
-    /**
-     * @var string $valDeviseLocalAchat
-     * #[ORM\Column(name="valdeviselocalachat", type="string")]
-     */
-    private $valDeviseLocalAchat;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var ArrayCollection Operation $operations
-     * #[ORM\OneToMany(targetEntity: App\Entity\Operation::class, mappedBy="devise" )]
-     * 
-     */
-    private $operations;
-
-    /**
-     * @var boolean $siLocale
-     * #[ORM\Column(name="locale", type="boolean")]
-     */
-    private $siLocale;
-
-    /**
-     * @var integer $acffiche
-     * #[ORM\Column(name="affiche", type="integer")]
-     */
-    private $affiche;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-
-    public function getId(): ?string {
+    public function getId(): ?int
+    {
         return $this->id;
     }
-    
-    /**
-     * @var string $urlIcone
-     * #[ORM\Column(name="urlicone",type="string",length=170, nullable=true)]
-     */
-    private $urlIcone;
 
-    /**
-     * @Assert\File(maxSize="6000000")
-     * mimeTypes = {"image/gif", "image/jpeg", "image/png"},
-     * #[Assert\NotBlank()]
-     */
-    public $icone;
-
-    /**
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
-     */
-    public function preUpload() {
-
-        if (null !== $this->icone) {
-            // faites ce que vous voulez pour générer un nom unique
-            $this->urlIcone = sha1(uniqid(mt_rand(), true)) . '.' . $this->icone->guessExtension();
-        }
-    }
-
-    /**
-     * @ORM\PostPersist()
-     * @ORM\PostUpdate()
-     */
-    public function upload() {
-
-        if (null === $this->icone) {
-            return;
-        }
-        
-        $this->icone->move($this->getUploadRootDir(), $this->urlIcone);
-        chmod($this->getUploadRootDir(), 0755);
-        unset($this->icone);
-    }
-
-    public function removeUpload($icone) {
-
-        unlink($icone);
-    }
-
-    public function getAbsolutePath(): ?string {
-        return null === $this->urlIcone ? null : $this->getUploadRootDir() . '' . $this->urlIcone;
-    }
-
-    public function getWebPath(): ?string {
-        return null === $this->urlIcone ? null : $this->getUploadDir() . '' . $this->urlIcone;
-    }
-
-    public function getUploadRootDir(): ?string {
-        // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__ . '/../../../../web/' . $this->getUploadDir();
-    }
-
-    public function getUploadDir(): ?string {
-        // on se débarrasse de « __DIR__ » afin de ne pas avoir de problème lorsqu'on affiche
-        // le document/image dans la vue.
-        return 'upload/drapeaux/';
-    }
-    
-
-    /**
-     * Set codeDevise
-     *
-     * @param string $codeDevise
-     * @return Devise
-     */
-    public function setCodeDevise(string $codeDevise): self {
-        $this->codeDevise = $codeDevise;
-
-        return $this;
-    }
-
-    /**
-     * Get codeDevise
-     *
-     * @return string 
-     */
-    public function getCodeDevise(): ?string {
+    public function getCodeDevise(): ?string
+    {
         return $this->codeDevise;
     }
 
-    /**
-     * Set libDevise
-     *
-     * @param string $libDevise
-     * @return Devise
-     */
-    public function setLibDevise(string $libDevise): self {
-        $this->libDevise = $libDevise;
-
+    public function setCodeDevise(string $codeDevise): self
+    {
+        $this->codeDevise = strtoupper($codeDevise); // Mettre en majuscule
         return $this;
     }
 
-    /**
-     * Get libDevise
-     *
-     * @return string 
-     */
-    public function getLibDevise(): ?string {
+    public function getLibDevise(): ?string
+    {
         return $this->libDevise;
     }
 
-    /**
-     * Set valDeviseLocal
-     *
-     * @param string $valDeviseLocal
-     * @return Devise
-     */
-    public function setValDeviseLocal(string $valDeviseLocal): self {
-        $this->valDeviseLocal = $valDeviseLocal;
-
+    public function setLibDevise(string $libDevise): self
+    {
+        $this->libDevise = $libDevise;
         return $this;
     }
 
-    /**
-     * Get valDeviseLocal
-     *
-     * @return string 
-     */
-    public function getValDeviseLocal(): ?string {
+    public function getValDeviseLocal(): ?string // Retourne string car DECIMAL
+    {
         return $this->valDeviseLocal;
     }
 
-    /**
-     * Add operations
-     *
-     * @param \App\Entity\Operation $operations
-     * @return Devise
-     */
-    public function addOperation(\App\Entity\Operation $operations) {
-        $this->operations[] = $operations;
-
+    public function setValDeviseLocal(?string $valDeviseLocal): self // Accepte null
+    {
+        $this->valDeviseLocal = $valDeviseLocal;
         return $this;
     }
 
-    /**
-     * Remove operations
-     *
-     * @param \App\Entity\Operation $operations
-     */
-    public function removeOperation(\App\Entity\Operation $operations) {
-        $this->operations->removeElement($operations);
+    public function getValDeviseLocalAchat(): ?string // Retourne string car DECIMAL
+    {
+        return $this->valDeviseLocalAchat;
     }
 
-    /**
-     * Get operations
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getOperations(): ?string {
-        return $this->operations;
-    }
-
-    /**
-     * Set siLocale
-     *
-     * @param boolean $siLocale
-     * @return Devise
-     */
-    public function setSiLocale(string $siLocale): self {
-        $this->siLocale = $siLocale;
-
+    public function setValDeviseLocalAchat(?string $valDeviseLocalAchat): self // Accepte null
+    {
+        $this->valDeviseLocalAchat = $valDeviseLocalAchat;
         return $this;
     }
 
-    /**
-     * Get siLocale
-     *
-     * @return boolean 
-     */
-    public function getSiLocale(): ?string {
+    public function isSiLocale(): ?bool // Getter booléen standard
+    {
         return $this->siLocale;
     }
 
-    /**
-     * Set affiche
-     *
-     * @param integer $affiche
-     * @return Devise
-     */
-    public function setAffiche(string $affiche): self {
-        $this->affiche = $affiche;
-
+    public function setSiLocale(bool $siLocale): self // Type bool
+    {
+        $this->siLocale = $siLocale;
         return $this;
     }
 
-    /**
-     * Get affiche
-     *
-     * @return integer 
-     */
-    public function getAffiche(): ?string {
+    public function isAffiche(): ?bool // Getter booléen standard
+    {
         return $this->affiche;
     }
 
-
-    /**
-     * Set urlIcone
-     *
-     * @param string $urlIcone
-     * @return Devise
-     */
-    public function setUrlIcone(string $urlIcone): self
+    public function setAffiche(bool $affiche): self // Type bool
     {
-        $this->urlIcone = $urlIcone;
-    
+        $this->affiche = $affiche;
         return $this;
     }
 
-    /**
-     * Get urlIcone
-     *
-     * @return string 
-     */
     public function getUrlIcone(): ?string
     {
         return $this->urlIcone;
     }
 
+    // setUrlIcone est généralement interne (géré par l'upload)
+
     /**
-     * Set valDeviseLocalAchat
-     *
-     * @param string $valDeviseLocalAchat
-     * @return Devise
+     * Utilisé par les formulaires pour lier le champ d'upload.
      */
-    public function setValDeviseLocalAchat(string $valDeviseLocalAchat): self
+    public function setIcone(?File $icone = null): self
     {
-        $this->valDeviseLocalAchat = $valDeviseLocalAchat;
-    
+        $this->icone = $icone;
+        // La logique de préparation (stockage ancien nom) est dans PrePersist/PreUpdate
         return $this;
     }
 
-    /**
-     * Get valDeviseLocalAchat
-     *
-     * @return string 
-     */
-    public function getValDeviseLocalAchat(): ?string
+    public function getIcone(): ?File
     {
-        return $this->valDeviseLocalAchat;
+        return $this->icone;
+    }
+
+    /**
+     * @return Collection<int, Operation>
+     */
+    public function getOperations(): Collection
+    {
+        return $this->operations;
+    }
+
+    public function addOperation(Operation $operation): self
+    {
+        if (!$this->operations->contains($operation)) {
+            $this->operations->add($operation);
+            $operation->setDevise($this); // Mettre à jour l'autre côté
+        }
+        return $this;
+    }
+
+    public function removeOperation(Operation $operation): self
+    {
+        if ($this->operations->removeElement($operation)) {
+            // Mettre l'autre côté à null si nécessaire
+            if ($operation->getDevise() === $this) {
+                $operation->setDevise(null);
+            }
+        }
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        return $this->libDevise . ' (' . $this->codeDevise . ')' ?? 'Devise #' . $this->id;
     }
 }

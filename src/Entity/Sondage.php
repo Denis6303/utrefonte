@@ -2,87 +2,111 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\SondageRepository; // Importer le Repository
 use Doctrine\Common\Collections\ArrayCollection;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;          // Importer Types
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;   // Importer Gedmo
+use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\SondageOpinion;
 
 /**
- * Classe qui va gere les questions de sondages du site web
+ * Classe qui va gerer les questions de sondages du site web
  *
  * @author Gautier
- * #[ORM\Entity](repositoryClass="App\Entity\SondageRepository")
- * #[ORM\Table(name="sondage")]
  */
-class Sondage {
+#[ORM\Entity(repositoryClass: SondageRepository::class)]
+#[ORM\Table(name: 'sondage')]
+#[ORM\HasLifecycleCallbacks] // Garder si PrePersist est utilisé pour la date
+class Sondage
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idsondage', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    function __construct() {
-        
+    /**
+     * La question du sondage (traduisible).
+     * @var string|null
+     */
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'question', type: Types::TEXT)] // Changé en TEXT pour une question potentiellement longue
+    #[Assert\NotBlank(message: "La question ne peut être vide.", groups: ['translatable_validation'])]
+    private ?string $question = null; // Type hint ?string
+
+    /**
+     * Statut du sondage (actif/inactif).
+     */
+    #[ORM\Column(name: 'actif', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $actif = true; // Initialisé dans le constructeur, type hint ?bool
+
+    /**
+     * ID de l'utilisateur ayant ajouté. Relation ManyToOne serait mieux.
+     */
+    #[ORM\Column(name: 'questionajoutpar', type: Types::INTEGER, nullable: true)] // Rendu nullable
+    private ?int $questionAjoutPar = null; // Type hint ?int
+
+    /**
+     * Date d'ajout de la question.
+     */
+    #[ORM\Column(name: 'questiondateajout', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull] // Initialisé
+    private ?DateTimeImmutable $questionDateAjout = null; // Type hint ?DateTimeImmutable
+
+    /**
+     * Locale utilisée pour les traductions Gedmo (non mappée).
+     * @var string|null
+     */
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+    // --- RELATION ---
+    /**
+     * Options/Opinions possibles pour ce sondage.
+     * 'sondage' est la propriété dans SondageOpinion qui référence cette entité (mappedBy).
+     * @var Collection<int, SondageOpinion>
+     */
+    #[ORM\OneToMany(mappedBy: 'sondage', targetEntity: SondageOpinion::class, cascade: ['persist', 'remove'], orphanRemoval: true)] // Vérifiez mappedBy='sondage'
+    private Collection $sondageOpinions;
+
+
+    public function __construct()
+    {
+        $this->actif = true; // Actif par défaut
+        $this->sondageOpinions = new ArrayCollection();
+        // La date est gérée par PrePersist ou initialisée ici si pas de callback
+        // $this->questionDateAjout = new DateTimeImmutable();
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idsondage", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @Gedmo\Translatable
-     * @var string $question
-     * #[ORM\Column(name="question" , type="string")]
-     */
-    private $question;
-
-    /**
-     * @var integer $actif
-     * #[ORM\Column(name="actif" , type="integer")]
-     *   
-     */
-    private $actif;
-
-    /**
-     * @var integer $questionAjoutPar
-     * #[ORM\Column(name="questionajoutpar" , type="integer")]
-     *   
-     */
-    private $questionAjoutPar;
-
-    /**
-     * @var Datetime $questionDateAjout
-     * #[ORM\Column(name="questiondateajout" , type="datetime")]
-     *   
-     */
-    private $questionDateAjout;
-
-    /**
-     * @var ArrayCollection SondageOpinion $sondageOpinions
-     * #[ORM\OneToMany(targetEntity: App\Entity\SondageOpinion::class, mappedBy="sondage" )]
-     * 
-     */
-    private $sondageOpinions;
-
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    private $locale;
-
-    public function setTranslatableLocale(string $locale): self {
-        $this->locale = $locale;
+    #[ORM\PrePersist]
+    public function setDateOnCreate(): void
+    {
+        if ($this->questionDateAjout === null) {
+            $this->questionDateAjout = new DateTimeImmutable();
+        }
+         if ($this->actif === null) { // Sécurité
+             $this->actif = true;
+         }
+        // On pourrait définir questionAjoutPar ici si l'utilisateur est connu
     }
+
+    // --- GETTERS & SETTERS ---
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
+
+    // Pas de setter pour l'ID
 
     /**
      * Set question
@@ -90,112 +114,133 @@ class Sondage {
      * @param string $question
      * @return Sondage
      */
-    public function setQuestion(string $question): self {
+    public function setQuestion(string $question): self
+    {
         $this->question = $question;
-
         return $this;
     }
 
     /**
      * Get question
      *
-     * @return string 
+     * @return string|null
      */
-    public function getQuestion(): ?string {
+    public function getQuestion(): ?string
+    {
         return $this->question;
+    }
+
+    /**
+     * Vérifie si le sondage est actif.
+     */
+    public function isActif(): ?bool // Getter booléen
+    {
+        return $this->actif;
     }
 
     /**
      * Set actif
      *
-     * @param integer $actif
+     * @param boolean $actif
      * @return Sondage
      */
-    public function setActif(string $actif): self {
+    public function setActif(bool $actif): self // Type paramètre corrigé en bool
+    {
         $this->actif = $actif;
-
         return $this;
     }
 
     /**
-     * Get actif
-     *
-     * @return integer 
+     * Get actif (moins sémantique que isActif)
+     * @return boolean|null
      */
-    public function getActif(): ?string {
+    public function getActif(): ?bool // Type retour corrigé
+    {
         return $this->actif;
     }
+
 
     /**
      * Set questionAjoutPar
      *
-     * @param integer $questionAjoutPar
+     * @param integer|null $questionAjoutPar
      * @return Sondage
      */
-    public function setQuestionAjoutPar(string $questionAjoutPar): self {
+    public function setQuestionAjoutPar(?int $questionAjoutPar): self // Type param corrigé, accepte null
+    {
         $this->questionAjoutPar = $questionAjoutPar;
-
         return $this;
     }
 
     /**
      * Get questionAjoutPar
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getQuestionAjoutPar(): ?string {
+    public function getQuestionAjoutPar(): ?int // Type retour corrigé
+    {
         return $this->questionAjoutPar;
-    }
-
-    /**
-     * Set questionDateAjout
-     *
-     * @param \DateTime $questionDateAjout
-     * @return Sondage
-     */
-    public function setQuestionDateAjout(string $questionDateAjout): self {
-        $this->questionDateAjout = $questionDateAjout;
-
-        return $this;
     }
 
     /**
      * Get questionDateAjout
      *
-     * @return \DateTime 
+     * @return DateTimeImmutable|null
      */
-    public function getQuestionDateAjout(): ?string {
+    public function getQuestionDateAjout(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->questionDateAjout;
     }
 
-    /**
-     * Add sondageOpinions
-     *
-     * @param \App\Entity\SondageOpinion $sondageOpinions
-     * @return Sondage
-     */
-    public function addSondageOpinion(\App\Entity\SondageOpinion $sondageOpinions) {
-        $this->sondageOpinions[] = $sondageOpinions;
+    // Setter retiré car géré par PrePersist
 
-        return $this;
-    }
+    // --- Gestion de la collection SondageOpinion ---
 
     /**
-     * Remove sondageOpinions
-     *
-     * @param \App\Entity\SondageOpinion $sondageOpinions
+     * @return Collection<int, SondageOpinion>
      */
-    public function removeSondageOpinion(\App\Entity\SondageOpinion $sondageOpinions) {
-        $this->sondageOpinions->removeElement($sondageOpinions);
-    }
-
-    /**
-     * Get sondageOpinions
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getSondageOpinions(): ?string {
+    public function getSondageOpinions(): Collection // Type retour corrigé
+    {
         return $this->sondageOpinions;
     }
 
+    public function addSondageOpinion(SondageOpinion $sondageOpinion): self // Type param corrigé
+    {
+        if (!$this->sondageOpinions->contains($sondageOpinion)) {
+            $this->sondageOpinions->add($sondageOpinion);
+            // Mettre à jour le côté propriétaire (ManyToOne dans SondageOpinion)
+            $sondageOpinion->setSondage($this); // Assurez-vous que setSondage existe
+        }
+        return $this;
+    }
+
+    public function removeSondageOpinion(SondageOpinion $sondageOpinion): self // Type param corrigé
+    {
+        if ($this->sondageOpinions->removeElement($sondageOpinion)) {
+            // Mettre le côté propriétaire à null (géré par orphanRemoval si non null)
+            if ($sondageOpinion->getSondage() === $this) { // Assurez-vous que getSondage existe
+                $sondageOpinion->setSondage(null);
+            }
+        }
+        return $this;
+    }
+
+    // --- Gestionnaire de locale Gedmo ---
+    public function setTranslatableLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        // Tronquer la question si elle est trop longue pour une représentation string
+        $questionPreview = mb_substr($this->question ?? '', 0, 50);
+        if (mb_strlen($this->question ?? '') > 50) {
+            $questionPreview .= '...';
+        }
+        return $questionPreview ?: 'Sondage #' . $this->id;
+    }
 }

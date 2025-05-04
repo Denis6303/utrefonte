@@ -2,1116 +2,625 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\ArticleRepository; // Assurez-vous que ce repository existe
 use Doctrine\Common\Collections\ArrayCollection;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo; // Gedmo annotations use attributes too
+use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables pour les dates
 
-/**
- * Classe qui va gere les articles du point de vue détails et articles au sens proprement dit
- *
- * @author Gautier
- * #[ORM\Entity](repositoryClass="App\Entity\ArticleRepository")
- * #[ORM\Table(name="article")]
- * @ORM\HasLifecycleCallbacks
- */
-class Article {
-
-    function __construct() {
-
-        $this->setCompteurArticle(0);
-    }
-
-    /**
-     * #[ORM\OneToMany(targetEntity: App\Entity\Menu::class, mappedBy="Menu")]
-     */
-    private $menu;
+#[ORM\Entity(repositoryClass: ArticleRepository::class)]
+#[ORM\Table(name: 'article')]
+#[ORM\HasLifecycleCallbacks] // Conserve les callbacks de cycle de vie
+class Article
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idarticle', type: Types::INTEGER)]
+    private ?int $id = null;
 
     /**
-     * @var ArrayCollection Media $medias
-     * Owning Side
-     * @ORM\ManyToMany(targetEntity="App\Entity\Media", inversedBy="articles", cascade={"all"})
-     * @ORM\JoinTable(name="pointer",
-     * joinColumns={@ORM\JoinColumn(name="article_idarticle", referencedColumnName="idarticle")},
-     * inverseJoinColumns={@ORM\JoinColumn(name="media_idmedia", referencedColumnName="idmedia" )}
-     * )
+     * @var string|null Titre de l'article (traduisible)
      */
-    private $medias;
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'titrearticle', type: Types::STRING, length: 100, nullable: true)]
+    #[Assert\NotBlank(message: "Le titre ne peut pas être vide.", groups: ['translatable_validation'])] // Valider si besoin pour chaque langue
+    #[Assert\Length(max: 100, maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères.")]
+    private ?string $titreArticle = null;
 
     /**
-     * @var ArrayCollection Cadre $cadres
-     * Owning Side
-     * @ORM\ManyToMany(targetEntity="App\Entity\Cadre", inversedBy="articles", cascade={"persist","merge"})
-     * @ORM\JoinTable(name="positionner",
-     * joinColumns={@ORM\JoinColumn(name="article_idarticle", referencedColumnName="idarticle")},
-     * inverseJoinColumns={@ORM\JoinColumn(name="cadre_idcadre", referencedColumnName="idcadre" )}
-     * )
+     * @var string|null Texte d'introduction (traduisible)
      */
-    private $cadres;
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'introtextearticle', type: Types::TEXT, nullable: true)]
+    private ?string $introTexteArticle = null;
 
     /**
-     * @var Rubrique $rubrique
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Rubrique::class, inversedBy="articles", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idrubrique", referencedColumnName="idrubrique")
-     * })
+     * @var string|null Description complète (traduisible)
      */
-    private $rubrique;
+    #[Gedmo\Translatable]
+    #[ORM\Column(name: 'descriptionarticle', type: Types::TEXT, nullable: true)]
+    private ?string $descriptionArticle = null;
 
     /**
-     * @var integer $id
-     * #[ORM\Id] 
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     * #[ORM\Column(name="idarticle" , type="integer")]
+     * @var int|null Statut de l'article (0-6)
      */
-    private $id;
+    #[ORM\Column(name: 'statutarticle', type: Types::INTEGER, nullable: true)] // Rendu nullable pour correspondre à la DB
+    #[Assert\NotNull(message: "Le statut doit être défini.")] // NotNull car c'est un integer
+    #[Assert\Range(min: 0, max: 6, notInRangeMessage: "Le statut doit être compris entre {{ min }} et {{ max }}.")] // Assert\Range est plus approprié
+    private ?int $statutArticle = null;
+
+    #[ORM\Column(name: 'urlarticle', type: Types::STRING, length: 255, nullable: true)] // Prévoir une longueur pour l'URL
+    #[Assert\Length(max: 255)]
+    // #[Assert\Url(message: "L'URL '{{ value }}' n'est pas une URL valide.")] // Décommentez si c'est toujours une URL complète
+    private ?string $urlArticle = null;
+
+    #[ORM\Column(name: 'referencearticle', type: Types::STRING, length: 255, nullable: true)] // Prévoir une longueur
+    #[Assert\Length(max: 255)]
+    private ?string $referenceArticle = null;
 
     /**
-     * @Gedmo\Translatable
-     * @var string $titreArticle
-     * #[ORM\Column(name="titrearticle", type="string",length=100, nullable=true)]
-     * #[Assert\NotBlank()]
+     * @var int|null Indicateur de corbeille (0/1). Utiliser un boolean serait mieux.
      */
-    private $titreArticle;
+    #[ORM\Column(name: 'corbeillearticle', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $corbeilleArticle = 0; // Initialisé à 0 (non supprimé)
 
     /**
-     * @Gedmo\Translatable
-     * @var text $introTexteArticle
-     * #[ORM\Column(name="introtextearticle" , type="text", nullable=true)]
-     *  
+     * @var int|null Indicateur d'archive (0/1). Utiliser un boolean serait mieux.
      */
-    private $introTexteArticle;
+    #[ORM\Column(name: 'archivearticle', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $archiveArticle = 0; // Initialisé à 0 (non archivé)
 
     /**
-     * @Gedmo\Translatable
-     * @var text $descriptionArticle
-     * #[ORM\Column(name="descriptionarticle" , type="text", nullable=true)]
-     *   
+     * @var int|null ID de la dernière rubrique (utilité à clarifier)
      */
-    private $descriptionArticle;
+    #[ORM\Column(name: 'lastrubriquearticle', type: Types::INTEGER, nullable: true)]
+    private ?int $lastRubriqueArticle = null;
+
+    #[ORM\Column(name: 'compteurarticle', type: Types::INTEGER, nullable: true)]
+    private ?int $compteurArticle = 0; // Initialisé via constructeur
+
+    #[ORM\Column(name: 'articledatepublie', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDatePublie = null;
+
+    #[ORM\Column(name: 'articledateajout', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateAjout = null;
+
+    #[ORM\Column(name: 'articledatemodif', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateModif = null;
 
     /**
-     * @var integer $statutArticle
-     * #[ORM\Column(name="statutarticle" , type="integer")]
-     * @Assert\Regex(pattern="/^[0-6]$/", message="la valeur doit être comprise entre 0 et 6")  
+     * @var int|null Indicateur affichage date publication (0/1). Utiliser un boolean serait mieux.
      */
-    private $statutArticle;
+    #[ORM\Column(name: 'affichedatepublie', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $afficheDatePublie = null;
 
     /**
-     * @var string $urlArticle
-     * #[ORM\Column(name="urlarticle" , type="string", nullable=true)]
+     * @var int|null Indicateur affichage auteur (0/1). Utiliser un boolean serait mieux.
      */
-    private $urlArticle;
+    #[ORM\Column(name: 'afficheauteur', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $afficheAuteur = null;
+
+     /**
+     * @var int|null Indicateur affichage accueil (0/1). Utiliser un boolean serait mieux.
+     */
+    #[ORM\Column(name: 'afficheaccueil', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $afficheAccueil = null;
 
     /**
-     * @var string $referenceArticle
-     * #[ORM\Column(name="referencearticle" , type="string", nullable=true)]
-     *   
+     * @var int|null Indicateur affichage référence (0/1). Utiliser un boolean serait mieux.
      */
-    private $referenceArticle;
+    #[ORM\Column(name: 'affichereference', type: Types::INTEGER, nullable: true)] // Ou Types::BOOLEAN
+    private ?int $afficheReference = null;
+
+    #[ORM\Column(name: 'articledatesupprime', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateSupprime = null;
+
+    #[ORM\Column(name: 'articledaterestaure', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateRestaure = null;
+
+    #[ORM\Column(name: 'articledatedepublie', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateDepublie = null;
+
+    #[ORM\Column(name: 'articledatearchive', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateArchive = null;
+
+    #[ORM\Column(name: 'articledatevalide', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleDateValide = null;
 
     /**
-     * @var integer $corbeilleArticle
-     * #[ORM\Column(name="corbeillearticle" , type="integer", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant modifié. Relation ManyToOne serait mieux.
      */
-    private $corbeilleArticle;
+    #[ORM\Column(name: 'articlemodifpar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleModifPar = null;
 
     /**
-     * @var integer $archiveArticle
-     * #[ORM\Column(name="archivearticle" , type="integer", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant supprimé. Relation ManyToOne serait mieux.
      */
-    private $archiveArticle;
+    #[ORM\Column(name: 'articlesupprimepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleSupprimePar = null;
 
     /**
-     * @var integer $lastRubriqueArticle
-     * #[ORM\Column(name="lastrubriquearticle" , type="integer", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant ajouté. Relation ManyToOne serait mieux.
      */
-    private $lastRubriqueArticle;
+    #[ORM\Column(name: 'articleajoutpar', type: Types::INTEGER, nullable: true)] // Nom de colonne corrigé: articleajoutPar
+    private ?int $articleAjoutPar = null;
 
     /**
-     * @var integer $compteurArticle
-     * #[ORM\Column(name="compteurarticle" , type="integer", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant validé. Relation ManyToOne serait mieux.
      */
-    private $compteurArticle;
+    #[ORM\Column(name: 'articlevalidepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleValidePar = null;
 
     /**
-     * @var datetime $articleDatePublie
-     * #[ORM\Column(name="articledatepublie" , type="datetime", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant archivé. Relation ManyToOne serait mieux.
      */
-    private $articleDatePublie;
+    #[ORM\Column(name: 'articlearchivepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleArchivePar = null;
 
     /**
-     * @var datetime $articleDateAjout
-     * #[ORM\Column(name="articledateajout" , type="datetime", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant dépublié. Relation ManyToOne serait mieux.
      */
-    private $articleDateAjout;
+    #[ORM\Column(name: 'articledepubliepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleDepubliePar = null;
 
     /**
-     * @var datetime $articleDateModif
-     * #[ORM\Column(name="articledatemodif" , type="datetime", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant restauré. Relation ManyToOne serait mieux.
      */
-    private $articleDateModif;
+    #[ORM\Column(name: 'articlerestaurepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articleRestaurePar = null;
 
     /**
-     * @var datetime $articleDatePublie
-     * #[ORM\Column(name="affichedatepublie" , type="integer", nullable=true)]
-     *   
+     * @var int|null ID de l'utilisateur ayant publié. Relation ManyToOne serait mieux.
      */
-    private $afficheDatePublie;
+    #[ORM\Column(name: 'articlepubliepar', type: Types::INTEGER, nullable: true)]
+    private ?int $articlePubliePar = null;
 
     /**
-     * @var integer $afficheAuteur
-     * #[ORM\Column(name="afficheauteur" , type="integer", nullable=true)]
-     *   
+     * @var int|null Ordre d'affichage
      */
-    private $afficheAuteur;
+    #[ORM\Column(name: 'ordre', type: Types::INTEGER, nullable: true)]
+    private ?int $ordre = null;
 
     /**
-     * @var integer $afficheAccueil
-     * #[ORM\Column(name="afficheaccueil" , type="integer", nullable=true)]
-     *   
+     * @var int|null Type de présentation
      */
-    private $afficheAccueil;
+    #[ORM\Column(name: 'typepresentation', type: Types::INTEGER, nullable: true)]
+    private ?int $typePre = null;
 
     /**
-     * @var datetime $afficheReference
-     * #[ORM\Column(name="affichereference" , type="integer", nullable=true)]
-     *   
+     * Locale utilisée pour les traductions (non mappée).
      */
-    private $afficheReference;
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+    // --- RELATIONS ---
+
+    #[ORM\ManyToOne(targetEntity: Rubrique::class, inversedBy: 'articles', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idrubrique', referencedColumnName: 'idrubrique', nullable: true)] // Rendre nullable si un article peut ne pas avoir de rubrique
+    private ?Rubrique $rubrique = null;
 
     /**
-     * @var datetime $articleDateSupprime
-     * #[ORM\Column(name="articledatesupprime" , type="datetime", nullable=true)]
-     *   
+     * @var Collection<int, Menu> Menus associés à cet article (inverse side).
+     * Attention: 'mappedBy="Menu"' semble incorrect. Ce devrait être le nom de la propriété
+     * dans l'entité Menu qui pointe vers Article (ex: 'article'). A vérifier/corriger.
      */
-    private $articleDateSupprime;
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Menu::class)] // Vérifiez/corrigez 'article'
+    private Collection $menu;
 
     /**
-     * @var datetime $articleDateRestaure
-     * #[ORM\Column(name="articledaterestaure" , type="datetime", nullable=true)]
-     *   
+     * @var Collection<int, Media> Médias associés à cet article (owning side).
      */
-    private $articleDateRestaure;
+    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'articles', cascade: ['persist', 'merge'])] // cascade: ['all'] est souvent trop large
+    #[ORM\JoinTable(name: 'pointer')]
+    #[ORM\JoinColumn(name: 'article_idarticle', referencedColumnName: 'idarticle')]
+    #[ORM\InverseJoinColumn(name: 'media_idmedia', referencedColumnName: 'idmedia')]
+    private Collection $medias;
 
     /**
-     * @var datetime $articleDateDepublie
-     * #[ORM\Column(name="articledatedepublie" , type="datetime", nullable=true)]
-     *   
+     * @var Collection<int, Cadre> Cadres associés à cet article (owning side).
      */
-    private $articleDateDepublie;
+    #[ORM\ManyToMany(targetEntity: Cadre::class, inversedBy: 'articles', cascade: ['persist', 'merge'])]
+    #[ORM\JoinTable(name: 'positionner')]
+    #[ORM\JoinColumn(name: 'article_idarticle', referencedColumnName: 'idarticle')]
+    #[ORM\InverseJoinColumn(name: 'cadre_idcadre', referencedColumnName: 'idcadre')]
+    private Collection $cadres;
 
-    /**
-     * @var datetime $articleDateArchive
-     * #[ORM\Column(name="articledatearchive" , type="datetime", nullable=true)]
-     *   
-     */
-    private $articleDateArchive;
 
-    /**
-     * @var datetime $articleDateValide
-     * #[ORM\Column(name="articledatevalide" , type="datetime", nullable=true)]
-     *   
-     */
-    private $articleDateValide;
-
-    /**
-     * @var integer $articleModifPar
-     * #[ORM\Column(name="articlemodifpar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articleModifPar;
-
-    /**
-     * @var integer $articleSupprimePar
-     * #[ORM\Column(name="articlesupprimepar" , type="integer", nullable=true)]
-     * 
-     *   
-     */
-    private $articleSupprimePar;
-
-    /**
-     * @var integer $articleAjoutPar
-     * #[ORM\Column(name="articleajoutPar" , type="integer", nullable=true)]
-     * 
-     *   
-     */
-    private $articleAjoutPar;
-
-    /**
-     * @var integer $articleValidePar
-     * #[ORM\Column(name="articlevalidepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articleValidePar;
-
-    /**
-     * @var integer $articleArchivePar
-     * #[ORM\Column(name="articlearchivepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articleArchivePar;
-
-    /**
-     * @var integer $articleDepubliePar
-     * #[ORM\Column(name="articledepubliepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articleDepubliePar;
-
-    /**
-     * @var integer $articleRestaurePar
-     * #[ORM\Column(name="articlerestaurepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articleRestaurePar;
-
-    /**
-     * @var integer $articlePubliePar
-     * #[ORM\Column(name="articlepubliepar" , type="integer", nullable=true)]
-     *   
-     */
-    private $articlePubliePar;
-
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    private $locale;
-
-    /**
-     * @var integer $ordre
-     * #[ORM\Column(name="ordre" , type="integer", nullable=true)]
-     *   
-     */
-    private $ordre;
-    
-    
-    /**
-     * @var integer $typePre 
-     * #[ORM\Column(name="typepresentation",type="integer",nullable=true)]
-     */
-    
-    private $typePre; 
-    
-    /**
-     * @ORM\PrePersist()
-     * 
-     */
-    public function presend() {
-        $this->articleDateAjout = new \DateTime();
-        $this->corbeilleArticle = 0;  // pas a la corbeille
-        $this->archiveArticle = 0;  // pas archive
-        $this->statutArticle = 1; /// en cours de redaction 
+    public function __construct()
+    {
+        $this->compteurArticle = 0;
+        $this->menu = new ArrayCollection();
+        $this->medias = new ArrayCollection();
+        $this->cadres = new ArrayCollection();
         $this->corbeilleArticle = 0;
+        $this->archiveArticle = 0;
+        // La date d'ajout et le statut initial sont gérés par PrePersist
     }
 
-    public function setTranslatableLocale(string $locale): self {
-        $this->locale = $locale;
+    #[ORM\PrePersist]
+    public function initializeOnPrePersist(): void
+    {
+        if ($this->articleDateAjout === null) { // Evite d'écraser si déjà défini
+            $this->articleDateAjout = new DateTimeImmutable();
+        }
+        if ($this->statutArticle === null) { // Statut par défaut si non défini
+            $this->statutArticle = 1; // 1 = En cours de rédaction (supposition)
+        }
+        // corbeille et archive sont déjà initialisés dans le constructeur
+        // $this->corbeilleArticle = 0;
+        // $this->archiveArticle = 0;
     }
 
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    // --- GETTERS & SETTERS ---
+    // (Types corrigés et cohérents avec les propriétés)
+
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
-    /**
-     * Set titreArticle
-     *
-     * @param string $titreArticle
-     * @return Article
-     */
-    public function setTitreArticle(string $titreArticle): self {
-        $this->titreArticle = $titreArticle;
-
-        return $this;
-    }
-
-    /**
-     * Get titreArticle
-     *
-     * @return string 
-     */
-    public function getTitreArticle(): ?string {
+    public function getTitreArticle(): ?string
+    {
         return $this->titreArticle;
     }
 
-    /**
-     * Set introTexteArticle
-     *
-     * @param string $introTexteArticle
-     * @return Article
-     */
-    public function setIntroTexteArticle(string $introTexteArticle): self {
-        $this->introTexteArticle = $introTexteArticle;
-
+    public function setTitreArticle(?string $titreArticle): self // Peut être null
+    {
+        $this->titreArticle = $titreArticle;
         return $this;
     }
 
-    /**
-     * Get introTexteArticle
-     *
-     * @return string 
-     */
-    public function getIntroTexteArticle(): ?string {
+    public function getIntroTexteArticle(): ?string
+    {
         return $this->introTexteArticle;
     }
 
-    /**
-     * Set descriptionArticle
-     *
-     * @param string $descriptionArticle
-     * @return Article
-     */
-    public function setDescriptionArticle(string $descriptionArticle): self {
-        $this->descriptionArticle = $descriptionArticle;
-
+    public function setIntroTexteArticle(?string $introTexteArticle): self // Peut être null
+    {
+        $this->introTexteArticle = $introTexteArticle;
         return $this;
     }
 
-    /**
-     * Get descriptionArticle
-     *
-     * @return string 
-     */
-    public function getDescriptionArticle(): ?string {
+    public function getDescriptionArticle(): ?string
+    {
         return $this->descriptionArticle;
     }
 
-    /**
-     * Set statutArticle
-     *
-     * @param integer $statutArticle
-     * @return Article
-     */
-    public function setStatutArticle(string $statutArticle): self {
-        $this->statutArticle = $statutArticle;
-
+    public function setDescriptionArticle(?string $descriptionArticle): self // Peut être null
+    {
+        $this->descriptionArticle = $descriptionArticle;
         return $this;
     }
 
-    /**
-     * Get statutArticle
-     *
-     * @return integer 
-     */
-    public function getStatutArticle(): ?string {
+    public function getStatutArticle(): ?int
+    {
         return $this->statutArticle;
     }
 
-    /**
-     * Set urlArticle
-     *
-     * @param string $urlArticle
-     * @return Article
-     */
-    public function setUrlArticle(string $urlArticle): self {
-        $this->urlArticle = $urlArticle;
-
+    public function setStatutArticle(?int $statutArticle): self // Peut être null
+    {
+        $this->statutArticle = $statutArticle;
         return $this;
     }
 
-    /**
-     * Get urlArticle
-     *
-     * @return string 
-     */
-    public function getUrlArticle(): ?string {
+    public function getUrlArticle(): ?string
+    {
         return $this->urlArticle;
     }
 
-    /**
-     * Set referenceArticle
-     *
-     * @param string $referenceArticle
-     * @return Article
-     */
-    public function setReferenceArticle(string $referenceArticle): self {
-        $this->referenceArticle = $referenceArticle;
-
+    public function setUrlArticle(?string $urlArticle): self // Peut être null
+    {
+        $this->urlArticle = $urlArticle;
         return $this;
     }
 
-    /**
-     * Get referenceArticle
-     *
-     * @return string 
-     */
-    public function getReferenceArticle(): ?string {
+    public function getReferenceArticle(): ?string
+    {
         return $this->referenceArticle;
     }
 
-    /**
-     * Set corbeilleArticle
-     *
-     * @param integer $corbeilleArticle
-     * @return Article
-     */
-    public function setCorbeilleArticle(string $corbeilleArticle): self {
-        $this->corbeilleArticle = $corbeilleArticle;
-
+    public function setReferenceArticle(?string $referenceArticle): self // Peut être null
+    {
+        $this->referenceArticle = $referenceArticle;
         return $this;
     }
 
-    /**
-     * Get corbeilleArticle
-     *
-     * @return integer 
-     */
-    public function getCorbeilleArticle(): ?string {
+    public function getCorbeilleArticle(): ?int // Ou ?bool si type boolean
+    {
         return $this->corbeilleArticle;
     }
 
-    /**
-     * Set archiveArticle
-     *
-     * @param integer $archiveArticle
-     * @return Article
-     */
-    public function setArchiveArticle(string $archiveArticle): self {
-        $this->archiveArticle = $archiveArticle;
+    public function isCorbeille(): bool
+    {
+        return $this->corbeilleArticle === 1;
+    }
 
+    public function setCorbeilleArticle(?int $corbeilleArticle): self // Ou ?bool
+    {
+        $this->corbeilleArticle = $corbeilleArticle;
         return $this;
     }
 
-    /**
-     * Get archiveArticle
-     *
-     * @return integer 
-     */
-    public function getArchiveArticle(): ?string {
+    public function getArchiveArticle(): ?int // Ou ?bool
+    {
         return $this->archiveArticle;
     }
 
-    /**
-     * Set lastRubriqueArticle
-     *
-     * @param integer $lastRubriqueArticle
-     * @return Article
-     */
-    public function setLastRubriqueArticle(string $lastRubriqueArticle): self {
-        $this->lastRubriqueArticle = $lastRubriqueArticle;
+     public function isArchive(): bool
+    {
+        return $this->archiveArticle === 1;
+    }
 
+    public function setArchiveArticle(?int $archiveArticle): self // Ou ?bool
+    {
+        $this->archiveArticle = $archiveArticle;
         return $this;
     }
 
-    /**
-     * Get lastRubriqueArticle
-     *
-     * @return integer 
-     */
-    public function getLastRubriqueArticle(): ?string {
+    public function getLastRubriqueArticle(): ?int
+    {
         return $this->lastRubriqueArticle;
     }
 
-    /**
-     * Set articleDatePublie
-     *
-     * @param \DateTime $articleDatePublie
-     * @return Article
-     */
-    public function setArticleDatePublie(string $articleDatePublie): self {
-        $this->articleDatePublie = $articleDatePublie;
-
+    public function setLastRubriqueArticle(?int $lastRubriqueArticle): self
+    {
+        $this->lastRubriqueArticle = $lastRubriqueArticle;
         return $this;
     }
 
-    /**
-     * Get articleDatePublie
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDatePublie(): ?string {
-        return $this->articleDatePublie;
-    }
-
-    /**
-     * Set articleDateAjout
-     *
-     * @param \DateTime $articleDateAjout
-     * @return Article
-     */
-    public function setArticleDateAjout(string $articleDateAjout): self {
-        $this->articleDateAjout = $articleDateAjout;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateAjout(): ?string {
-        return $this->articleDateAjout;
-    }
-
-    /**
-     * Set articleDateModif
-     *
-     * @param \DateTime $articleDateModif
-     * @return Article
-     */
-    public function setArticleDateModif(string $articleDateModif): self {
-        $this->articleDateModif = $articleDateModif;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateModif(): ?string {
-        return $this->articleDateModif;
-    }
-
-    /**
-     * Set articleDateSupprime
-     *
-     * @param \DateTime $articleDateSupprime
-     * @return Article
-     */
-    public function setArticleDateSupprime(string $articleDateSupprime): self {
-        $this->articleDateSupprime = $articleDateSupprime;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateSupprime
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateSupprime(): ?string {
-        return $this->articleDateSupprime;
-    }
-
-    /**
-     * Set articleDateRestaure
-     *
-     * @param \DateTime $articleDateRestaure
-     * @return Article
-     */
-    public function setArticleDateRestaure(string $articleDateRestaure): self {
-        $this->articleDateRestaure = $articleDateRestaure;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateRestaure
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateRestaure(): ?string {
-        return $this->articleDateRestaure;
-    }
-
-    /**
-     * Set articleDateDepublie
-     *
-     * @param \DateTime $articleDateDepublie
-     * @return Article
-     */
-    public function setArticleDateDepublie(string $articleDateDepublie): self {
-        $this->articleDateDepublie = $articleDateDepublie;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateDepublie
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateDepublie(): ?string {
-        return $this->articleDateDepublie;
-    }
-
-    /**
-     * Set articleDateArchive
-     *
-     * @param \DateTime $articleDateArchive
-     * @return Article
-     */
-    public function setArticleDateArchive(string $articleDateArchive): self {
-        $this->articleDateArchive = $articleDateArchive;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateArchive
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateArchive(): ?string {
-        return $this->articleDateArchive;
-    }
-
-    /**
-     * Set articleDateValide
-     *
-     * @param \DateTime $articleDateValide
-     * @return Article
-     */
-    public function setArticleDateValide(string $articleDateValide): self {
-        $this->articleDateValide = $articleDateValide;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDateValide
-     *
-     * @return \DateTime 
-     */
-    public function getArticleDateValide(): ?string {
-        return $this->articleDateValide;
-    }
-
-    /**
-     * Set articleModifPar
-     *
-     * @param integer $articleModifPar
-     * @return Article
-     */
-    public function setArticleModifPar(string $articleModifPar): self {
-        $this->articleModifPar = $articleModifPar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleModifPar
-     *
-     * @return integer 
-     */
-    public function getArticleModifPar(): ?string {
-        return $this->articleModifPar;
-    }
-
-    /**
-     * Set articleSupprimePar
-     *
-     * @param integer $articleSupprimePar
-     * @return Article
-     */
-    public function setArticleSupprimePar(string $articleSupprimePar): self {
-        $this->articleSupprimePar = $articleSupprimePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleSupprimePar
-     *
-     * @return integer 
-     */
-    public function getArticleSupprimePar(): ?string {
-        return $this->articleSupprimePar;
-    }
-
-    /**
-     * Set articleAjoutPar
-     *
-     * @param integer $articleAjoutPar
-     * @return Article
-     */
-    public function setArticleAjoutPar(string $articleAjoutPar): self {
-        $this->articleAjoutPar = $articleAjoutPar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleAjoutPar
-     *
-     * @return integer 
-     */
-    public function getArticleAjoutPar(): ?string {
-        return $this->articleAjoutPar;
-    }
-
-    /**
-     * Set articleValidePar
-     *
-     * @param integer $articleValidePar
-     * @return Article
-     */
-    public function setArticleValidePar(string $articleValidePar): self {
-        $this->articleValidePar = $articleValidePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleValidePar
-     *
-     * @return integer 
-     */
-    public function getArticleValidePar(): ?string {
-        return $this->articleValidePar;
-    }
-
-    /**
-     * Set articleArchivePar
-     *
-     * @param integer $articleArchivePar
-     * @return Article
-     */
-    public function setArticleArchivePar(string $articleArchivePar): self {
-        $this->articleArchivePar = $articleArchivePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleArchivePar
-     *
-     * @return integer 
-     */
-    public function getArticleArchivePar(): ?string {
-        return $this->articleArchivePar;
-    }
-
-    /**
-     * Set articleDepubliePar
-     *
-     * @param integer $articleDepubliePar
-     * @return Article
-     */
-    public function setArticleDepubliePar(string $articleDepubliePar): self {
-        $this->articleDepubliePar = $articleDepubliePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleDepubliePar
-     *
-     * @return integer 
-     */
-    public function getArticleDepubliePar(): ?string {
-        return $this->articleDepubliePar;
-    }
-
-    /**
-     * Set articleRestaurePar
-     *
-     * @param integer $articleRestaurePar
-     * @return Article
-     */
-    public function setArticleRestaurePar(string $articleRestaurePar): self {
-        $this->articleRestaurePar = $articleRestaurePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articleRestaurePar
-     *
-     * @return integer 
-     */
-    public function getArticleRestaurePar(): ?string {
-        return $this->articleRestaurePar;
-    }
-
-    /**
-     * Set articlePubliePar
-     *
-     * @param integer $articlePubliePar
-     * @return Article
-     */
-    public function setArticlePubliePar(string $articlePubliePar): self {
-        $this->articlePubliePar = $articlePubliePar;
-
-        return $this;
-    }
-
-    /**
-     * Get articlePubliePar
-     *
-     * @return integer 
-     */
-    public function getArticlePubliePar(): ?string {
-        return $this->articlePubliePar;
-    }
-
-    /**
-     * Add menu
-     *
-     * @param \App\Entity\Menu $menu
-     * @return Article
-     */
-    public function addMenu(\App\Entity\Menu $menu) {
-        $this->menu[] = $menu;
-
-        return $this;
-    }
-
-    /**
-     * Remove menu
-     *
-     * @param \App\Entity\Menu $menu
-     */
-    public function removeMenu(\App\Entity\Menu $menu) {
-        $this->menu->removeElement($menu);
-    }
-
-    /**
-     * Get menu
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMenu(): ?string {
-        return $this->menu;
-    }
-
-    /**
-     * Add medias
-     *
-     * @param \App\Entity\Media $medias
-     * @return Article
-     */
-    public function addMedia(\App\Entity\Media $medias) {
-        $this->medias[] = $medias;
-
-        return $this;
-    }
-
-    /**
-     * Remove medias
-     *
-     * @param \App\Entity\Media $medias
-     */
-    public function removeMedia(\App\Entity\Media $medias) {
-        $this->medias->removeElement($medias);
-    }
-
-    /**
-     * Get medias
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMedias(): ?string {
-        return $this->medias;
-    }
-
-    /**
-     * Add cadres
-     *
-     * @param \App\Entity\Cadre $cadres
-     * @return Article
-     */
-    public function addCadre(\App\Entity\Cadre $cadres) {
-        $this->cadres[] = $cadres;
-
-        return $this;
-    }
-
-    /**
-     * Remove cadres
-     *
-     * @param \App\Entity\Cadre $cadres
-     */
-    public function removeCadre(\App\Entity\Cadre $cadres) {
-        $this->cadres->removeElement($cadres);
-    }
-
-    /**
-     * Get cadres
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCadres(): ?string {
-        return $this->cadres;
-    }
-
-    /**
-     * Set rubrique
-     *
-     * @param \App\Entity\Rubrique $rubrique
-     * @return Article
-     */
-    public function setRubrique(\App\Entity\Rubrique $rubrique = null) {
-        $this->rubrique = $rubrique;
-
-        return $this;
-    }
-
-    /**
-     * Get rubrique
-     *
-     * @return \App\Entity\Rubrique 
-     */
-    public function getRubrique(): ?string {
-        return $this->rubrique;
-    }
-
-    /**
-     * Set compteurArticle
-     *
-     * @param integer $compteurArticle
-     * @return Article
-     */
-    public function setCompteurArticle(string $compteurArticle): self {
-        $this->compteurArticle = $compteurArticle;
-
-        return $this;
-    }
-
-    /**
-     * Get compteurArticle
-     *
-     * @return integer 
-     */
-    public function getCompteurArticle(): ?string {
+    public function getCompteurArticle(): ?int
+    {
         return $this->compteurArticle;
     }
 
-    /**
-     * Set afficheDatePublie
-     *
-     * @param integer $afficheDatePublie
-     * @return Article
-     */
-    public function setAfficheDatePublie(string $afficheDatePublie): self {
-        $this->afficheDatePublie = $afficheDatePublie;
-
+    public function setCompteurArticle(?int $compteurArticle): self
+    {
+        $this->compteurArticle = $compteurArticle;
         return $this;
     }
 
-    /**
-     * Get afficheDatePublie
-     *
-     * @return integer 
-     */
-    public function getAfficheDatePublie(): ?string {
+    // ... (Getters/Setters pour toutes les dates avec ?DateTimeImmutable / DateTimeImmutable)
+
+    public function getArticleDatePublie(): ?DateTimeImmutable
+    {
+        return $this->articleDatePublie;
+    }
+
+    public function setArticleDatePublie(?DateTimeImmutable $articleDatePublie): self
+    {
+        $this->articleDatePublie = $articleDatePublie;
+        return $this;
+    }
+
+    public function getArticleDateAjout(): ?DateTimeImmutable
+    {
+        return $this->articleDateAjout;
+    }
+
+    // Ne pas permettre de setter la date d'ajout manuellement si géré par PrePersist
+    // public function setArticleDateAjout(?DateTimeImmutable $articleDateAjout): self
+    // {
+    //     $this->articleDateAjout = $articleDateAjout;
+    //     return $this;
+    // }
+
+    public function getArticleDateModif(): ?DateTimeImmutable
+    {
+        return $this->articleDateModif;
+    }
+
+    public function setArticleDateModif(?DateTimeImmutable $articleDateModif): self
+    {
+        $this->articleDateModif = $articleDateModif;
+        return $this;
+    }
+
+     public function getAfficheDatePublie(): ?int // Ou ?bool
+    {
         return $this->afficheDatePublie;
     }
 
-    /**
-     * Set afficheAuteur
-     *
-     * @param integer $afficheAuteur
-     * @return Article
-     */
-    public function setAfficheAuteur(string $afficheAuteur): self {
-        $this->afficheAuteur = $afficheAuteur;
-
+    public function setAfficheDatePublie(?int $afficheDatePublie): self // Ou ?bool
+    {
+        $this->afficheDatePublie = $afficheDatePublie;
         return $this;
     }
 
-    /**
-     * Get afficheAuteur
-     *
-     * @return integer 
-     */
-    public function getAfficheAuteur(): ?string {
+    public function getAfficheAuteur(): ?int // Ou ?bool
+    {
         return $this->afficheAuteur;
     }
 
-    /**
-     * Set afficheReference
-     *
-     * @param integer $afficheReference
-     * @return Article
-     */
-    public function setAfficheReference(string $afficheReference): self {
-        $this->afficheReference = $afficheReference;
-
+    public function setAfficheAuteur(?int $afficheAuteur): self // Ou ?bool
+    {
+        $this->afficheAuteur = $afficheAuteur;
         return $this;
     }
 
-    /**
-     * Get afficheReference
-     *
-     * @return integer 
-     */
-    public function getAfficheReference(): ?string {
-        return $this->afficheReference;
-    }
-
-    /**
-     * Set ordre
-     *
-     * @param integer $ordre
-     * @return Article
-     */
-    public function setOrdre(string $ordre): self {
-        $this->ordre = $ordre;
-
-        return $this;
-    }
-
-    /**
-     * Get $ordre
-     *
-     * @return integer 
-     */
-    public function getOrdre(): ?string {
-        return $this->ordre;
-    }
-
-    /**
-     * Set afficheAccueil
-     *
-     * @param integer $afficheAccueil
-     * @return Article
-     */
-    public function setAfficheAccueil(string $afficheAccueil): self {
-        $this->afficheAccueil = $afficheAccueil;
-
-        return $this;
-    }
-
-    /**
-     * Get afficheAccueil
-     *
-     * @return integer 
-     */
-    public function getAfficheAccueil(): ?string {
+     public function getAfficheAccueil(): ?int // Ou ?bool
+    {
         return $this->afficheAccueil;
     }
 
+    public function setAfficheAccueil(?int $afficheAccueil): self // Ou ?bool
+    {
+        $this->afficheAccueil = $afficheAccueil;
+        return $this;
+    }
+
+    public function getAfficheReference(): ?int // Ou ?bool
+    {
+        return $this->afficheReference;
+    }
+
+    public function setAfficheReference(?int $afficheReference): self // Ou ?bool
+    {
+        $this->afficheReference = $afficheReference;
+        return $this;
+    }
+
+     public function getArticleDateSupprime(): ?DateTimeImmutable { return $this->articleDateSupprime; }
+     public function setArticleDateSupprime(?DateTimeImmutable $d): self { $this->articleDateSupprime = $d; return $this; }
+     public function getArticleDateRestaure(): ?DateTimeImmutable { return $this->articleDateRestaure; }
+     public function setArticleDateRestaure(?DateTimeImmutable $d): self { $this->articleDateRestaure = $d; return $this; }
+     public function getArticleDateDepublie(): ?DateTimeImmutable { return $this->articleDateDepublie; }
+     public function setArticleDateDepublie(?DateTimeImmutable $d): self { $this->articleDateDepublie = $d; return $this; }
+     public function getArticleDateArchive(): ?DateTimeImmutable { return $this->articleDateArchive; }
+     public function setArticleDateArchive(?DateTimeImmutable $d): self { $this->articleDateArchive = $d; return $this; }
+     public function getArticleDateValide(): ?DateTimeImmutable { return $this->articleDateValide; }
+     public function setArticleDateValide(?DateTimeImmutable $d): self { $this->articleDateValide = $d; return $this; }
 
 
-    /**
-     * Set typePre
-     *
-     * @param integer $typePre
-     * @return Article
-     */
-    public function setTypePre(string $typePre): self
+    // ... (Getters/Setters pour toutes les propriétés *Par avec ?int / int)
+     public function getArticleModifPar(): ?int { return $this->articleModifPar; }
+     public function setArticleModifPar(?int $id): self { $this->articleModifPar = $id; return $this; }
+     public function getArticleSupprimePar(): ?int { return $this->articleSupprimePar; }
+     public function setArticleSupprimePar(?int $id): self { $this->articleSupprimePar = $id; return $this; }
+     public function getArticleAjoutPar(): ?int { return $this->articleAjoutPar; }
+     public function setArticleAjoutPar(?int $id): self { $this->articleAjoutPar = $id; return $this; }
+     public function getArticleValidePar(): ?int { return $this->articleValidePar; }
+     public function setArticleValidePar(?int $id): self { $this->articleValidePar = $id; return $this; }
+     public function getArticleArchivePar(): ?int { return $this->articleArchivePar; }
+     public function setArticleArchivePar(?int $id): self { $this->articleArchivePar = $id; return $this; }
+     public function getArticleDepubliePar(): ?int { return $this->articleDepubliePar; }
+     public function setArticleDepubliePar(?int $id): self { $this->articleDepubliePar = $id; return $this; }
+     public function getArticleRestaurePar(): ?int { return $this->articleRestaurePar; }
+     public function setArticleRestaurePar(?int $id): self { $this->articleRestaurePar = $id; return $this; }
+     public function getArticlePubliePar(): ?int { return $this->articlePubliePar; }
+     public function setArticlePubliePar(?int $id): self { $this->articlePubliePar = $id; return $this; }
+
+
+    public function getOrdre(): ?int
+    {
+        return $this->ordre;
+    }
+
+    public function setOrdre(?int $ordre): self
+    {
+        $this->ordre = $ordre;
+        return $this;
+    }
+
+    public function getTypePre(): ?int
+    {
+        return $this->typePre;
+    }
+
+    public function setTypePre(?int $typePre): self
     {
         $this->typePre = $typePre;
-    
+        return $this;
+    }
+
+
+    // --- Gestionnaire de locale pour Gedmo ---
+    public function setTranslatableLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+    // --- Gestion des collections ---
+
+    public function getRubrique(): ?Rubrique
+    {
+        return $this->rubrique;
+    }
+
+    public function setRubrique(?Rubrique $rubrique): self // Type hint corrigé
+    {
+        $this->rubrique = $rubrique;
         return $this;
     }
 
     /**
-     * Get typePre
-     *
-     * @return integer 
+     * @return Collection<int, Menu>
      */
-    public function getTypePre(): ?string
+    public function getMenu(): Collection
     {
-        return $this->typePre;
+        return $this->menu;
+    }
+
+    public function addMenu(Menu $menu): self // Type hint corrigé
+    {
+        if (!$this->menu->contains($menu)) {
+            $this->menu->add($menu);
+            // Si la relation est bidirectionnelle, mettez à jour l'autre côté:
+            // $menu->setArticle($this); // Assurez-vous que setArticle existe dans Menu
+        }
+        return $this;
+    }
+
+    public function removeMenu(Menu $menu): self // Type hint corrigé
+    {
+        if ($this->menu->removeElement($menu)) {
+            // Si la relation est bidirectionnelle et Menu est l'owning side,
+            // ou si orphanRemoval=true, mettez l'autre côté à null:
+            // if ($menu->getArticle() === $this) { // Assurez-vous que getArticle existe
+            //     $menu->setArticle(null);
+            // }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedias(): Collection
+    {
+        return $this->medias;
+    }
+
+    public function addMedia(Media $media): self // Type hint corrigé
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+            // Si Media est le côté inverse et que vous gérez la relation des deux côtés :
+            // $media->addArticle($this); // Assurez-vous qu'une méthode addArticle existe dans Media
+        }
+        return $this;
+    }
+
+    public function removeMedia(Media $media): self // Type hint corrigé
+    {
+        $this->medias->removeElement($media);
+        // Si Media est le côté inverse et que vous gérez la relation des deux côtés :
+        // $media->removeArticle($this); // Assurez-vous qu'une méthode removeArticle existe dans Media
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cadre>
+     */
+    public function getCadres(): Collection
+    {
+        return $this->cadres;
+    }
+
+    public function addCadre(Cadre $cadre): self // Type hint corrigé
+    {
+        if (!$this->cadres->contains($cadre)) {
+            $this->cadres->add($cadre);
+             // Si Cadre est le côté inverse et que vous gérez la relation des deux côtés :
+             // $cadre->addArticle($this);
+        }
+        return $this;
+    }
+
+    public function removeCadre(Cadre $cadre): self // Type hint corrigé
+    {
+         $this->cadres->removeElement($cadre);
+         // Si Cadre est le côté inverse et que vous gérez la relation des deux côtés :
+         // $cadre->removeArticle($this);
+        return $this;
+    }
+
+     // Optionnel: toString pour affichage facile
+    public function __toString(): string
+    {
+        return $this->titreArticle ?? 'Article #' . $this->id;
     }
 }
