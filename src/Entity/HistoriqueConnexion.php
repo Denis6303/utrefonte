@@ -2,229 +2,174 @@
 
 namespace App\Entity;
 
+use App\Repository\HistoriqueConnexionRepository; // Importer le Repository
+use Doctrine\DBAL\Types\Types;                   // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer Utilisateur et Abonne si nécessaire
+// use App\Entity\Utilisateur;
+// use App\Entity\Abonne;
 
 /**
- * #[ORM\Entity]
- * #[ORM\Entity](repositoryClass="App\Entity\HistoriqueConnexionRepository")
- * #[ORM\Table(name="historique")]
+ * Historique des connexions des utilisateurs et/ou abonnés.
  */
-class HistoriqueConnexion {
+#[ORM\Entity(repositoryClass: HistoriqueConnexionRepository::class)]
+#[ORM\Table(name: 'historique')] // Nom de table explicite
+class HistoriqueConnexion
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idconnexion', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private, type hint ?int
 
-    public function __construct() {
-        $this->dateDeb = new \Datetime();
+    #[ORM\Column(name: 'datedeb', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull] // Assurer que la date est définie (via constructeur)
+    private ?DateTimeImmutable $dateDeb = null; // Type hint DateTimeImmutable
+
+    #[ORM\Column(name: 'datefin', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Changé en DATETIME_IMMUTABLE
+    private ?DateTimeImmutable $dateFin = null; // Type hint DateTimeImmutable
+
+    /**
+     * Adresse IP de connexion.
+     */
+    #[ORM\Column(name: 'adresseip', type: Types::STRING, length: 45, nullable: true)] // Longueur suffisante pour IPv6
+    #[Assert\Ip(message: "L'adresse IP '{{ value }}' n'est pas valide.")] // Valider le format IP
+    #[Assert\Length(max: 45)] // Ajouter contrainte de longueur
+    private ?string $adresseIp = null;
+
+    /**
+     * Lieu estimé de la connexion (peut venir de GeoIP).
+     */
+    #[ORM\Column(name: 'lieu', type: Types::STRING, length: 100, nullable: true)] // Longueur augmentée
+    #[Assert\Length(max: 100)]
+    private ?string $lieu = null;
+
+    /**
+     * Durée de la session (stockée comme string? Envisager integer pour secondes).
+     * Type 'private' dans le docblock original était incorrect.
+     */
+    #[ORM\Column(name: 'duree', type: Types::STRING, length: 100, nullable: true)] // Gardé STRING, mais INTEGER (secondes) ou JSON seraient mieux
+    private ?string $duree = null;
+
+    // --- RELATIONS ---
+
+    /**
+     * L'Utilisateur qui s'est connecté (peut être null si c'est un Abonne?).
+     */
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'historiques', cascade: ['persist'])] // Merge est moins courant ici
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'idutilisateur', nullable: true)] // Gardé nullable
+    private ?Utilisateur $utilisateur = null;
+
+    /**
+     * L'Abonne qui s'est connecté (peut être null si c'est un Utilisateur?).
+     */
+    #[ORM\ManyToOne(targetEntity: Abonne::class, inversedBy: 'historiques', cascade: ['persist'])] // Merge est moins courant ici
+    #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne', nullable: true)] // Gardé nullable
+    private ?Abonne $abonne = null;
+
+
+    public function __construct()
+    {
+        // Initialiser avec DateTimeImmutable
+        $this->dateDeb = new DateTimeImmutable();
     }
 
-    /**
-     * #[ORM\Id]
-     * #[ORM\Column(name="idconnexion", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var datetime $dateDeb
-     * #[ORM\Column(name="datedeb", type="datetime")]
-     */
-    private $dateDeb;
-
-    /**
-     * @var datetime $dateFin
-     * #[ORM\Column(name="datefin", type="datetime",nullable=true)]
-     */
-    private $dateFin;
-
-    /**
-     * @var strinng $adresseIp
-     * #[ORM\Column(name="adresseip", type="string",length=24,nullable=true)]
-     */
-    private $adresseIp;
-
-    /**
-     * @var strinng $lieu
-     * #[ORM\Column(name="lieu", type="string",length=60,nullable=true)]
-     */
-    private $lieu;
-
-    /**
-     * @var private $duree
-     * #[ORM\Column(name="duree", type="string",length=100,nullable=true)]
-     */
-    private $duree;
-
-    /**
-     * @var Utilisateur $utilisateur
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Utilisateur::class, inversedBy="historiques", cascade={"persist","merge"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idutilisateur", referencedColumnName="idutilisateur")
-     * })
-     */
-    private $utilisateur;
-
-    /**
-     * @var Abonne $abonne
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Abonne::class, inversedBy="historiques", cascade={"persist","merge"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idabonne", referencedColumnName="idabonne")
-     * })
-     */
-    private $abonne;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
 
-    /**
-     * Set dateDeb
-     *
-     * @param \DateTime $dateDeb
-     * @return HistoriqueConnexion
-     */
-    public function setDateDeb(string $dateDeb): self {
-        $this->dateDeb = $dateDeb;
-
-        return $this;
-    }
-
-    /**
-     * Get dateDeb
-     *
-     * @return \DateTime 
-     */
-    public function getDateDeb(): ?string {
+    public function getDateDeb(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->dateDeb;
     }
 
     /**
-     * Set dateFin
-     *
-     * @param \DateTime $dateFin
-     * @return HistoriqueConnexion
+     * La date de début est définie à la construction, ce setter n'est peut-être pas nécessaire.
      */
-    public function setDateFin(string $dateFin): self {
-        $this->dateFin = $dateFin;
-
+    public function setDateDeb(DateTimeImmutable $dateDeb): self // Type paramètre corrigé
+    {
+        $this->dateDeb = $dateDeb;
         return $this;
     }
 
-    /**
-     * Get dateFin
-     *
-     * @return \DateTime 
-     */
-    public function getDateFin(): ?string {
+    public function getDateFin(): ?DateTimeImmutable // Type retour corrigé
+    {
         return $this->dateFin;
     }
 
-    /**
-     * Set adresseIp
-     *
-     * @param string $adresseIp
-     * @return HistoriqueConnexion
-     */
-    public function setAdresseIp(string $adresseIp): self {
-        $this->adresseIp = $adresseIp;
-
+    public function setDateFin(?DateTimeImmutable $dateFin): self // Type paramètre corrigé, accepte null
+    {
+        $this->dateFin = $dateFin;
         return $this;
     }
 
-    /**
-     * Get adresseIp
-     *
-     * @return string 
-     */
-    public function getAdresseIp(): ?string {
+    public function getAdresseIp(): ?string
+    {
         return $this->adresseIp;
     }
 
-    /**
-     * Set lieu
-     *
-     * @param string $lieu
-     * @return HistoriqueConnexion
-     */
-    public function setLieu(string $lieu): self {
-        $this->lieu = $lieu;
-
+    public function setAdresseIp(?string $adresseIp): self // Accepte null
+    {
+        $this->adresseIp = $adresseIp;
         return $this;
     }
 
-    /**
-     * Get lieu
-     *
-     * @return string 
-     */
-    public function getLieu(): ?string {
+    public function getLieu(): ?string
+    {
         return $this->lieu;
     }
 
-    /**
-     * Set utilisateur
-     *
-     * @param \App\Entity\Utilisateur $utilisateur
-     * @return HistoriqueConnexion
-     */
-    public function setUtilisateur(\App\Entity\Utilisateur $utilisateur = null) {
-        $this->utilisateur = $utilisateur;
-
+    public function setLieu(?string $lieu): self // Accepte null
+    {
+        $this->lieu = $lieu;
         return $this;
     }
 
-    /**
-     * Get utilisateur
-     *
-     * @return \App\Entity\Utilisateur 
-     */
-    public function getUtilisateur(): ?string {
-        return $this->utilisateur;
-    }
-
-    /**
-     * Set abonne
-     *
-     * @param \App\Entity\Abonne $abonne
-     * @return HistoriqueConnexion
-     */
-    public function setAbonne(\App\Entity\Abonne $abonne = null) {
-        $this->abonne = $abonne;
-
-        return $this;
-    }
-
-    /**
-     * Get abonne
-     *
-     * @return \App\Entity\Abonne 
-     */
-    public function getAbonne(): ?string {
-        return $this->abonne;
-    }
-
-    /**
-     * Set duree
-     *
-     * @param string $duree
-     * @return HistoriqueConnexion
-     */
-    public function setDuree(string $duree): self {
-        $this->duree = $duree;
-
-        return $this;
-    }
-
-    /**
-     * Get duree
-     *
-     * @return string 
-     */
-    public function getDuree(): ?string {
+    public function getDuree(): ?string
+    {
         return $this->duree;
     }
 
+    public function setDuree(?string $duree): self // Accepte null
+    {
+        $this->duree = $duree;
+        return $this;
+    }
+
+    // --- Getters/Setters pour les relations ---
+
+    public function getUtilisateur(): ?Utilisateur // Type retour corrigé
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self // Type param corrigé
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
+    public function getAbonne(): ?Abonne // Type retour corrigé
+    {
+        return $this->abonne;
+    }
+
+    public function setAbonne(?Abonne $abonne): self // Type param corrigé
+    {
+        $this->abonne = $abonne;
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        $userIdentifier = $this->utilisateur ? 'Utilisateur:'.$this->utilisateur->getId() : ($this->abonne ? 'Abonne:'.$this->abonne->getId() : 'Inconnu');
+        $dateStr = $this->dateDeb ? $this->dateDeb->format('Y-m-d H:i') : 'N/A';
+        return 'Connexion ' . $userIdentifier . ' le ' . $dateStr;
+    }
 }

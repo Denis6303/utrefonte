@@ -16,7 +16,7 @@ framework:
     # Enabled features
     http_client: true
     mailer: true
-    notifier: true
+    notifier: false
     
     # Cache configuration
     cache:
@@ -39,12 +39,11 @@ framework:
     # Assets configuration
     assets:
         json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
-        version_strategy: 'App\Asset\VersionStrategy\HashVersionStrategy'
 
     # Validation
     validation:
         email_validation_mode: html5
-        enable_annotations: true
+        auto_mapping: true
 
 when@test:
     framework:

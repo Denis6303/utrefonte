@@ -2,227 +2,165 @@
 
 namespace App\Entity;
 
+use App\Repository\AgenceRepository; // Assurez-vous que ce repository existe ou créez-le
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Importer pour le type hint
 
-/**
- * #[ORM\Entity]
- * #[ORM\Entity](repositoryClass="App\Entity\AgenceRepository")
- * #[ORM\Table(name="agence")]
- */
-class Agence{
+#[ORM\Entity(repositoryClass: AgenceRepository::class)]
+#[ORM\Table(name: 'agence')]
+class Agence
+{
+    /**
+     * Clé primaire non auto-générée.
+     * Le code agence doit être fourni.
+     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'codeagence', type: Types::STRING, length: 4)] // Longueur spécifique de 4 caractères
+    #[Assert\NotBlank(message: "Le code agence ne peut pas être vide.")]
+    #[Assert\Length(exactly: 4, exactMessage: "Le code agence doit contenir exactement {{ limit }} caractères.")]
+    private ?string $codeAgence = null;
 
-    //constructeur    
-    public function __construct() {
-        $this->etatAgence = 1;
-        $this->suppr = 0;
-    }
+    #[ORM\Column(name: 'libagence', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé de l'agence ne peut pas être vide.")]
+    #[Assert\Length(max: 100, maxMessage: "Le libellé ne peut pas dépasser {{ limit }} caractères.")]
+    private ?string $libAgence = null;
+
+    #[ORM\Column(name: 'telagence', type: Types::STRING, length: 25, nullable: true)] // Rendu nullable si le téléphone n'est pas obligatoire
+    #[Assert\Length(max: 25, maxMessage: "Le téléphone ne peut pas dépasser {{ limit }} caractères.")]
+    // Ajoutez d'autres Assert comme Regex si vous voulez valider le format du téléphone
+    private ?string $telAgence = null;
+
+    #[ORM\Column(name: 'adresseagence', type: Types::TEXT)]
+    #[Assert\NotBlank(message: "L'adresse de l'agence ne peut pas être vide.")]
+    private ?string $adresseAgence = null;
 
     /**
-     * @var string $codeAgence
-     * #[ORM\Id]
-     * #[ORM\Column(name="codeagence", type="string",length=04)]
+     * État de l'agence (par exemple: 1=actif, 0=inactif).
      */
-    private $codeAgence;
+    #[ORM\Column(name: 'etatagence', type: Types::INTEGER)]
+    #[Assert\NotNull(message: "L'état de l'agence doit être défini.")]
+    // Optionnel : Valider les valeurs possibles (ex: 0 ou 1)
+    // #[Assert\Choice(choices: [0, 1], message: "L'état doit être 0 ou 1.")]
+    private ?int $etatAgence = null;
+
+    #[ORM\Column(name: 'datecreation', type: Types::DATETIME_IMMUTABLE)] // Utilisation de DATETIME_IMMUTABLE recommandée
+    #[Assert\NotNull(message: "La date de création est requise.")]
+    private ?\DateTimeImmutable $dateCreation = null;
 
     /**
-     * @var string $libAgence
-     * #[ORM\Column(name="libagence", type="string",length=100)]
+     * Indicateur de suppression logique (0=non supprimé, 1=supprimé).
      */
-    private $libAgence;
-
-    /**
-     * @var string $telAgence
-     * #[ORM\Column(name="telagence", type="string",length=25)] 
-     */
-    private $telAgence;
-
-    /**
-     * @var text $adresseAgence
-     * #[ORM\Column(name="adresseagence", type="text")]
-     * #[Assert\NotBlank()]  
-     */
-    private $adresseAgence;
-
-    /**
-     * @var integer $etatAgence
-     * #[ORM\Column(name="etatagence", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $etatAgence;
-    
-    /**
-     * #[ORM\Column(name="datecreation", type="datetime")]
-     * @var string $dateCreation 
-     */
-    private $dateCreation;   
-
-    /**
-     * @var integer $suppr
-     * #[ORM\Column(name="suppr", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $suppr;
+    #[ORM\Column(name: 'suppr', type: Types::INTEGER)] // Pourrait être Types::BOOLEAN si seulement 0/1
+    #[Assert\NotNull]
+    // Optionnel : Valider les valeurs possibles
+    // #[Assert\Choice(choices: [0, 1], message: "La valeur de suppression doit être 0 ou 1.")]
+    private ?int $suppr = null;
 
 
-    /**
-     * Set codeAgence
-     *
-     * @param string $codeAgence
-     * @return Agence
-     */
-    public function setCodeAgence(string $codeAgence): self
+    public function __construct()
     {
-        $this->codeAgence = $codeAgence;
-    
-        return $this;
+        $this->etatAgence = 1; // Valeur par défaut pour actif
+        $this->suppr = 0;      // Valeur par défaut pour non supprimé
+        $this->dateCreation = new DateTimeImmutable(); // Initialiser la date de création
     }
 
-    /**
-     * Get codeAgence
-     *
-     * @return string 
-     */
+
     public function getCodeAgence(): ?string
     {
         return $this->codeAgence;
     }
 
     /**
-     * Set libAgence
-     *
-     * @param string $libAgence
-     * @return Agence
+     * Le code agence est la clé primaire, il ne devrait généralement pas être modifié après création.
+     * Si vous permettez de le définir, assurez-vous que c'est avant la persistence initiale.
      */
-    public function setLibAgence(string $libAgence): self
+    public function setCodeAgence(string $codeAgence): self
     {
-        $this->libAgence = $libAgence;
-    
+        $this->codeAgence = $codeAgence;
         return $this;
     }
 
-    /**
-     * Get libAgence
-     *
-     * @return string 
-     */
     public function getLibAgence(): ?string
     {
         return $this->libAgence;
     }
 
-    /**
-     * Set telAgence
-     *
-     * @param string $telAgence
-     * @return Agence
-     */
-    public function setTelAgence(string $telAgence): self
+    public function setLibAgence(string $libAgence): self
     {
-        $this->telAgence = $telAgence;
-    
+        $this->libAgence = $libAgence;
         return $this;
     }
 
-    /**
-     * Get telAgence
-     *
-     * @return string 
-     */
     public function getTelAgence(): ?string
     {
         return $this->telAgence;
     }
 
-    /**
-     * Set adresseAgence
-     *
-     * @param string $adresseAgence
-     * @return Agence
-     */
-    public function setAdresseAgence(string $adresseAgence): self
+    public function setTelAgence(?string $telAgence): self // Accepte null si nullable=true
     {
-        $this->adresseAgence = $adresseAgence;
-    
+        $this->telAgence = $telAgence;
         return $this;
     }
 
-    /**
-     * Get adresseAgence
-     *
-     * @return string 
-     */
     public function getAdresseAgence(): ?string
     {
         return $this->adresseAgence;
     }
 
-    /**
-     * Set etatAgence
-     *
-     * @param integer $etatAgence
-     * @return Agence
-     */
-    public function setEtatAgence(string $etatAgence): self
+    public function setAdresseAgence(string $adresseAgence): self
     {
-        $this->etatAgence = $etatAgence;
-    
+        $this->adresseAgence = $adresseAgence;
         return $this;
     }
 
-    /**
-     * Get etatAgence
-     *
-     * @return integer 
-     */
-    public function getEtatAgence(): ?string
+    public function getEtatAgence(): ?int // Type de retour corrigé en ?int
     {
         return $this->etatAgence;
     }
 
-    /**
-     * Set suppr
-     *
-     * @param integer $suppr
-     * @return Agence
-     */
-    public function setSuppr(string $suppr): self
+    public function setEtatAgence(int $etatAgence): self // Type de paramètre corrigé en int
     {
-        $this->suppr = $suppr;
-    
+        $this->etatAgence = $etatAgence;
         return $this;
     }
 
-    /**
-     * Get suppr
-     *
-     * @return integer 
-     */
-    public function getSuppr(): ?string
+    public function getSuppr(): ?int // Type de retour corrigé en ?int
     {
         return $this->suppr;
     }
 
-    /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     * @return Agence
-     */
-    public function setDateCreation(string $dateCreation): self
+     // Méthode sémantique pour la suppression logique
+    public function isSuppr(): bool
     {
-        $this->dateCreation = $dateCreation;
-    
+        return $this->suppr === 1;
+    }
+
+    public function setSuppr(int $suppr): self // Type de paramètre corrigé en int
+    {
+        $this->suppr = $suppr;
         return $this;
     }
 
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime 
-     */
-    public function getDateCreation(): ?string
+    public function getDateCreation(): ?\DateTimeImmutable // Type de retour corrigé
     {
         return $this->dateCreation;
+    }
+
+    /**
+     * La date de création est généralement définie à la construction et ne devrait pas être modifiable.
+     * Si elle doit être modifiable, la méthode est correcte. Sinon, supprimez ce setter.
+     */
+    public function setDateCreation(\DateTimeImmutable $dateCreation): self // Type de paramètre corrigé
+    {
+        $this->dateCreation = $dateCreation;
+        return $this;
+    }
+
+    // Méthode __toString pour affichage simple
+    public function __toString(): string
+    {
+        return $this->libAgence ?? $this->codeAgence ?? 'Agence';
     }
 }

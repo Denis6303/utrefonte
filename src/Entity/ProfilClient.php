@@ -4,250 +4,98 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * #[ORM\Entity](repositoryClass="App\Entity\ProfilClientRepository")
- * #[ORM\Table(name="profilclient")]
- */
-class ProfilClient {
-
-    function __construct() {
-        $this->etatProfil = 1;
-        $this->suppr = 0;
+#[ORM\Entity(repositoryClass: App\Repository\ProfilClientRepository::class)]
+#[ORM\Table(name: 'profilclient')]
+class ProfilClient
+{
+    public function __construct()
+    {
+        $this->abonnes = new ArrayCollection();
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idprofil", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idprofilclient', type: 'integer')]
+    private ?int $idProfilClient = null;
 
-    /**
-     * 
-     * @var string $libProfil
-     * #[ORM\Column(name="libprofil",type="string",length=70)]
-     * #[Assert\NotBlank(message=" Le libellé du profil ne peut être vide ")]
-     * @Assert\MinLength(3)
-     */
-    private $libProfil;
+    #[ORM\Column(name: 'libelleprofil', type: 'string', length: 100)]
+    #[Assert\NotBlank]
+    private ?string $libelleProfil = null;
 
-    /**
-     * @var integer $etatProfil
-     * #[ORM\Column(name="etatprofil",type="integer" )]
-     *   
-     */
-    private $etatProfil;
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @var integer $typeProfil
-     * #[ORM\Column(name="typeprofil",type="integer" )]
-     *   
-     */
-    private $typeProfil;
+    #[ORM\Column(name: 'etat', type: 'integer')]
+    private ?int $etat = null;
 
-    /**
-     * @var integer $ordre
-     * #[ORM\Column(name="ordre",type="integer", nullable=True)]
-     *   
-     */
-    private $ordre;
+    #[ORM\OneToMany(targetEntity: Abonne::class, mappedBy: 'profilClient')]
+    private Collection $abonnes;
 
-    /**
-     * @var integer $suppr
-     * #[ORM\Column(name="suppr", type="integer", nullable=True)]
-     * #[Assert\NotBlank()]  
-     */
-    private $suppr;
-    
-    /**
-     * @var ArrayCollection Utilisateur $utilisateurs
-     * #[ORM\OneToMany(targetEntity: App\Entity\Utilisateur::class, mappedBy="Profil")]
-     * 
-     */
-    private $utilisateurs;
-
-    /**
-     * @var ArrayCollection Abonne $abonnes
-     * #[ORM\OneToMany(targetEntity: App\Entity\Abonne::class, mappedBy="Profil")]
-     * 
-     */
-    private $abonnes;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
-        return $this->id;
+    public function getIdProfilClient(): ?int
+    {
+        return $this->idProfilClient;
     }
 
-    
-    /**
-     * Set ordre
-     *
-     * @param integer $ordre
-     * @return ProfilClient
-     */
-    public function setOrdre(string $ordre): self {
-        $this->libProfil = $ordre;
+    public function getLibelleProfil(): ?string
+    {
+        return $this->libelleProfil;
+    }
 
+    public function setLibelleProfil(string $libelleProfil): self
+    {
+        $this->libelleProfil = $libelleProfil;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getEtat(): ?int
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(int $etat): self
+    {
+        $this->etat = $etat;
         return $this;
     }
 
     /**
-     * Get ordre
-     *
-     * @return integer 
+     * @return Collection<int, Abonne>
      */
-    public function getOrdre(): ?string {
-        return $this->ordre;
-    }    
-    
-    /**
-     * Set libProfil
-     *
-     * @param string $libProfil
-     * @return ProfilClient
-     */
-    public function setLibProfil(string $libProfil): self {
-        $this->libProfil = $libProfil;
-
-        return $this;
-    }
-
-    /**
-     * Get libProfil
-     *
-     * @return string 
-     */
-    public function getLibProfil(): ?string {
-        return $this->libProfil;
-    }
-
-    /**
-     * Set etatProfil
-     *
-     * @param integer $etatProfil
-     * @return ProfilClient
-     */
-    public function setEtatProfil(string $etatProfil): self {
-        $this->etatProfil = $etatProfil;
-
-        return $this;
-    }
-
-    /**
-     * Get etatProfil
-     *
-     * @return integer 
-     */
-    public function getEtatProfil(): ?string {
-        return $this->etatProfil;
-    }
-
-    /**
-     * Add utilisateurs
-     *
-     * @param \App\Entity\Utilisateur $utilisateurs
-     * @return ProfilClient
-     */
-    public function addUtilisateur(\App\Entity\Utilisateur $utilisateurs) {
-        $this->utilisateurs[] = $utilisateurs;
-
-        return $this;
-    }
-
-    /**
-     * Remove utilisateurs
-     *
-     * @param \App\Entity\Utilisateur $utilisateurs
-     */
-    public function removeUtilisateur(\App\Entity\Utilisateur $utilisateurs) {
-        $this->utilisateurs->removeElement($utilisateurs);
-    }
-
-    /**
-     * Get utilisateurs
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getUtilisateurs(): ?string {
-        return $this->utilisateurs;
-    }
-
-    /**
-     * Add abonnes
-     *
-     * @param \App\Entity\Abonne $abonnes
-     * @return ProfilClient
-     */
-    public function addAbonne(\App\Entity\Abonne $abonnes) {
-        $this->abonnes[] = $abonnes;
-
-        return $this;
-    }
-
-    /**
-     * Remove abonnes
-     *
-     * @param \App\Entity\Abonne $abonnes
-     */
-    public function removeAbonne(\App\Entity\Abonne $abonnes) {
-        $this->abonnes->removeElement($abonnes);
-    }
-
-    /**
-     * Get abonnes
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getAbonnes(): ?string {
+    public function getAbonnes(): Collection
+    {
         return $this->abonnes;
     }
 
-    /**
-     * Set typeProfil
-     *
-     * @param integer $typeProfil
-     * @return ProfilClient
-     */
-    public function setTypeProfil(string $typeProfil): self {
-        $this->typeProfil = $typeProfil;
-
+    public function addAbonne(Abonne $abonne): self
+    {
+        if (!$this->abonnes->contains($abonne)) {
+            $this->abonnes->add($abonne);
+            $abonne->setProfilClient($this);
+        }
         return $this;
     }
 
-    /**
-     * Get typeProfil
-     *
-     * @return integer 
-     */
-    public function getTypeProfil(): ?string {
-        return $this->typeProfil;
-    }
-        
-    /**
-     * Set suppr
-     *
-     * @param integer $suppr
-     * @return ProfilClient
-     */
-    public function setSuppr(string $suppr): self {
-        $this->suppr = $suppr;
-
+    public function removeAbonne(Abonne $abonne): self
+    {
+        if ($this->abonnes->removeElement($abonne)) {
+            if ($abonne->getProfilClient() === $this) {
+                $abonne->setProfilClient(null);
+            }
+        }
         return $this;
     }
-
-    /**
-     * Get suppr
-     *
-     * @return integer 
-     */
-    public function getSuppr(): ?string {
-        return $this->suppr;
-    }
-
 }

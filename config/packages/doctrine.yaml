@@ -7,7 +7,6 @@ doctrine:
             collate: utf8mb4_unicode_ci
         types:
             json: Doctrine\DBAL\Types\JsonType
-            enum: App\Doctrine\Type\EnumType
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
@@ -25,7 +24,7 @@ doctrine:
         mappings:
             App:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
@@ -43,10 +42,8 @@ doctrine:
                 hour:
                     lifetime: 3600
                     cache_driver:
-                        type: array
-                        host: '%env(REDIS_HOST)%'
-                        port: '%env(REDIS_PORT)%'
-                        database: 1
+                        type: pool
+                        pool: doctrine.result_cache_pool
 
 when@test:
     doctrine:

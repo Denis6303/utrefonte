@@ -4,289 +4,114 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * App\Entity
- *
- * #[ORM\Table(name="service")]
- * #[ORM\Entity](repositoryClass="App\Entity\ServiceRepository")
- *
- */
-class Service {
-
-    function __construct() {
-        
+#[ORM\Entity(repositoryClass: App\Repository\ServiceRepository::class)]
+#[ORM\Table(name: 'service')]
+class Service
+{
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idservice", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idservice', type: 'integer')]
+    private ?int $idService = null;
 
-    /**
-     * @var string $libService
-     * #[ORM\Column(name="libservice",type="string",length=100)]
-     * #[Assert\NotBlank(message="Le libellé du service ne peut être vide")]
-     * @Assert\MinLength(2)
-     */
-    private $libService;
+    #[ORM\Column(name: 'libelleservice', type: 'string', length: 100)]
+    #[Assert\NotBlank]
+    private ?string $libelleService = null;
 
-    /**
-     * @var string $emailService
-     * #[ORM\Column(name="emailservice",type="string",length=100)]
-     * @Assert\MinLength(2)
-     */
-    private $emailService;
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @var text $descriptionService
-     * #[ORM\Column(name="descriptionservice",type="string")]
-     */
-    private $descriptionService;
+    #[ORM\Column(name: 'prix', type: 'decimal', precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private ?string $prix = null;
 
-    /**
-     * @var integer $serviceAjoutPar
-     * #[ORM\Column(name="serviceajoutpar" , type="integer")]
-     *   
-     */
-    private $serviceAjoutPar;
+    #[ORM\Column(name: 'etat', type: 'integer')]
+    private ?int $etat = null;
 
-    /**
-     * @var integer $serviceModifPar
-     * #[ORM\Column(name="servicemodifpar" , type="integer", nullable=true)]
-     *   
-     */
-    private $serviceModifPar;
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'service')]
+    private Collection $messages;
 
-    /**
-     * @var datetime $serviceDateAjout
-     * #[ORM\Column(name="servicedateajout" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $serviceDateAjout;
-
-    /**
-     * @var datetime $serviceDateModif
-     * #[ORM\Column(name="servicedatemodif" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $serviceDateModif;
-
-    /**
-     * @var integer $etatService
-     * #[ORM\Column(name="etatservice",type="integer" )]
-     *   
-     */
-    private $etatService;
-
-    /**
-     * @var integer $typeService
-     * #[ORM\Column(name="typeService",type="integer" )]
-     *   
-     */
-    private $typeService;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
-        return $this->id;
+    public function getIdService(): ?int
+    {
+        return $this->idService;
     }
 
-    /**
-     * Set libService
-     *
-     * @param string $libService
-     * @return Service
-     */
-    public function setLibService(string $libService): self {
-        $this->libService = $libService;
+    public function getLibelleService(): ?string
+    {
+        return $this->libelleService;
+    }
 
+    public function setLibelleService(string $libelleService): self
+    {
+        $this->libelleService = $libelleService;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getPrix(): ?string
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(string $prix): self
+    {
+        $this->prix = $prix;
+        return $this;
+    }
+
+    public function getEtat(): ?int
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(int $etat): self
+    {
+        $this->etat = $etat;
         return $this;
     }
 
     /**
-     * Get libService
-     *
-     * @return string 
+     * @return Collection<int, Message>
      */
-    public function getLibService(): ?string {
-        return $this->libService;
+    public function getMessages(): Collection
+    {
+        return $this->messages;
     }
 
-    /**
-     * Set descriptionService
-     *
-     * @param string $descriptionService
-     * @return Service
-     */
-    public function setDescriptionService(string $descriptionService): self {
-        $this->descriptionService = $descriptionService;
-
+    public function addMessage(Message $message): self
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setService($this);
+        }
         return $this;
     }
 
-    /**
-     * Get descriptionService
-     *
-     * @return string 
-     */
-    public function getDescriptionService(): ?string {
-        return $this->descriptionService;
-    }
-
-    /**
-     * Set serviceAjoutPar
-     *
-     * @param integer $serviceAjoutPar
-     * @return Service
-     */
-    public function setServiceAjoutPar(string $serviceAjoutPar): self {
-        $this->serviceAjoutPar = $serviceAjoutPar;
-
+    public function removeMessage(Message $message): self
+    {
+        if ($this->messages->removeElement($message)) {
+            if ($message->getService() === $this) {
+                $message->setService(null);
+            }
+        }
         return $this;
     }
-
-    /**
-     * Get serviceAjoutPar
-     *
-     * @return integer 
-     */
-    public function getServiceAjoutPar(): ?string {
-        return $this->serviceAjoutPar;
-    }
-
-    /**
-     * Set serviceModifPar
-     *
-     * @param integer $serviceModifPar
-     * @return Service
-     */
-    public function setServiceModifPar(string $serviceModifPar): self {
-        $this->serviceModifPar = $serviceModifPar;
-
-        return $this;
-    }
-
-    /**
-     * Get serviceModifPar
-     *
-     * @return integer 
-     */
-    public function getServiceModifPar(): ?string {
-        return $this->serviceModifPar;
-    }
-
-    /**
-     * Set serviceDateAjout
-     *
-     * @param \DateTime $serviceDateAjout
-     * @return Service
-     */
-    public function setServiceDateAjout(string $serviceDateAjout): self {
-        $this->serviceDateAjout = $serviceDateAjout;
-
-        return $this;
-    }
-
-    /**
-     * Get serviceDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getServiceDateAjout(): ?string {
-        return $this->serviceDateAjout;
-    }
-
-    /**
-     * Set serviceDateModif
-     *
-     * @param \DateTime $serviceDateModif
-     * @return Service
-     */
-    public function setServiceDateModif(string $serviceDateModif): self {
-        $this->serviceDateModif = $serviceDateModif;
-
-        return $this;
-    }
-
-    /**
-     * Get serviceDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getServiceDateModif(): ?string {
-        return $this->serviceDateModif;
-    }
-
-    /**
-     * Set etatService
-     *
-     * @param integer $etatService
-     * @return Service
-     */
-    public function setEtatService(string $etatService): self {
-        $this->etatService = $etatService;
-
-        return $this;
-    }
-
-    /**
-     * Get etatService
-     *
-     * @return integer 
-     */
-    public function getEtatService(): ?string {
-        return $this->etatService;
-    }
-
-    /**
-     * Set emailService
-     *
-     * @param string $emailService
-     * @return Service
-     */
-    public function setEmailService(string $emailService): self {
-        $this->emailService = $emailService;
-
-        return $this;
-    }
-
-    /**
-     * Get emailService
-     *
-     * @return string 
-     */
-    public function getEmailService(): ?string {
-        return $this->emailService;
-    }
-
-    /**
-     * Set typeService
-     *
-     * @param integer $typeService
-     * @return Service
-     */
-    public function setTypeService(string $typeService): self {
-        $this->typeService = $typeService;
-
-        return $this;
-    }
-
-    /**
-     * Get typeService
-     *
-     * @return integer 
-     */
-    public function getTypeService(): ?string {
-        return $this->typeService;
-    }
-
 }

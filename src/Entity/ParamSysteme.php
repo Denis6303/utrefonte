@@ -2,82 +2,87 @@
 
 namespace App\Entity;
 
+use App\Repository\ParamSystemeRepository; // Importer le Repository (nom de classe corrigé)
+use Doctrine\DBAL\Types\Types;          // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="paramsysteme")]
- * #[ORM\Entity](repositoryClass="App\Entity\ParamSystemeRepository")
- *
+ * Entité représentant un paramètre système clé/valeur.
  */
-class ParamSysteme {
+#[ORM\Entity(repositoryClass: ParamSystemeRepository::class)] // Nom Repository corrigé
+#[ORM\Table(name: 'paramsysteme')]
+// Pas besoin de @ORM\HasLifecycleCallbacks si non utilisé
+class ParamSysteme
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idparam', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    function __construct() {
-        $this->suppr = 0;
-        $this->etatParametre = 1;
+    /**
+     * Clé unique identifiant le paramètre.
+     */
+    #[ORM\Column(name: 'cle', type: Types::STRING, length: 100, unique: true)] // Rendu unique
+    #[Assert\NotBlank(message: "La clé du paramètre est obligatoire.")]
+    #[Assert\Length(max: 100, maxMessage: "La clé ne doit pas dépasser {{ limit }} caractères.")]
+    #[Assert\Regex(pattern: "/^[a-zA-Z0-9_.-]+$/", message: "La clé ne peut contenir que des lettres, chiffres, underscores, points et tirets.")] // Valider format clé
+    private ?string $cle = null; // Type hint ?string
+
+    /**
+     * Valeur du paramètre. Stockée en TEXT pour flexibilité.
+     */
+    #[ORM\Column(name: 'valeur', type: Types::TEXT, nullable: true)] // Changé en TEXT nullable
+    // Pas de NotBlank/MinLength ici, la valeur peut être vide/null ou spécifique au type/clé
+    private ?string $valeur = null; // Type hint ?string
+
+    /**
+     * Description expliquant le rôle du paramètre.
+     */
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)] // Changé en TEXT nullable
+    private ?string $description = null; // Type hint ?string
+
+    /**
+     * Type de la valeur stockée (pour cast éventuel, ex: 1=string, 2=int, 3=bool).
+     * !! Recommandation : Pourrait être une relation ManyToOne vers une entité ParamType !!
+     */
+    #[ORM\Column(name: 'idtype', type: Types::INTEGER)] // Nom de colonne conservé
+    #[Assert\NotNull(message: "Le type de paramètre est requis.")]
+    // Optionnel: #[Assert\Choice(choices: [1, 2, 3], message: "Type invalide.")]
+    private ?int $type = null; // Nom de propriété 'type', Type hint ?int
+
+    /**
+     * Indicateur de suppression logique.
+     */
+    #[ORM\Column(name: 'suppr', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $suppr = false; // Initialisé dans le constructeur, Type hint ?bool
+
+    /**
+     * État du paramètre (actif/inactif).
+     */
+    #[ORM\Column(name: 'etatparametre', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $etatParametre = true; // Initialisé dans le constructeur, Type hint ?bool
+
+
+    public function __construct()
+    {
+        $this->suppr = false; // Non supprimé par défaut
+        $this->etatParametre = true; // Actif par défaut
     }
-
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idparam", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var integer $cle
-     * #[ORM\Column(name="cle", type="string" ,length=100)]
-     * #[Assert\NotBlank()]  
-     */
-    private $cle;    
-    
-    /**
-     * @var string $valeur
-     * #[ORM\Column(name="valeur",type="string",length=100)]
-     * @Assert\MinLength(2)
-     */
-    private $valeur;
-        
-    /**
-     * @var string $description
-     * #[ORM\Column(name="description",type="string",length=255,nullable=true)]
-     * 
-     */
-    private $description;
-    
-    /**
-     * @var integer $type
-     * #[ORM\Column(name="idtype", type="integer")]
-     */
-    private $type;  
-    
-    /**
-     * @var integer $suppr
-     * #[ORM\Column(name="suppr", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $suppr;
-    
-    /**
-     * @var integer $etatParametre
-     * #[ORM\Column(name="etatparametre",type="integer" )]
-     *   
-     */
-    private $etatParametre;
-
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getId(): ?string
+    public function getId(): ?int // Type retour corrigé
     {
         return $this->id;
     }
+
+    // Pas de setter pour l'ID
 
     /**
      * Set cle
@@ -88,14 +93,13 @@ class ParamSysteme {
     public function setCle(string $cle): self
     {
         $this->cle = $cle;
-    
         return $this;
     }
 
     /**
      * Get cle
      *
-     * @return string 
+     * @return string|null
      */
     public function getCle(): ?string
     {
@@ -105,20 +109,19 @@ class ParamSysteme {
     /**
      * Set valeur
      *
-     * @param string $valeur
+     * @param string|null $valeur // Accepte null
      * @return ParamSysteme
      */
-    public function setValeur(string $valeur): self
+    public function setValeur(?string $valeur): self // Accepte null
     {
         $this->valeur = $valeur;
-    
         return $this;
     }
 
     /**
-     * Get valeur
+     * Get valeur (brute, string)
      *
-     * @return string 
+     * @return string|null
      */
     public function getValeur(): ?string
     {
@@ -131,19 +134,18 @@ class ParamSysteme {
      * @param integer $type
      * @return ParamSysteme
      */
-    public function setType(string $type): self
+    public function setType(int $type): self // Type param corrigé en int
     {
         $this->type = $type;
-    
         return $this;
     }
 
     /**
      * Get type
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getType(): ?string
+    public function getType(): ?int // Type retour corrigé
     {
         return $this->type;
     }
@@ -151,20 +153,19 @@ class ParamSysteme {
     /**
      * Set description
      *
-     * @param string $description
+     * @param string|null $description // Accepte null
      * @return ParamSysteme
      */
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self // Accepte null
     {
         $this->description = $description;
-    
         return $this;
     }
 
     /**
      * Get description
      *
-     * @return string 
+     * @return string|null
      */
     public function getDescription(): ?string
     {
@@ -172,48 +173,67 @@ class ParamSysteme {
     }
 
     /**
-     * Set suppr
-     *
-     * @param integer $suppr
-     * @return ParamSysteme
+     * Vérifie si le paramètre est supprimé.
      */
-    public function setSuppr(string $suppr): self
-    {
-        $this->suppr = $suppr;
-    
-        return $this;
-    }
-
-    /**
-     * Get suppr
-     *
-     * @return integer 
-     */
-    public function getSuppr(): ?string
+    public function isSuppr(): ?bool // Getter booléen
     {
         return $this->suppr;
     }
 
     /**
-     * Set etatParametre
+     * Set suppr
      *
-     * @param integer $etatParametre
+     * @param boolean $suppr
      * @return ParamSysteme
      */
-    public function setEtatParametre(string $etatParametre): self
+    public function setSuppr(bool $suppr): self // Type param corrigé en bool
     {
-        $this->etatParametre = $etatParametre;
-    
+        $this->suppr = $suppr;
         return $this;
     }
 
     /**
-     * Get etatParametre
-     *
-     * @return integer 
+     * Get suppr (moins sémantique que isSuppr)
+     * @return boolean|null
      */
-    public function getEtatParametre(): ?string
+     public function getSuppr(): ?bool // Type retour corrigé
+     {
+         return $this->suppr;
+     }
+
+    /**
+     * Vérifie si le paramètre est actif.
+     */
+    public function isEtatParametre(): ?bool // Getter booléen
     {
         return $this->etatParametre;
+    }
+
+    /**
+     * Set etatParametre
+     *
+     * @param boolean $etatParametre
+     * @return ParamSysteme
+     */
+    public function setEtatParametre(bool $etatParametre): self // Type param corrigé en bool
+    {
+        $this->etatParametre = $etatParametre;
+        return $this;
+    }
+
+    /**
+     * Get etatParametre (moins sémantique que isEtatParametre)
+     * @return boolean|null
+     */
+     public function getEtatParametre(): ?bool // Type retour corrigé
+     {
+         return $this->etatParametre;
+     }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->cle ?? 'ParamSysteme #' . $this->id;
     }
 }

@@ -5,177 +5,94 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * #[ORM\Entity](repositoryClass="App\Entity\ActionRepository")
- * #[ORM\Table(name="action")]
- */
-class Action {
+#[ORM\Entity(repositoryClass: App\Repository\ActionRepository::class)]
+#[ORM\Table(name: 'action')]
+class Action
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idaction', type: 'integer')]
+    private ?int $idAction = null;
 
-    function __construct() {
-        
+    #[ORM\Column(name: 'libelleaction', type: 'string', length: 100)]
+    #[Assert\NotBlank]
+    private ?string $libelleAction = null;
+
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(name: 'datecreation', type: 'datetime')]
+    private ?\DateTimeInterface $dateCreation = null;
+
+    #[ORM\Column(name: 'dateexpiration', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $dateExpiration = null;
+
+    #[ORM\Column(name: 'etat', type: 'boolean')]
+    private ?bool $etat = null;
+
+    public function __construct()
+    {
+        $this->dateCreation = new \DateTime();
+        $this->etat = true;
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idaction", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var string $libAction
-     * #[ORM\Column(name="libaction",type="string",length=50)]
-     * #[Assert\NotBlank(message="Libellé requis! ")]
-     * @Assert\MinLength(3)
-     */
-    private $libAction;
-
-    /**
-     * @var string $descriptionAction
-     * #[ORM\Column(name="descriptionaction" , type="string", nullable=True)]
-     * 
-     *   
-     */
-    private $descriptionAction;
-
-    /**
-     * @var integer $client
-     * #[ORM\Column(name="client", type="integer" ,length=1)]
-     * #[Assert\NotBlank()]  
-     */
-    private $client;
-
-    /**
-     * @var Controleur $controleur
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Controleur::class, inversedBy="actions", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idcontroleur", referencedColumnName="idcontroleur")
-     * })
-     */
-    private $controleur;
-
-    /**
-     * @var Module $module
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Module::class, inversedBy="actions", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idmodule", referencedColumnName="idmodule")
-     * })
-     */
-    private $module;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
-        return $this->id;
+    public function getIdAction(): ?int
+    {
+        return $this->idAction;
     }
 
-    /**
-     * Set libAction
-     *
-     * @param string $libAction
-     * @return Action
-     */
-    public function setLibAction(string $libAction): self {
-        $this->libAction = $libAction;
+    public function getLibelleAction(): ?string
+    {
+        return $this->libelleAction;
+    }
 
+    public function setLibelleAction(string $libelleAction): self
+    {
+        $this->libelleAction = $libelleAction;
         return $this;
     }
 
-    /**
-     * Get libAction
-     *
-     * @return string 
-     */
-    public function getLibAction(): ?string {
-        return $this->libAction;
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
-    /**
-     * Set descriptionAction
-     *
-     * @param string $descriptionAction
-     * @return Action
-     */
-    public function setDescriptionAction(string $descriptionAction): self {
-        $this->descriptionAction = $descriptionAction;
-
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 
-    /**
-     * Get descriptionAction
-     *
-     * @return string 
-     */
-    public function getDescriptionAction(): ?string {
-        return $this->descriptionAction;
+    public function getDateCreation(): ?\DateTimeInterface
+    {
+        return $this->dateCreation;
     }
 
-    /**
-     * Set controleur
-     *
-     * @param \App\Entity\Controleur $controleur
-     * @return Action
-     */
-    public function setControleur(\App\Entity\Controleur $controleur = null) {
-        $this->controleur = $controleur;
-
+    public function setDateCreation(\DateTimeInterface $dateCreation): self
+    {
+        $this->dateCreation = $dateCreation;
         return $this;
     }
 
-    /**
-     * Get controleur
-     *
-     * @return \App\Entity\Controleur 
-     */
-    public function getControleur(): ?string {
-        return $this->controleur;
+    public function getDateExpiration(): ?\DateTimeInterface
+    {
+        return $this->dateExpiration;
     }
 
-    /**
-     * Set module
-     *
-     * @param \App\Entity\Module $module
-     * @return Action
-     */
-    public function setModule(\App\Entity\Module $module = null) {
-        $this->module = $module;
-
+    public function setDateExpiration(?\DateTimeInterface $dateExpiration): self
+    {
+        $this->dateExpiration = $dateExpiration;
         return $this;
     }
 
-    /**
-     * Get module
-     *
-     * @return \App\Entity\Module 
-     */
-    public function getModule(): ?string {
-        return $this->module;
+    public function getEtat(): ?bool
+    {
+        return $this->etat;
     }
 
-    /**
-     * Set client
-     *
-     * @param integer $client
-     * @return Action
-     */
-    public function setClient(string $client): self {
-        $this->client = $client;
-
+    public function setEtat(bool $etat): self
+    {
+        $this->etat = $etat;
         return $this;
     }
-
-    /**
-     * Get client
-     *
-     * @return integer 
-     */
-    public function getClient(): ?string {
-        return $this->client;
-    }
-
 }

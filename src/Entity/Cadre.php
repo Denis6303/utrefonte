@@ -2,502 +2,370 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\CadreRepository; // Assurez-vous que ce repository existe
 use Doctrine\Common\Collections\ArrayCollection;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo; // Import Gedmo pour l'attribut Locale
+use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables pour les dates
 
 /**
- * Classe qui va gerer les cadres
- *
- * @author Edem
- * #[ORM\Entity](repositoryClass="App\Entity\CadreRepository")
- * #[ORM\Table(name="cadre")]
- * @ORM\HasLifecycleCallbacks
+ * Entité représentant un Cadre (potentiellement un bloc de contenu).
  */
-class Cadre {
+#[ORM\Entity(repositoryClass: CadreRepository::class)]
+#[ORM\Table(name: 'cadre')]
+#[ORM\HasLifecycleCallbacks] // Conserve les callbacks
+class Cadre
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idcadre', type: Types::INTEGER)]
+    private ?int $id = null;
 
-    function __construct() {
-        $this->etatCadre = 1;
+    #[ORM\Column(name: 'libcadre', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé du cadre ne peut être vide")]
+    #[Assert\Length(min: 2, minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.", max: 100, maxMessage: "Le libellé ne peut pas dépasser {{ limit }} caractères.")] // Combinaison de MinLength et longueur max
+    private ?string $libCadre = null;
+
+    #[ORM\Column(name: 'contenucadre', type: Types::TEXT, nullable: true)] // Rendre nullable si le contenu peut être vide
+    private ?string $contenuCadre = null;
+
+    #[ORM\Column(name: 'positioncadre', type: Types::INTEGER, nullable: true)] // Rendre nullable si non obligatoire
+    private ?int $positionCadre = null;
+
+    #[ORM\Column(name: 'naturecadre', type: Types::INTEGER, nullable: true)] // Rendre nullable si non obligatoire
+    // Ajoutez une validation si nécessaire (ex: Assert\Choice)
+    private ?int $natureCadre = null;
+
+    /**
+     * @var int|null ID de l'utilisateur ayant ajouté. Relation ManyToOne serait mieux.
+     */
+    #[ORM\Column(name: 'cadreajoutpar', type: Types::INTEGER, nullable: true)] // Rendre nullable pour éviter erreur si non défini avant PrePersist
+    private ?int $cadreAjoutPar = null;
+
+    /**
+     * @var int|null ID de l'utilisateur ayant modifié. Relation ManyToOne serait mieux.
+     */
+    #[ORM\Column(name: 'cadremodifpar', type: Types::INTEGER, nullable: true)]
+    private ?int $cadreModifPar = null;
+
+    #[ORM\Column(name: 'cadredateajout', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PrePersist, nullable=true évite erreur avant flush
+    private ?DateTimeImmutable $cadreDateAjout = null;
+
+    #[ORM\Column(name: 'cadredatemodif', type: Types::DATETIME_IMMUTABLE, nullable: true)] // Géré par PreUpdate
+    private ?DateTimeImmutable $cadreDateModif = null;
+
+    /**
+     * @var int État du cadre (ex: 1=actif, 0=inactif)
+     */
+    #[ORM\Column(name: 'etatcadre', type: Types::INTEGER)]
+    #[Assert\NotNull] // Ne peut pas être null car initialisé
+    // #[Assert\Choice(choices: [0, 1], message: "L'état doit être 0 ou 1.")] // Si limité à 0/1
+    private ?int $etatCadre = null; // Initialisé dans le constructeur
+
+    /**
+     * @var int|null ID de la rubrique pointée (utilité à clarifier)
+     */
+    #[ORM\Column(name: 'rubpointer', type: Types::INTEGER, nullable: true)]
+    private ?int $rubPointer = null;
+
+    /**
+     * @var int|null ID de l'article pointé (utilité à clarifier)
+     */
+    #[ORM\Column(name: 'articlepointer', type: Types::INTEGER, nullable: true)]
+    private ?int $articlePointer = null;
+
+    /**
+     * Locale utilisée pour les traductions Gedmo (non mappée).
+     */
+    #[Gedmo\Locale]
+    private ?string $locale = null;
+
+    // --- RELATIONS ---
+
+    /**
+     * @var Collection<int, Article> Articles liés (Inverse Side).
+     */
+    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'cadres', cascade: ['persist'])]
+    private Collection $articles;
+
+    /**
+     * @var Collection<int, Media> Médias liés (OneToMany).
+     * orphanRemoval=true: si un Media est retiré de la collection, il est supprimé.
+     */
+    #[ORM\OneToMany(mappedBy: 'cadre', targetEntity: Media::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $medias;
+
+    /**
+     * @var Collection<int, Rubrique> Rubriques liées (Inverse Side).
+     */
+    #[ORM\ManyToMany(targetEntity: Rubrique::class, mappedBy: 'cadres', cascade: ['persist'])]
+    private Collection $rubriques;
+
+    #[ORM\ManyToOne(targetEntity: TypeCadre::class, inversedBy: 'cadres', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idtypecadre', referencedColumnName: 'idtypecadre', nullable: true)] // Rendre nullable si un cadre peut ne pas avoir de type
+    private ?TypeCadre $typeCadre = null;
+
+
+    public function __construct()
+    {
+        $this->etatCadre = 1; // Valeur par défaut : Actif
+        $this->articles = new ArrayCollection();
+        $this->medias = new ArrayCollection();
+        $this->rubriques = new ArrayCollection();
+        // DateAjout sera défini dans PrePersist
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idcadre", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
-
-    /**
-     * @var ArrayCollection Article $articles
-     *
-     * Inverse Side
-     * @ORM\ManyToMany(targetEntity="App\Entity\Article",mappedBy="cadres", cascade={"persist"})
-     */
-    private $articles;
-
-    /**
-     * @var Media $medias
-     * #[ORM\OneToMany(targetEntity: App\Entity\Media::class, mappedBy="cadre" )]
-     * 
-     */
-    private $medias;
-
-    /**
-     * @var ArrayCollection Rubrique $rubriques
-     * Inverse Side
-     * @ORM\ManyToMany(targetEntity="App\Entity\Rubrique",mappedBy="cadres", cascade={"persist"})
-     */
-    private $rubriques;
-
-    /**
-     * @var TypeCadre $typeCadre
-     * #[ORM\ManyToOne(targetEntity: App\Entity\TypeCadre::class, inversedBy="cadres", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idtypecadre", referencedColumnName="idtypecadre")
-     * })
-     */
-    private $typeCadre;
-
-    /**
-     * @var string $libCadre
-     * #[ORM\Column(name="libcadre",type="string",length=100)]
-     * #[Assert\NotBlank(message="Le libellé du cadre ne peut être vide")]
-     * @Assert\MinLength(2)
-     */
-    private $libCadre;
-
-    /**
-     * @var text $contenuCadre
-     * #[ORM\Column(name="contenucadre",type="text")]
-     */
-    private $contenuCadre;
-
-    /**
-     * @var integer $positionCadre
-     * #[ORM\Column(name="positioncadre",type="integer")]
-     */
-    private $positionCadre;
-
-    /**
-     * @var integer $natureCadre
-     * #[ORM\Column(name="naturecadre",type="integer")]
-     */
-    private $natureCadre;
-
-    /**
-     * @var integer $cadreAjoutPar
-     * #[ORM\Column(name="cadreajoutpar" , type="integer")]
-     *   
-     */
-    private $cadreAjoutPar;
-
-    /**
-     * @var integer $cadreModifPar
-     * #[ORM\Column(name="cadremodifpar" , type="integer", nullable=true)]
-     *   
-     */
-    private $cadreModifPar;
-
-    /**
-     * @var datetime $cadreDateAjout
-     * #[ORM\Column(name="cadredateajout" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $cadreDateAjout;
-
-    /**
-     * @var datetime $cadreDateModif
-     * #[ORM\Column(name="cadredatemodif" , type="datetime", nullable=true)]
-     * #[Assert\NotBlank()]
-     *   
-     */
-    private $cadreDateModif;
-
-    /**
-     * @var integer $etatCadre
-     * #[ORM\Column(name="etatcadre",type="integer" )]
-     *   
-     */
-    private $etatCadre;
-
-    /**
-     * @var integer $rubPointer
-     * #[ORM\Column(name="rubPointer",type="integer", nullable=true )]
-     *   
-     */
-    private $rubPointer;
-
-    /**
-     * @var integer $articlePointer
-     * #[ORM\Column(name="articlePointer",type="integer", nullable=true )]
-     *   
-     */
-    private $articlePointer;
-
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    private $locale;
-
-    public function setTranslatableLocale(string $locale): self {
-        $this->locale = $locale;
+    #[ORM\PrePersist]
+    public function setTimestampsOnCreate(): void
+    {
+        if ($this->cadreDateAjout === null) {
+             $this->cadreDateAjout = new DateTimeImmutable();
+        }
+        // On pourrait aussi définir cadreAjoutPar ici si l'utilisateur est accessible
     }
 
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    #[ORM\PreUpdate]
+    public function setTimestampsOnUpdate(): void
+    {
+        $this->cadreDateModif = new DateTimeImmutable();
+        // On pourrait aussi définir cadreModifPar ici si l'utilisateur est accessible
+    }
+
+    // --- GETTERS & SETTERS ---
+    // (Types corrigés et cohérents)
+
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
-    /**
-     * Set libCadre
-     *
-     * @param string $libCadre
-     * @return Cadre
-     */
-    public function setLibCadre(string $libCadre): self {
-        $this->libCadre = $libCadre;
-
-        return $this;
-    }
-
-    /**
-     * Get libCadre
-     *
-     * @return string 
-     */
-    public function getLibCadre(): ?string {
+    public function getLibCadre(): ?string
+    {
         return $this->libCadre;
     }
 
-    /**
-     * Set contenuCadre
-     *
-     * @param string $contenuCadre
-     * @return Cadre
-     */
-    public function setContenuCadre(string $contenuCadre): self {
-        $this->contenuCadre = $contenuCadre;
-
+    public function setLibCadre(string $libCadre): self
+    {
+        $this->libCadre = $libCadre;
         return $this;
     }
 
-    /**
-     * Get contenuCadre
-     *
-     * @return string 
-     */
-    public function getContenuCadre(): ?string {
+    public function getContenuCadre(): ?string
+    {
         return $this->contenuCadre;
     }
 
-    /**
-     * Set positionCadre
-     *
-     * @param integer $positionCadre
-     * @return Cadre
-     */
-    public function setPositionCadre(string $positionCadre): self {
-        $this->positionCadre = $positionCadre;
-
+    public function setContenuCadre(?string $contenuCadre): self // Accepte null
+    {
+        $this->contenuCadre = $contenuCadre;
         return $this;
     }
 
-    /**
-     * Get positionCadre
-     *
-     * @return integer 
-     */
-    public function getPositionCadre(): ?string {
+    public function getPositionCadre(): ?int
+    {
         return $this->positionCadre;
     }
 
-    /**
-     * Set natureCadre
-     *
-     * @param integer $natureCadre
-     * @return Cadre
-     */
-    public function setNatureCadre(string $natureCadre): self {
-        $this->natureCadre = $natureCadre;
-
+    public function setPositionCadre(?int $positionCadre): self // Accepte null
+    {
+        $this->positionCadre = $positionCadre;
         return $this;
     }
 
-    /**
-     * Get natureCadre
-     *
-     * @return integer 
-     */
-    public function getNatureCadre(): ?string {
+    public function getNatureCadre(): ?int
+    {
         return $this->natureCadre;
     }
 
-    /**
-     * Set cadreAjoutPar
-     *
-     * @param integer $cadreAjoutPar
-     * @return Cadre
-     */
-    public function setCadreAjoutPar(string $cadreAjoutPar): self {
-        $this->cadreAjoutPar = $cadreAjoutPar;
-
+    public function setNatureCadre(?int $natureCadre): self // Accepte null
+    {
+        $this->natureCadre = $natureCadre;
         return $this;
     }
 
-    /**
-     * Get cadreAjoutPar
-     *
-     * @return integer 
-     */
-    public function getCadreAjoutPar(): ?string {
+    public function getCadreAjoutPar(): ?int
+    {
         return $this->cadreAjoutPar;
     }
 
-    /**
-     * Set cadreModifPar
-     *
-     * @param integer $cadreModifPar
-     * @return Cadre
-     */
-    public function setCadreModifPar(string $cadreModifPar): self {
-        $this->cadreModifPar = $cadreModifPar;
-
+    public function setCadreAjoutPar(?int $cadreAjoutPar): self // Accepte null
+    {
+        $this->cadreAjoutPar = $cadreAjoutPar;
         return $this;
     }
 
-    /**
-     * Get cadreModifPar
-     *
-     * @return integer 
-     */
-    public function getCadreModifPar(): ?string {
+    public function getCadreModifPar(): ?int
+    {
         return $this->cadreModifPar;
     }
 
-    /**
-     * Set cadreDateAjout
-     *
-     * @param \DateTime $cadreDateAjout
-     * @return Cadre
-     */
-    public function setCadreDateAjout(string $cadreDateAjout): self {
-        $this->cadreDateAjout = $cadreDateAjout;
-
+    public function setCadreModifPar(?int $cadreModifPar): self // Accepte null
+    {
+        $this->cadreModifPar = $cadreModifPar;
         return $this;
     }
 
-    /**
-     * Get cadreDateAjout
-     *
-     * @return \DateTime 
-     */
-    public function getCadreDateAjout(): ?string {
+    public function getCadreDateAjout(): ?DateTimeImmutable
+    {
         return $this->cadreDateAjout;
     }
 
-    /**
-     * Set cadreDateModif
-     *
-     * @param \DateTime $cadreDateModif
-     * @return Cadre
-     */
-    public function setCadreDateModif(string $cadreDateModif): self {
-        $this->cadreDateModif = $cadreDateModif;
+    // Pas de setter pour cadreDateAjout car géré par PrePersist
 
-        return $this;
-    }
-
-    /**
-     * Get cadreDateModif
-     *
-     * @return \DateTime 
-     */
-    public function getCadreDateModif(): ?string {
+    public function getCadreDateModif(): ?DateTimeImmutable
+    {
         return $this->cadreDateModif;
     }
 
-    /**
-     * Add articles
-     *
-     * @param \App\Entity\Article $articles
-     * @return Cadre
-     */
-    public function addArticle(\App\Entity\Article $articles) {
-        $this->articles[] = $articles;
+    // Pas de setter pour cadreDateModif car géré par PreUpdate
 
-        return $this;
-    }
-
-    /**
-     * Remove articles
-     *
-     * @param \App\Entity\Article $articles
-     */
-    public function removeArticle(\App\Entity\Article $articles) {
-        $this->articles->removeElement($articles);
-    }
-
-    /**
-     * Get articles
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getArticles(): ?string {
-        return $this->articles;
-    }
-
-    /**
-     * Add medias
-     *
-     * @param \App\Entity\Media $medias
-     * @return Cadre
-     */
-    public function addMedia(\App\Entity\Media $medias) {
-        $this->medias[] = $medias;
-
-        return $this;
-    }
-
-    /**
-     * Remove medias
-     *
-     * @param \App\Entity\Media $medias
-     */
-    public function removeMedia(\App\Entity\Media $medias) {
-        $this->medias->removeElement($medias);
-    }
-
-    /**
-     * Get medias
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMedias(): ?string {
-        return $this->medias;
-    }
-
-    /**
-     * Add rubriques
-     *
-     * @param \App\Entity\Rubrique $rubriques
-     * @return Cadre
-     */
-    public function addRubrique(\App\Entity\Rubrique $rubriques) {
-        $this->rubriques[] = $rubriques;
-
-        return $this;
-    }
-
-    /**
-     * Remove rubriques
-     *
-     * @param \App\Entity\Rubrique $rubriques
-     */
-    public function removeRubrique(\App\Entity\Rubrique $rubriques) {
-        $this->rubriques->removeElement($rubriques);
-    }
-
-    /**
-     * Get rubriques
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getRubriques(): ?string {
-        return $this->rubriques;
-    }
-
-    /**
-     * Set typeCadre
-     *
-     * @param \App\Entity\TypeCadre $typeCadre
-     * @return Cadre
-     */
-    public function setTypeCadre(\App\Entity\TypeCadre $typeCadre = null) {
-        $this->typeCadre = $typeCadre;
-
-        return $this;
-    }
-
-    /**
-     * Get typeCadre
-     *
-     * @return \App\Entity\TypeCadre 
-     */
-    public function getTypeCadre(): ?string {
-        return $this->typeCadre;
-    }
-
-    /**
-     * Set etatCadre
-     *
-     * @param integer $etatCadre
-     * @return Cadre
-     */
-    public function setEtatCadre(string $etatCadre): self {
-        $this->etatCadre = $etatCadre;
-
-        return $this;
-    }
-
-    /**
-     * Get etatCadre
-     *
-     * @return integer 
-     */
-    public function getEtatCadre(): ?string {
+    public function getEtatCadre(): ?int
+    {
         return $this->etatCadre;
     }
 
-    /**
-     * Set rubPointer
-     *
-     * @param integer $rubPointer
-     * @return Cadre
-     */
-    public function setRubPointer(string $rubPointer): self {
-        $this->rubPointer = $rubPointer;
-
+    public function setEtatCadre(int $etatCadre): self // Ne doit pas être null
+    {
+        $this->etatCadre = $etatCadre;
         return $this;
     }
 
-    /**
-     * Get rubPointer
-     *
-     * @return integer 
-     */
-    public function getRubPointer(): ?string {
+     public function isActif(): bool // Méthode sémantique
+    {
+        return $this->etatCadre === 1;
+    }
+
+    public function getRubPointer(): ?int
+    {
         return $this->rubPointer;
     }
 
-    /**
-     * Set articlePointer
-     *
-     * @param integer $articlePointer
-     * @return Cadre
-     */
-    public function setArticlePointer(string $articlePointer): self {
-        $this->articlePointer = $articlePointer;
+    public function setRubPointer(?int $rubPointer): self // Accepte null
+    {
+        $this->rubPointer = $rubPointer;
+        return $this;
+    }
 
+    public function getArticlePointer(): ?int
+    {
+        return $this->articlePointer;
+    }
+
+    public function setArticlePointer(?int $articlePointer): self // Accepte null
+    {
+        $this->articlePointer = $articlePointer;
+        return $this;
+    }
+
+    // --- Gestionnaire de locale Gedmo ---
+    public function setTranslatableLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+    // --- Gestion des collections ---
+
+    /**
+     * @return Collection<int, Article>
+     */
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(Article $article): self
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles->add($article);
+            // Comme c'est l'inverse side, on doit potentiellement mettre à jour l'owning side (Article)
+            $article->addCadre($this); // Assurez-vous que addCadre existe dans Article
+        }
+        return $this;
+    }
+
+    public function removeArticle(Article $article): self
+    {
+        if ($this->articles->removeElement($article)) {
+            // Mettre à jour l'owning side
+            $article->removeCadre($this); // Assurez-vous que removeCadre existe dans Article
+        }
         return $this;
     }
 
     /**
-     * Get articlePointer
-     *
-     * @return integer 
+     * @return Collection<int, Media>
      */
-    public function getArticlePointer(): ?string {
-        return $this->articlePointer;
+    public function getMedias(): Collection
+    {
+        return $this->medias;
     }
 
+    public function addMedia(Media $media): self
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+            // Mettre à jour l'owning side dans Media
+            $media->setCadre($this); // Assurez-vous que setCadre existe dans Media
+        }
+        return $this;
+    }
+
+    public function removeMedia(Media $media): self
+    {
+        if ($this->medias->removeElement($media)) {
+            // Mettre à null l'owning side si la relation est nullable et qu'on ne veut pas supprimer Media (orphanRemoval=true le fera)
+            if ($media->getCadre() === $this) { // Assurez-vous que getCadre existe
+                 $media->setCadre(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rubrique>
+     */
+    public function getRubriques(): Collection
+    {
+        return $this->rubriques;
+    }
+
+    public function addRubrique(Rubrique $rubrique): self
+    {
+        if (!$this->rubriques->contains($rubrique)) {
+            $this->rubriques->add($rubrique);
+            // Mettre à jour l'owning side dans Rubrique
+            $rubrique->addCadre($this); // Assurez-vous que addCadre existe dans Rubrique
+        }
+        return $this;
+    }
+
+    public function removeRubrique(Rubrique $rubrique): self
+    {
+        if ($this->rubriques->removeElement($rubrique)) {
+             // Mettre à jour l'owning side dans Rubrique
+            $rubrique->removeCadre($this); // Assurez-vous que removeCadre existe dans Rubrique
+        }
+        return $this;
+    }
+
+    public function getTypeCadre(): ?TypeCadre
+    {
+        return $this->typeCadre;
+    }
+
+    public function setTypeCadre(?TypeCadre $typeCadre): self // Accepte null
+    {
+        $this->typeCadre = $typeCadre;
+        return $this;
+    }
+
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        return $this->libCadre ?? 'Cadre #' . $this->id;
+    }
 }

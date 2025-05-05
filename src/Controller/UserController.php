@@ -14,6 +14,9 @@ use App\Entity\Type\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
@@ -35,7 +38,8 @@ class UserController extends AbstractController
         private readonly AccessControl $accessControl,
         private readonly RequestStack $requestStack,
         private readonly TranslatorInterface $translator,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly string $userPhotosDirectory
     ) {}
 
     #[Route('/create', name: 'user_create')]
@@ -193,7 +197,7 @@ class UserController extends AbstractController
 
             $fileName = 'user_' . $user->getId() . '_' . uniqid() . '.' . $extension;
             $user->getPhoto()->move(
-                $this->getParameter('user_photos_directory'),
+                $this->userPhotosDirectory,
                 $fileName
             );
             $user->setUrlPhoto($fileName);

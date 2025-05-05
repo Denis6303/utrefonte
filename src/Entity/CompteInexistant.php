@@ -2,172 +2,122 @@
 
 namespace App\Entity;
 
+use App\Repository\CompteInexistantRepository; // Importer le Repository
+use Doctrine\DBAL\Types\Types; // Importer Types pour les types de colonnes
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable; // Utiliser les objets immuables pour les dates
 
-/**
- * #[ORM\Entity]
- * #[ORM\Entity](repositoryClass="App\Entity\CompteInexistantRepository")
- * #[ORM\Table(name="compteinexistant")]
- */
-class CompteInexistant {
+#[ORM\Entity(repositoryClass: CompteInexistantRepository::class)]
+#[ORM\Table(name: 'compteinexistant')]
+class CompteInexistant
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idcompteinexistant', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    /**
-     * #[ORM\Id]
-     * #[ORM\Column(name="idcompte", type="integer")]	
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'numerocompte', type: Types::STRING, length: 20)]
+    #[Assert\NotBlank(message: "Le numéro de compte est obligatoire.")]
+    #[Assert\Length(
+        max: 20,
+        maxMessage: "Le numéro de compte ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $numeroCompte = null;
 
-    public function __construct() {
-        $this->dateCreation = new \Datetime();
+    #[ORM\Column(name: 'libellecompte', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé du compte est obligatoire.")]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libelleCompte = null;
+
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(name: 'datecreation', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull] // Assurer que la date est toujours définie
+    private ?DateTimeImmutable $dateCreation = null; // Changé en DateTimeImmutable
+
+    #[ORM\ManyToOne(targetEntity: TypeCompte::class)] // inversedBy n'est probablement pas nécessaire ici
+    #[ORM\JoinColumn(name: 'idtypecompte', referencedColumnName: 'idtypecompte', nullable: true)] // Gardé nullable
+    private ?TypeCompte $typeCompte = null;
+
+    public function __construct()
+    {
+        // Initialiser avec DateTimeImmutable
+        $this->dateCreation = new DateTimeImmutable();
     }
 
-    /**
-     * #[ORM\Column(name="datecreation", type="datetime" , nullable =true)]
-     * @var string $dateCreation 
-     */
-    private $dateNotification;
-
-    /**
-     * @var string $compte
-     * #[ORM\Column(name="compte", type="string", length =20)]
-     */
-    private $compte;
-
-    /**
-     * @var integer $idfile
-     * #[ORM\Column(name="idfile", type="integer")]
-     */
-    private $idfile;
-
-    /**
-     * @var integer $traite
-     * #[ORM\Column(name="traite", type="integer")]
-     */
-    private $traite;
-
-    /**
-     * @var TypeCompte $typeCompte
-     * #[ORM\ManyToOne(targetEntity: App\Entity\TypeCompte::class, inversedBy="comptes", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idtypecompte", referencedColumnName="idtypecompte")
-     * })
-     */
-    private $typeCompte;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Nom et type retour standardisés
+    {
         return $this->id;
     }
 
-    /**
-     * Set dateNotification
-     *
-     * @param \DateTime $dateNotification
-     * @return CompteInexistant
-     */
-    public function setDateNotification(string $dateNotification): self {
-        $this->dateNotification = $dateNotification;
+    public function getNumeroCompte(): ?string
+    {
+        return $this->numeroCompte;
+    }
 
+    public function setNumeroCompte(string $numeroCompte): self
+    {
+        $this->numeroCompte = $numeroCompte;
         return $this;
     }
 
-    /**
-     * Get dateNotification
-     *
-     * @return \DateTime 
-     */
-    public function getDateNotification(): ?string {
-        return $this->dateNotification;
+    public function getLibelleCompte(): ?string
+    {
+        return $this->libelleCompte;
     }
 
-    /**
-     * Set compte
-     *
-     * @param string $compte
-     * @return CompteInexistant
-     */
-    public function setCompte(string $compte): self {
-        $this->compte = $compte;
-
+    public function setLibelleCompte(string $libelleCompte): self
+    {
+        $this->libelleCompte = $libelleCompte;
         return $this;
     }
 
-    /**
-     * Get compte
-     *
-     * @return string 
-     */
-    public function getCompte(): ?string {
-        return $this->compte;
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
-    /**
-     * Set typeCompte
-     *
-     * @param integer $typeCompte
-     * @return CompteInexistant
-     */
-    public function setTypeCompte(string $typeCompte): self {
-        $this->typeCompte = $typeCompte;
-
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 
+    public function getDateCreation(): ?DateTimeImmutable // Type retour corrigé
+    {
+        return $this->dateCreation;
+    }
+
     /**
-     * Get typeCompte
-     *
-     * @return integer 
+     * Normalement, la date de création ne devrait pas être modifiable après l'instanciation.
+     * Si elle doit l'être, la méthode est correcte, sinon, elle peut être supprimée.
      */
-    public function getTypeCompte(): ?string {
+    public function setDateCreation(DateTimeImmutable $dateCreation): self // Type paramètre corrigé
+    {
+        $this->dateCreation = $dateCreation;
+        return $this;
+    }
+
+    public function getTypeCompte(): ?TypeCompte
+    {
         return $this->typeCompte;
     }
 
-    /**
-     * Set idfile
-     *
-     * @param integer $idfile
-     * @return CompteInexistant
-     */
-    public function setIdfile(string $idfile): self {
-        $this->idfile = $idfile;
-
+    public function setTypeCompte(?TypeCompte $typeCompte): self
+    {
+        $this->typeCompte = $typeCompte;
         return $this;
     }
 
-    /**
-     * Get idfile
-     *
-     * @return integer 
-     */
-    public function getIdfile(): ?string {
-        return $this->idfile;
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return 'Compte Inexistant: ' . $this->numeroCompte ?? 'CompteInexistant #' . $this->id;
     }
-
-    /**
-     * Set traite
-     *
-     * @param integer $traite
-     * @return CompteInexistant
-     */
-    public function setTraite(string $traite): self {
-        $this->traite = $traite;
-
-        return $this;
-    }
-
-    /**
-     * Get traite
-     *
-     * @return integer 
-     */
-    public function getTraite(): ?string {
-        return $this->traite;
-    }
-
 }

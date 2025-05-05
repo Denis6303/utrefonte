@@ -5,25 +5,15 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\StatistiqueType;
 use App\Entity\Statistique;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Service\AccessControl;
 
 class StatistiqueController extends AbstractController
-    private EntityManagerInterface $entityManager;
-    private AccessControl $accessControl;
-    private RequestStack $requestStack;
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        AccessControl $accessControl,
-        RequestStack $requestStack,
-        TranslatorInterface $translator
-    ) {
-        $this->entityManager = $entityManager;
-        $this->accessControl = $accessControl;
-        $this->requestStack->getCurrentRequest()Stack = $requestStack;
-        $this->translator = $translator;
-    }
-
 {
     private EntityManagerInterface $entityManager;
     private AccessControl $accessControl;
@@ -38,32 +28,38 @@ class StatistiqueController extends AbstractController
     ) {
         $this->entityManager = $entityManager;
         $this->accessControl = $accessControl;
-        $this->requestStack->getCurrentRequest()Stack = $requestStack;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
-    } {
-
-    public function __construct() {
-        
     }
 
-    public function ajoutStatistiqueAction(): Response(string $locale): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
+    /**
+     * Methode qui s'occupe de l'ajout d'une statistique
+     * 
+     * @param string $locale La locale
+     * @return Response Le template ajoutStat.html.twig
+     */
+    #[Route(
+        path: '/admin/statistique/ajout/{locale}',
+        name: 'app_statistique_ajout',
+        requirements: [
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function ajoutStatistique(Request $request, string $locale): Response
+    {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'ajoutStatistiqueAction', $this->container->get);
+        $checkAcces = $this->accessControl->verifAcces($em, 'ajoutStatistique', $this->container->get);
 
         if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
         }
+        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-
 
         $unelignestat = new Statistique();
         $unelignestat->setTranslatableLocale($locale);
-        $form = $this->createForm($this->createForm(StatistiqueType::class), $unelignestat);
-
-        $request = $request;
+        $form = $this->createForm(StatistiqueType::class, $unelignestat);
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
@@ -72,171 +68,242 @@ class StatistiqueController extends AbstractController
             $em->flush();
 
             $msgnotification = $this->translator->trans('notification.ajout');
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', $msgnotification);
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('notice', $msgnotification);
 
-            return $this->redirect($this->generateUrl('utb_admin_listestat', ['locale' => $locale,]));
+            return $this->redirect($this->generateUrl('app_admin_listestat', ['locale' => $locale]));
         }
 
-        return $this->render('utbAdminBundle/Statistique/ajoutStat.html.twig', array(
-                    'form' => $form->createView(), 'locale' => $locale,
-        ));
+        return $this->render('utbAdminBundle/Statistique/ajoutStat.html.twig', [
+            'form' => $form->createView(),
+            'locale' => $locale
+        ]);
     }
 
-    public function listeStatistiqueAction(): Response(string $locale): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
+    /**
+     * Methode qui liste les statistiques
+     * 
+     * @param string $locale La locale
+     * @return Response Le template listeStat.html.twig
+     */
+    #[Route(
+        path: '/admin/statistique/liste/{locale}',
+        name: 'app_statistique_liste',
+        requirements: [
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function listeStatistique(Request $request, string $locale): Response
+    {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'listeStatistiqueAction', $this->container->get);
+        $checkAcces = $this->accessControl->verifAcces($em, 'listeStatistique', $this->container->get);
 
         if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
         }
 
         $this->requestStack->getCurrentRequest()->setLocale($locale);
+        
         $listestatistique = $this->entityManager
                 ->getRepository("App\Entity\Statistique")
                 ->getAllStatByLocale($locale);
-
 
         $lesstatistiques = $this->entityManager
                 ->getRepository("App\Entity\Statistique")
                 ->AllStatistique(1, $locale);
 
-        // var_dump($lesstatistiques);
-
-        return $this->render('utbAdminBundle/Statistique/listeStat.html.twig', array('listestatistique' => $listestatistique, 'locale' => $locale, 'lesstatistiques' => $lesstatistiques,));
+        return $this->render('utbAdminBundle/Statistique/listeStat.html.twig', [
+            'listestatistique' => $listestatistique,
+            'locale' => $locale,
+            'lesstatistiques' => $lesstatistiques
+        ]);
     }
 
-    public function supprStatistiqueAction(): Response(int $id, string $locale): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
+    /**
+     * Methode qui s'occupe de la suppression d'une statistique
+     * 
+     * @param int $id L'identifiant de la statistique à supprimer
+     * @param string $locale La locale
+     * @return Response Une redirection vers la liste des statistiques
+     */
+    #[Route(
+        path: '/admin/statistique/supprimer/{id}/{locale}',
+        name: 'app_statistique_supprimer',
+        requirements: [
+            'id' => '\d+',
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function supprStatistique(Request $request, int $id, string $locale): Response
+    {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'supprStatistiqueAction', $this->container->get);
+        $checkAcces = $this->accessControl->verifAcces($em, 'supprStatistique', $this->container->get);
 
         if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
         }
-        //         
+        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
         $lastatistique = $em->getRepository("App\Entity\Statistique")->find($id);
 
         $em->remove($lastatistique);
         $em->flush();
 
-
-        return $this->redirect($this->generateUrl('utb_admin_listeprofil', array(
-                            'locale' => $locale,)));
+        return $this->redirect($this->generateUrl('app_admin_listestat', [
+            'locale' => $locale
+        ]));
     }
 
-    public function gererEtatStatistiqueAction(): Response(int $id, int $etat, string $locale): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
+    /**
+     * Methode qui s'occupe de la gestion de l'état d'une statistique
+     * 
+     * @param int $id L'identifiant de la statistique
+     * @param int $etat Le nouvel état de la statistique
+     * @param string $locale La locale
+     * @return Response Une redirection vers la liste des statistiques
+     */
+    #[Route(
+        path: '/admin/statistique/gerer-etat/{id}/{etat}/{locale}',
+        name: 'app_statistique_gerer_etat',
+        requirements: [
+            'id' => '\d+',
+            'etat' => '\d+',
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function gererEtatStatistique(Request $request, int $id, int $etat, string $locale): Response
+    {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'gererEtatStatistiqueAction', $this->container->get);
+        $checkAcces = $this->accessControl->verifAcces($em, 'gererEtatStatistique', $this->container->get);
 
         if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
         }
-        //  
+        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
 
-        // Récupération du profil 
         $unestat = $em->getRepository("App\Entity\Statistique")->find($id);
         $unestat->setEtatProfil($etat);
 
         $em->persist($unestat);
-
         $em->flush();
 
-        if ($etat = 0) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'Statistique désactivé avec succès');
+        if ($etat == 0) {
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('notice', 'Statistique désactivée avec succès');
         } else {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('notice', 'Statistique activé avec succès');
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('notice', 'Statistique activée avec succès');
         }
 
-        return $this->redirect($this->generateUrl('utb_admin_listestat', [
-                            'locale' => $locale,]));
+        return $this->redirect($this->generateUrl('app_admin_listestat', [
+            'locale' => $locale
+        ]));
     }
 
-    public function modifierStatistiqueAction(): Response(int $id, string $locale): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
+    /**
+     * Methode qui s'occupe de la modification d'une statistique
+     * 
+     * @param int $id L'identifiant de la statistique
+     * @param string $locale La locale
+     * @return Response La vue de modification ou une redirection
+     */
+    #[Route(
+        path: '/admin/statistique/modifier/{id}/{locale}',
+        name: 'app_statistique_modifier',
+        requirements: [
+            'id' => '\d+',
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function modifierStatistique(Request $request, int $id, string $locale): Response
+    {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'modifierStatistiqueAction', $this->container->get);
+        $checkAcces = $this->accessControl->verifAcces($em, 'modifierStatistique', $this->container->get);
 
         if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
         }
-
+        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        // Récupération de la statistique
-        $lastatistique = $em->getRepository("App\Entity\Statistique")->find($id);
 
-        // Création d'un forumaire pour lequel on spécifie qu'il doit correspondre avec une entité statistique 
-        $form = $this->createForm($this->createForm(StatistiqueType::class), $lastatistique);
-
-        // On récupère les données du formulaire si il a déjà été passé 
-        $request = $this->requestStack->getCurrentRequest();
-
-        // On traite les données passées en méthode POST 
-        if ($request->getMethod() == 'POST') {
-
-            // On applique les données récupérées au formulaire */
-            $form->handleRequest($request);
-
-
-            /* Si le formulaire est valide, on valide et on redirige vers la liste des profils */
-            if ($form->isValid()) {
-                $em->persist($lastatistique);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl("utb_admin_listestat"));
-            }
-        }
-        return $this->render('utbAdminBundle/Statistique/modifStat.html.twig', array(
-                    'form' => $form->createView(), 'id' => $id, 'locale' => $locale,));
-    }
-
-    public function ajoutLangueStatistiqueAction(): Response(string $locale, int $id): Response {
-        //code qui verifie si l'utilisateur courant a acces a cette action
-        $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
-        $checkAcces = $AccessControl->verifAcces($em, 'ajoutLangueStatistiqueAction', $this->container->get);
-
-        if (!$checkAcces) {
-            $this->requestStack->getCurrentRequest()Stack->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_admin_accueil', ['locale' => $locale]));
-        }
-
-
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
         $unestat = $em->getRepository("App\Entity\Statistique")->find($id);
-        $unestat->setTranslatableLocale($locale);
+        
+        if (!$unestat) {
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('error', 'Statistique non trouvée');
+            return $this->redirect($this->generateUrl('app_admin_listestat', ['locale' => $locale]));
+        }
 
-        $em->refresh($unestat);
+        $form = $this->createForm(StatistiqueType::class, $unestat);
+        $form->handleRequest($request);
 
-        // Change la locale  
-        $form = $this->createForm($this->createForm(StatistiqueType::class), $unestat);
-
-        $request = $request;
-
-        if ($request->isMethod('POST')) {
-
-            $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($unestat);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('utb_admin_listestat', ['locale' => $locale,
-            ]));
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('notice', 'Statistique modifiée avec succès');
+            return $this->redirect($this->generateUrl('app_admin_listestat', ['locale' => $locale]));
         }
 
-        return $this->render('utbAdminBundle/Statistique/ajoutLangueStat.html.twig', array(
-                    'form' => $form->createView(), 'locale' => $locale, 'id' => $id,
-        ));
+        return $this->render('admin/statistique/modifier.html.twig', [
+            'form' => $form->createView(),
+            'statistique' => $unestat,
+            'locale' => $locale
+        ]);
+    }
+
+    /**
+     * Methode qui s'occupe de l'ajout d'une traduction pour une statistique
+     * 
+     * @param int $id L'identifiant de la statistique
+     * @param string $locale La locale
+     * @return Response La vue d'ajout de langue ou une redirection
+     */
+    #[Route(
+        path: '/admin/statistique/ajout-langue/{id}/{locale}',
+        name: 'app_statistique_ajout_langue',
+        requirements: [
+            'id' => '\d+',
+            'locale' => '[a-z]{2}'
+        ]
+    )]
+    public function ajoutLangueStatistique(Request $request, int $id, string $locale): Response
+    {
+        $em = $this->entityManager;
+        $checkAcces = $this->accessControl->verifAcces($em, 'ajoutLangueStatistique', $this->container->get);
+
+        if (!$checkAcces) {
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('app_admin_accueil', ['locale' => $locale]));
+        }
+        
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+
+        $unestat = $em->getRepository("App\Entity\Statistique")->find($id);
+        
+        if (!$unestat) {
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('error', 'Statistique non trouvée');
+            return $this->redirect($this->generateUrl('app_admin_listestat', ['locale' => $locale]));
+        }
+
+        $form = $this->createForm(StatistiqueType::class, $unestat);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $unestat->setTranslatableLocale($locale);
+            $em->persist($unestat);
+            $em->flush();
+
+            $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add('notice', 'Traduction ajoutée avec succès');
+            return $this->redirect($this->generateUrl('app_admin_listestat', ['locale' => $locale]));
+        }
+
+        return $this->render('admin/statistique/ajoutLangue.html.twig', [
+            'form' => $form->createView(),
+            'statistique' => $unestat,
+            'locale' => $locale
+        ]);
     }
 
 }

@@ -2,53 +2,63 @@
 
 namespace App\Entity;
 
+use App\Repository\TypeCadreRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;         // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+// Importer Cadre si nécessaire
+// use App\Entity\Cadre;
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="typecadre")]
- * #[ORM\Entity](repositoryClass="App\Entity\TypeCadreRepository")
- *
+ * Entité représentant un type de Cadre (ex: bannière, bloc texte, bloc image).
  */
-class TypeCadre {
+#[ORM\Entity(repositoryClass: TypeCadreRepository::class)]
+#[ORM\Table(name: 'typecadre')]
+// Pas besoin de @ORM\HasLifecycleCallbacks si non utilisé
+class TypeCadre
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idtypecadre', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private, type hint ?int
 
-    function __construct() {
-        
+    #[ORM\Column(name: 'libTypeCadre', type: Types::STRING, length: 100)] // Nom de colonne conservé
+    #[Assert\NotBlank(message: "Le libellé du type de cadre ne peut être vide.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100, // Correspond à la longueur ORM
+        minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libTypeCadre = null; // Type hint ?string
+
+    /**
+     * Cadres de ce type.
+     * 'typeCadre' est la propriété dans Cadre qui référence cette entité (mappedBy).
+     * @var Collection<int, Cadre>
+     */
+    #[ORM\OneToMany(mappedBy: 'typeCadre', targetEntity: Cadre::class, cascade: ['persist'])] // Vérifiez mappedBy='typeCadre', cascade à adapter
+    private Collection $cadres;
+
+
+    public function __construct()
+    {
+        $this->cadres = new ArrayCollection();
     }
-
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idtypecadre", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
-
-    /**
-     * @var ArrayCollection Cadre $cadres
-     * #[ORM\OneToMany(targetEntity: App\Entity\Cadre::class, mappedBy="typeCadre" )]
-     * 
-     */
-    private $cadres;
-
-    /**
-     * @var string $libtypecadre
-     * #[ORM\Column(name="libTypeCadre",type="string",length=100)]
-     * #[Assert\NotBlank(message="Le Libellé du type de cadre ne peut être vide! ")]
-     * @Assert\MinLength(2)
-     */
-    private $libTypeCadre;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
+
+    // Pas de setter pour l'ID
 
     /**
      * Set libTypeCadre
@@ -56,49 +66,57 @@ class TypeCadre {
      * @param string $libTypeCadre
      * @return TypeCadre
      */
-    public function setLibTypeCadre(string $libTypeCadre): self {
+    public function setLibTypeCadre(string $libTypeCadre): self
+    {
         $this->libTypeCadre = $libTypeCadre;
-
         return $this;
     }
 
     /**
      * Get libTypeCadre
      *
-     * @return string 
+     * @return string|null
      */
-    public function getLibTypeCadre(): ?string {
+    public function getLibTypeCadre(): ?string
+    {
         return $this->libTypeCadre;
     }
 
-    /**
-     * Add cadres
-     *
-     * @param \App\Entity\Cadre $cadres
-     * @return TypeCadre
-     */
-    public function addCadre(\App\Entity\Cadre $cadres) {
-        $this->cadres[] = $cadres;
-
-        return $this;
-    }
+    // --- Gestion de la collection Cadres ---
 
     /**
-     * Remove cadres
-     *
-     * @param \App\Entity\Cadre $cadres
+     * @return Collection<int, Cadre>
      */
-    public function removeCadre(\App\Entity\Cadre $cadres) {
-        $this->cadres->removeElement($cadres);
-    }
-
-    /**
-     * Get cadres
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCadres(): ?string {
+    public function getCadres(): Collection // Type retour corrigé
+    {
         return $this->cadres;
     }
 
+    public function addCadre(Cadre $cadre): self // Type param corrigé
+    {
+        if (!$this->cadres->contains($cadre)) {
+            $this->cadres->add($cadre);
+            // Mettre à jour le côté propriétaire (ManyToOne dans Cadre)
+            $cadre->setTypeCadre($this); // Assurez-vous que setTypeCadre existe dans Cadre
+        }
+        return $this;
+    }
+
+    public function removeCadre(Cadre $cadre): self // Type param corrigé
+    {
+        if ($this->cadres->removeElement($cadre)) {
+            // Mettre le côté propriétaire à null (si la relation est nullable dans Cadre)
+            if ($cadre->getTypeCadre() === $this) { // Assurez-vous que getTypeCadre existe
+                $cadre->setTypeCadre(null);
+            }
+        }
+        return $this;
+    }
+
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->libTypeCadre ?? 'TypeCadre #' . $this->id;
+    }
 }

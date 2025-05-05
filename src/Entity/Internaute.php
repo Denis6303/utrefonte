@@ -2,229 +2,250 @@
 
 namespace App\Entity;
 
+use App\Repository\InternauteRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;           // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\Message;
+// use App\Entity\Pays;
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="internaute")]
- * #[ORM\Entity](repositoryClass="App\Entity\InternauteRepository")
- *
+ * Entité représentant un internaute (visiteur, contact, etc.).
  */
-class Internaute {
+#[ORM\Entity(repositoryClass: InternauteRepository::class)]
+#[ORM\Table(name: 'internaute')]
+class Internaute
+{
+    /**
+     * Email utilisé comme identifiant primaire.
+     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'mailinternaute', type: Types::STRING, length: 180)] // Longueur standard pour email, name conservé
+    #[Assert\NotBlank(message: "L'adresse email est obligatoire.")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
+    #[Assert\Length(max: 180)]
+    private ?string $mailInternaute = null;
 
-    function __construct() {
-        $this->typeInternaute = 0;
+    #[ORM\Column(name: 'nom', type: Types::STRING, length: 50)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $nom = null;
+
+    #[ORM\Column(name: 'prenom', type: Types::STRING, length: 50)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
+     #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le prénom doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le prénom ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $prenom = null;
+
+    /**
+     * Numéro de téléphone.
+     */
+    #[ORM\Column(name: 'tel', type: Types::STRING, length: 30, nullable: true)] // Rendu nullable, longueur augmentée
+    #[Assert\Length(max: 30, maxMessage: "Le téléphone ne doit pas dépasser {{ limit }} caractères.")]
+    // Optionnel : #[Assert\Regex(pattern: "/^\+?[0-9\s\-\(\)]{7,}$/", message: "Format de téléphone invalide.")]
+    private ?string $tel = null;
+
+    /**
+     * Adresse postale.
+     */
+    #[ORM\Column(name: 'adresse', type: Types::STRING, length: 255, nullable: true)] // Rendu nullable, longueur augmentée
+    #[Assert\Length(max: 255, maxMessage: "L'adresse ne doit pas dépasser {{ limit }} caractères.")]
+    private ?string $adresse = null;
+
+    /**
+     * Type d'internaute (ex: 0=visiteur, 1=contact, ...).
+     */
+    #[ORM\Column(name: 'typeinternaute', type: Types::INTEGER)]
+    #[Assert\NotNull]
+    // Optionnel : #[Assert\Choice(choices: [0, 1, 2], message: "Type d'internaute invalide.")]
+    private ?int $typeInternaute = 0; // Initialisé dans le constructeur
+
+    #[ORM\Column(name: 'dateinscription', type: Types::DATETIME_IMMUTABLE)] // Changé en DATETIME_IMMUTABLE
+    #[Assert\NotNull] // Assurer que la date est définie
+    private ?DateTimeImmutable $dateInscription = null; // Changé en DateTimeImmutable
+
+    /**
+     * État de l'internaute (ex: 0=inactif, 1=actif, 2=bloqué).
+     */
+    #[ORM\Column(name: 'etat', type: Types::INTEGER)]
+    #[Assert\NotNull]
+    // Optionnel : #[Assert\Choice(choices: [0, 1, 2], message: "État invalide.")]
+    private ?int $etat = 1; // Initialisé à 1 (actif) par défaut
+
+    // --- RELATIONS ---
+
+    /**
+     * Messages envoyés par cet internaute.
+     * 'internaute' est la propriété dans Message qui référence cette entité (mappedBy).
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(mappedBy: 'internaute', targetEntity: Message::class, cascade: ['persist', 'remove'], orphanRemoval: true)] // Vérifiez mappedBy='internaute'
+    private Collection $messages;
+
+    /**
+     * Pays de l'internaute.
+     */
+    #[ORM\ManyToOne(targetEntity: Pays::class, inversedBy: 'internautes')] // Ajout de inversedBy (vérifiez nom 'internautes' dans Pays)
+    #[ORM\JoinColumn(name: 'idpays', referencedColumnName: 'idpays', nullable: true)] // Gardé nullable
+    private ?Pays $pays = null;
+
+
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
+        $this->typeInternaute = 0; // Valeur par défaut (ex: visiteur)
+        $this->dateInscription = new DateTimeImmutable(); // Date d'inscription par défaut
+        $this->etat = 1; // Actif par défaut
     }
 
-    /**
-     * @var string $mailInternaute
-     * #[ORM\Id]
-     * #[ORM\Column(name="mailinternaute", type="string", length=100, nullable=true)]
-     * @Assert\Email(message = "email '{{ value }}'  n'est pas valide.")
-     */
-    protected $mailInternaute;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var string $nomPrenom
-     * #[ORM\Column(name="nomprenom",type="string",length=100, nullable=true)]
-     * @Assert\MinLength(2)
-     */
-    private $nomPrenom;
-
-    /**
-     * 
-     * @var string $numeroCompte
-     * #[ORM\Column(name="numerocompte", type="string",length=20, nullable=true)]	
-     */
-    private $numeroCompte;
-    
-    /**
-     * @var text $ville
-     * #[ORM\Column(name="ville",type="string")]
-     */
-    private $ville;
-
-    /**
-     * @var ArrayCollection Message $messages
-     * #[ORM\OneToMany(targetEntity: App\Entity\Message::class, mappedBy="Internaute" )]
-     * 
-     */
-    private $messages;
-
-    /**
-     * @var Pays $pays
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Pays::class, inversedBy="internaute", cascade={ "persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idpays", referencedColumnName="idpays")
-     * })
-     */
-    private $pays;
-
-    /**
-     * @var integer $typeInternaute
-     * #[ORM\Column(name="typeinternaute",type="integer")]
-     */
-    private $typeInternaute;
-
-    /**
-     * Set mailInternaute
-     *
-     * @param string $mailInternaute
-     * @return Internaute
-     */
-    public function setMailInternaute(string $mailInternaute): self {
-        $this->mailInternaute = $mailInternaute;
-
-        return $this;
-    }
-
-    /**
-     * Get mailInternaute
-     *
-     * @return string 
-     */
-    public function getMailInternaute(): ?string {
+    public function getMailInternaute(): ?string
+    {
         return $this->mailInternaute;
     }
 
-    /**
-     * Set nomPrenom
-     *
-     * @param string $nomPrenom
-     * @return Internaute
-     */
-    public function setNomPrenom(string $nomPrenom): self {
-        $this->nomPrenom = $nomPrenom;
+    // Le mail est l'ID, ne devrait pas être modifiable après création
+    // public function setMailInternaute(string $mailInternaute): self
+    // {
+    //     $this->mailInternaute = $mailInternaute;
+    //     return $this;
+    // }
 
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
         return $this;
     }
 
-    /**
-     * Get nomPrenom
-     *
-     * @return string 
-     */
-    public function getNomPrenom(): ?string {
-        return $this->nomPrenom;
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
     }
 
-    /**
-     * Set ville
-     *
-     * @param string $ville
-     * @return Internaute
-     */
-    public function setVille(string $ville): self {
-        $this->ville = $ville;
-
+    public function setPrenom(string $prenom): self
+    {
+        $this->prenom = $prenom;
         return $this;
     }
 
-    /**
-     * Get ville
-     *
-     * @return string 
-     */
-    public function getVille(): ?string {
-        return $this->ville;
+    public function getTel(): ?string
+    {
+        return $this->tel;
     }
 
-    /**
-     * Add messages
-     *
-     * @param \App\Entity\Message $messages
-     * @return Internaute
-     */
-    public function addMessage(\App\Entity\Message $messages) {
-        $this->messages[] = $messages;
-
+    public function setTel(?string $tel): self // Accepte null
+    {
+        $this->tel = $tel;
         return $this;
     }
 
-    /**
-     * Remove messages
-     *
-     * @param \App\Entity\Message $messages
-     */
-    public function removeMessage(\App\Entity\Message $messages) {
-        $this->messages->removeElement($messages);
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
     }
 
-    /**
-     * Get messages
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMessages(): ?string {
-        return $this->messages;
-    }
-
-    /**
-     * Set pays
-     *
-     * @param \App\Entity\Pays $pays
-     * @return Internaute
-     */
-    public function setPays(\App\Entity\Pays $pays = null) {
-        $this->pays = $pays;
-
+    public function setAdresse(?string $adresse): self // Accepte null
+    {
+        $this->adresse = $adresse;
         return $this;
     }
 
-    /**
-     * Get pays
-     *
-     * @return \App\Entity\Pays 
-     */
-    public function getPays(): ?string {
-        return $this->pays;
-    }
-
-    /**
-     * Set typeInternaute
-     *
-     * @param integer $typeInternaute
-     * @return Internaute
-     */
-    public function setTypeInternaute(string $typeInternaute): self {
-        $this->typeInternaute = $typeInternaute;
-
-        return $this;
-    }
-
-    /**
-     * Get typeInternaute
-     *
-     * @return integer 
-     */
-    public function getTypeInternaute(): ?string {
+    public function getTypeInternaute(): ?int
+    {
         return $this->typeInternaute;
     }
 
-
-    /**
-     * Set numeroCompte
-     *
-     * @param string $numeroCompte
-     * @return Internaute
-     */
-    public function setNumeroCompte(string $numeroCompte): self
+    public function setTypeInternaute(int $typeInternaute): self
     {
-        $this->numeroCompte = $numeroCompte;
-    
+        $this->typeInternaute = $typeInternaute;
         return $this;
     }
 
-    /**
-     * Get numeroCompte
-     *
-     * @return string 
-     */
-    public function getNumeroCompte(): ?string
+    public function getDateInscription(): ?DateTimeImmutable // Type retour corrigé
     {
-        return $this->numeroCompte;
+        return $this->dateInscription;
+    }
+
+    // Setter pour dateInscription retiré (défini à la construction)
+
+    public function getEtat(): ?int
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(int $etat): self
+    {
+        $this->etat = $etat;
+        return $this;
+    }
+
+    // --- Gestion de la collection Messages ---
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection // Type retour corrigé
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): self // Type param corrigé
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            // Mettre à jour le côté propriétaire (ManyToOne dans Message)
+            $message->setInternaute($this); // Assurez-vous que setInternaute existe dans Message
+        }
+        return $this;
+    }
+
+    public function removeMessage(Message $message): self // Type param corrigé
+    {
+        if ($this->messages->removeElement($message)) {
+            // Mettre le côté propriétaire à null (si la relation est nullable dans Message)
+            if ($message->getInternaute() === $this) { // Assurez-vous que getInternaute existe
+                $message->setInternaute(null);
+            }
+        }
+        return $this;
+    }
+
+    // --- Gestion de la relation Pays ---
+
+    public function getPays(): ?Pays // Type retour corrigé
+    {
+        return $this->pays;
+    }
+
+    public function setPays(?Pays $pays): self // Type param corrigé
+    {
+        $this->pays = $pays;
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return trim($this->prenom . ' ' . $this->nom) ?: $this->mailInternaute ?? 'Internaute Inconnu';
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Profil;
+use App\Entity\ProfilClient;
 use App\Entity\MessageReponse;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,30 +11,48 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'fos_user')]
+#[ORM\Table(name: 'user')]
 #[ORM\HasLifecycleCallbacks]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'iduser', type: 'integer')]
+    private ?int $idUser = null;
 
-    #[ORM\Column(name: 'nameUser', type: 'string', length: 50)]
-    #[Assert\NotBlank(message: 'Please enter your name', groups: ['Registration', 'Profile'])]
-    private ?string $nameUser = null;
+    #[ORM\Column(name: 'username', type: 'string', length: 50)]
+    #[Assert\NotBlank]
+    private ?string $username = null;
 
-    /**
-     * Encrypted password. Must not be persisted.
-     */
-    #[Assert\NotBlank(message: 'Please enter your password confirm')]
-    private ?string $cpassword = null;
+    #[ORM\Column(name: 'password', type: 'string', length: 50)]
+    #[Assert\NotBlank]
+    private ?string $password = null;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: 'users')]
+    #[ORM\Column(name: 'salt', type: 'string', length: 32)]
+    private ?string $salt = null;
+
+    #[ORM\Column(name: 'email', type: 'string', length: 50)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private ?string $email = null;
+
+    #[ORM\Column(name: 'is_active', type: 'boolean')]
+    private ?bool $isActive = null;
+
+    #[ORM\Column(name: 'roles', type: 'json')]
+    private array $roles = [];
+
+    #[ORM\OneToOne(targetEntity: Abonne::class)]
+    #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne')]
+    private ?Abonne $abonne = null;
+
+    #[ORM\ManyToOne(targetEntity: ProfilClient::class)]
     #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil')]
-    private ?Profil $profil = null;
+    private ?ProfilClient $profil = null;
 
     #[ORM\OneToMany(targetEntity: MessageReponse::class, mappedBy: 'user')]
     private Collection $messagereponses;
@@ -51,6 +69,9 @@ class User
     public function __construct()
     {
         $this->messagereponses = new ArrayCollection();
+        $this->salt = md5(uniqid('', true));
+        $this->isActive = true;
+        $this->roles = ['ROLE_USER'];
     }
 
     #[ORM\PrePersist]
@@ -102,31 +123,97 @@ class User
         return $this->uploadDir;
     }
 
-    public function getId(): ?int
+    public function getIdUser(): ?int
     {
-        return $this->id;
+        return $this->idUser;
     }
 
-    public function setNameUser(string $nameUser): self
+    public function getUsername(): ?string
     {
-        $this->nameUser = $nameUser;
+        return $this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
         return $this;
     }
 
-    public function getNameUser(): ?string
+    public function getPassword(): ?string
     {
-        return $this->nameUser;
+        return $this->password;
     }
 
-    public function setProfil(?Profil $profil): self
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function getSalt(): ?string
+    {
+        return $this->salt;
+    }
+
+    public function setSalt(string $salt): self
+    {
+        $this->salt = $salt;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function getAbonne(): ?Abonne
+    {
+        return $this->abonne;
+    }
+
+    public function setAbonne(?Abonne $abonne): self
+    {
+        $this->abonne = $abonne;
+        return $this;
+    }
+
+    public function getProfil(): ?ProfilClient
+    {
+        return $this->profil;
+    }
+
+    public function setProfil(?ProfilClient $profil): self
     {
         $this->profil = $profil;
         return $this;
-    }
-
-    public function getProfil(): ?Profil
-    {
-        return $this->profil;
     }
 
     public function getMessagereponses(): Collection
@@ -153,36 +240,7 @@ class User
         return $this;
     }
 
-    public function setCpassword(string $cpassword): self
+    public function eraseCredentials(): void
     {
-        $this->cpassword = $cpassword;
-        return $this;
-    }
-
-    public function getCpassword(): ?string
-    {
-        return $this->cpassword;
-    }
-
-    public function setUrlPhoto(?string $urlPhoto): self
-    {
-        $this->urlPhoto = $urlPhoto;
-        return $this;
-    }
-
-    public function getUrlPhoto(): ?string
-    {
-        return $this->urlPhoto;
-    }
-
-    public function setPhoto(?File $photo): self
-    {
-        $this->photo = $photo;
-        return $this;
-    }
-
-    public function getPhoto(): ?File
-    {
-        return $this->photo;
     }
 }

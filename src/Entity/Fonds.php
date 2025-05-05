@@ -2,85 +2,100 @@
 
 namespace App\Entity;
 
+use App\Repository\FondsRepository; // Importer le Repository
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;      // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+// Importer Compte et Utilisateur si nécessaire
+// use App\Entity\Compte;
+// use App\Entity\Utilisateur;
 
-/**
- * App\Entity
- *
- * #[ORM\Table(name="fonds")]
- * #[ORM\Entity](repositoryClass="App\Entity\FondsRepository")
- *
- */
-class Fonds {
+#[ORM\Entity(repositoryClass: FondsRepository::class)]
+#[ORM\Table(name: 'fonds')]
+// Pas besoin de @ORM\HasLifecycleCallbacks si non utilisé
+class Fonds
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idfonds', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé, visibilité private, type hint ?int
 
-    function __construct() {
-        //$this->etat = 0;
-        $this->suppr = 0;
+    #[ORM\Column(name: 'codefonds', type: Types::STRING, length: 10, unique: true)] // Un code est souvent unique
+    #[Assert\NotBlank(message: "Le code du fonds ne peut être vide.")]
+    #[Assert\Length(
+        min: 2,
+        max: 10, // Correspond à la longueur ORM
+        minMessage: "Le code doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le code ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $codeFonds = null;
+
+    #[ORM\Column(name: 'libfonds', type: Types::STRING, length: 100)]
+    #[Assert\NotBlank(message: "Le libellé du fonds ne peut être vide.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100, // Correspond à la longueur ORM
+        minMessage: "Le libellé doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le libellé ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $libFonds = null;
+
+    /**
+     * État du fonds (ex: 0=inactif, 1=actif).
+     */
+    #[ORM\Column(name: 'etatfonds', type: Types::INTEGER)] // Gardé INTEGER, mais BOOLEAN serait mieux si 0/1
+    #[Assert\NotNull] // Si un état doit toujours être défini
+    // #[Assert\Choice(choices: [0, 1], message: "L'état doit être 0 ou 1.")] // Si limité
+    private ?int $etatFonds = 1; // Initialiser un état par défaut (ex: actif)
+
+    /**
+     * Indicateur de suppression logique.
+     */
+    #[ORM\Column(name: 'suppr', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $suppr = false; // Initialisé dans le constructeur
+
+    // --- RELATIONS ---
+
+    /**
+     * Comptes associés à ce fonds.
+     * 'fonds' est la propriété dans Compte qui référence cette entité (mappedBy).
+     * @var Collection<int, Compte>
+     */
+    // mappedBy="Fonds" (avec majuscule) est probablement incorrect. Corrigé en 'fonds'. VÉRIFIEZ DANS L'ENTITÉ Compte.
+    #[ORM\OneToMany(mappedBy: 'fonds', targetEntity: Compte::class, cascade: ['persist'])]
+    private Collection $comptes;
+
+    /**
+     * Utilisateur lié (créateur? gestionnaire?).
+     * 'fonds' est la propriété dans Utilisateur qui référence cette entité (inversedBy).
+     */
+    // inversedBy="Fonds" (avec majuscule) est probablement incorrect. Corrigé en 'fonds'. VÉRIFIEZ DANS L'ENTITÉ Utilisateur.
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'fonds', cascade: ['persist', 'merge'])]
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'idutilisateur', nullable: true)] // Gardé nullable
+    private ?Utilisateur $utilisateur = null;
+
+
+    public function __construct()
+    {
+        $this->suppr = false; // Non supprimé par défaut
+        $this->etatFonds = 1; // Actif par défaut
+        $this->comptes = new ArrayCollection();
     }
-
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idfonds", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
-
-    /**
-     * @var string $codeFonds
-     * #[ORM\Column(name="codefonds",type="string",length=10)]
-     * #[Assert\NotBlank(message=" Le libellé de la table ne peut être vide ")]
-     * @Assert\MinLength(2)
-     */
-    private $codeFonds;
-
-    /**
-     * @var string $libFonds
-     * #[ORM\Column(name="libfonds",type="string",length=100)]
-     * #[Assert\NotBlank(message=" Le libellé de la table ne peut être vide ")]
-     * @Assert\MinLength(2)
-     */
-    private $libFonds;
-
-    /**
-     * @var ArrayCollection Compte $comptes
-     * #[ORM\OneToMany(targetEntity: App\Entity\Compte::class, mappedBy="Fonds" )]
-     * 
-     */
-    private $comptes;
-
-    /**
-     * @var Utilisateur $utilisateur
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Utilisateur::class, inversedBy="Fonds", cascade={"persist","merge"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idutilisateur", referencedColumnName="idutilisateur")
-     * })
-     */
-    private $utilisateur;
-
-    /**
-     * @var integer $etatFonds
-     * #[ORM\Column(name="etatfonds",type="integer" )]
-     *   
-     */
-    private $etatFonds;
-    
-    /**
-     * @var integer $suppr
-     * #[ORM\Column(name="suppr", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $suppr;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getId(): ?string {
+    public function getId(): ?int // Type retour corrigé
+    {
         return $this->id;
     }
+
+    // Pas de setter pour l'ID
 
     /**
      * Set codeFonds
@@ -88,18 +103,19 @@ class Fonds {
      * @param string $codeFonds
      * @return Fonds
      */
-    public function setCodeFonds(string $codeFonds): self {
+    public function setCodeFonds(string $codeFonds): self
+    {
         $this->codeFonds = $codeFonds;
-
         return $this;
     }
 
     /**
      * Get codeFonds
      *
-     * @return string 
+     * @return string|null
      */
-    public function getCodeFonds(): ?string {
+    public function getCodeFonds(): ?string
+    {
         return $this->codeFonds;
     }
 
@@ -109,49 +125,20 @@ class Fonds {
      * @param string $libFonds
      * @return Fonds
      */
-    public function setLibFonds(string $libFonds): self {
+    public function setLibFonds(string $libFonds): self
+    {
         $this->libFonds = $libFonds;
-
         return $this;
     }
 
     /**
      * Get libFonds
      *
-     * @return string 
+     * @return string|null
      */
-    public function getLibFonds(): ?string {
+    public function getLibFonds(): ?string
+    {
         return $this->libFonds;
-    }
-
-    /**
-     * Add comptes
-     *
-     * @param \App\Entity\Compte $comptes
-     * @return Fonds
-     */
-    public function addCompte(\App\Entity\Compte $comptes) {
-        $this->comptes[] = $comptes;
-
-        return $this;
-    }
-
-    /**
-     * Remove comptes
-     *
-     * @param \App\Entity\Compte $comptes
-     */
-    public function removeCompte(\App\Entity\Compte $comptes) {
-        $this->comptes->removeElement($comptes);
-    }
-
-    /**
-     * Get comptes
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getComptes(): ?string {
-        return $this->comptes;
     }
 
     /**
@@ -160,61 +147,110 @@ class Fonds {
      * @param integer $etatFonds
      * @return Fonds
      */
-    public function setEtatFonds(string $etatFonds): self {
+    public function setEtatFonds(int $etatFonds): self // Type param corrigé en int
+    {
         $this->etatFonds = $etatFonds;
-
         return $this;
     }
 
     /**
      * Get etatFonds
      *
-     * @return integer 
+     * @return integer|null
      */
-    public function getEtatFonds(): ?string {
+    public function getEtatFonds(): ?int // Type retour corrigé
+    {
         return $this->etatFonds;
+    }
+
+     /**
+      * Vérifie si le fonds est supprimé.
+      */
+    public function isSuppr(): ?bool // Getter booléen
+    {
+        return $this->suppr;
+    }
+
+    /**
+     * Set suppr
+     *
+     * @param boolean $suppr
+     * @return Fonds
+     */
+    public function setSuppr(bool $suppr): self // Type param corrigé en bool
+    {
+        $this->suppr = $suppr;
+        return $this;
+    }
+
+    /**
+     * Get suppr (moins sémantique que isSuppr)
+     *
+     * @return boolean|null
+     */
+    public function getSuppr(): ?bool // Type retour corrigé
+    {
+        return $this->suppr;
     }
 
     /**
      * Set utilisateur
      *
-     * @param \App\Entity\Utilisateur $utilisateur
+     * @param Utilisateur|null $utilisateur
      * @return Fonds
      */
-    public function setUtilisateur(\App\Entity\Utilisateur $utilisateur = null) {
+    public function setUtilisateur(?Utilisateur $utilisateur): self // Type param corrigé, accepte null
+    {
         $this->utilisateur = $utilisateur;
-
         return $this;
     }
 
     /**
      * Get utilisateur
      *
-     * @return \App\Entity\Utilisateur 
+     * @return Utilisateur|null
      */
-    public function getUtilisateur(): ?string {
+    public function getUtilisateur(): ?Utilisateur // Type retour corrigé
+    {
         return $this->utilisateur;
     }
-    
-    /**
-     * Set suppr
-     *
-     * @param integer $suppr
-     * @return Fonds
-     */
-    public function setSuppr(string $suppr): self {
-        $this->suppr = $suppr;
 
+
+    // --- Gestion de la collection Comptes ---
+
+    /**
+     * @return Collection<int, Compte>
+     */
+    public function getComptes(): Collection // Type retour corrigé
+    {
+        return $this->comptes;
+    }
+
+    public function addCompte(Compte $compte): self // Type param corrigé
+    {
+        if (!$this->comptes->contains($compte)) {
+            $this->comptes->add($compte);
+            // Mettre à jour le côté propriétaire (ManyToOne dans Compte)
+            $compte->setFonds($this); // Assurez-vous que setFonds existe et est correct dans Compte
+        }
         return $this;
     }
 
-    /**
-     * Get suppr
-     *
-     * @return integer 
-     */
-    public function getSuppr(): ?string {
-        return $this->suppr;
+    public function removeCompte(Compte $compte): self // Type param corrigé
+    {
+        if ($this->comptes->removeElement($compte)) {
+            // Mettre le côté propriétaire à null (si la relation est nullable dans Compte)
+            if ($compte->getFonds() === $this) { // Assurez-vous que getFonds existe dans Compte
+                $compte->setFonds(null);
+            }
+        }
+        return $this;
     }
 
+    // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        return $this->libFonds . ' (' . $this->codeFonds . ')' ?? 'Fonds #' . $this->id;
+    }
 }
