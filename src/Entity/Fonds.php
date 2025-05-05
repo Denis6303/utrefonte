@@ -73,7 +73,7 @@ class Fonds
      * 'fonds' est la propriété dans User qui référence cette entité (inversedBy).
      */
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fonds', cascade: ['persist'])]
-    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'iduser', nullable: true)] // Gardé nullable
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'id', nullable: true)] // Changed from 'iduser' to 'id'
     private ?User $utilisateur = null;
 
 
