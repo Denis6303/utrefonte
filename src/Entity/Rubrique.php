@@ -130,7 +130,7 @@ class Rubrique
      * Cadres associés à cette rubrique (Owning Side).
      * @var Collection<int, Cadre>
      */
-    #[ORM\ManyToMany(targetEntity: Cadre::class, inversedBy: 'rubriques', cascade: ['persist', 'merge'])]
+    #[ORM\ManyToMany(targetEntity: Cadre::class, inversedBy: 'rubriques', cascade: ['persist'])]
     #[ORM\JoinTable(name: 'cadresrubrique')] // Nom de table conservé
     #[ORM\JoinColumn(name: 'idrubrique', referencedColumnName: 'idrubrique')]
     #[ORM\InverseJoinColumn(name: 'idcadre', referencedColumnName: 'idcadre')]

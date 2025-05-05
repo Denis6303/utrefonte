@@ -70,12 +70,11 @@ class Fonds
 
     /**
      * Utilisateur lié (créateur? gestionnaire?).
-     * 'fonds' est la propriété dans Utilisateur qui référence cette entité (inversedBy).
+     * 'fonds' est la propriété dans User qui référence cette entité (inversedBy).
      */
-    // inversedBy="Fonds" (avec majuscule) est probablement incorrect. Corrigé en 'fonds'. VÉRIFIEZ DANS L'ENTITÉ Utilisateur.
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'fonds', cascade: ['persist', 'merge'])]
-    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'idutilisateur', nullable: true)] // Gardé nullable
-    private ?Utilisateur $utilisateur = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fonds', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'iduser', nullable: true)] // Gardé nullable
+    private ?User $utilisateur = null;
 
 
     public function __construct()
@@ -196,10 +195,10 @@ class Fonds
     /**
      * Set utilisateur
      *
-     * @param Utilisateur|null $utilisateur
+     * @param User|null $utilisateur
      * @return Fonds
      */
-    public function setUtilisateur(?Utilisateur $utilisateur): self // Type param corrigé, accepte null
+    public function setUtilisateur(?User $utilisateur): self // Type param corrigé, accepte null
     {
         $this->utilisateur = $utilisateur;
         return $this;
@@ -208,9 +207,9 @@ class Fonds
     /**
      * Get utilisateur
      *
-     * @return Utilisateur|null
+     * @return User|null
      */
-    public function getUtilisateur(): ?Utilisateur // Type retour corrigé
+    public function getUtilisateur(): ?User // Type retour corrigé
     {
         return $this->utilisateur;
     }

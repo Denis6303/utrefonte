@@ -213,7 +213,7 @@ class Article
     /**
      * @var Collection<int, Media> Médias associés à cet article (owning side).
      */
-    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'articles', cascade: ['persist', 'merge'])] // cascade: ['all'] est souvent trop large
+    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'articles', cascade: ['persist'])] // Utiliser seulement 'persist' pour la cascade
     #[ORM\JoinTable(name: 'pointer')]
     #[ORM\JoinColumn(name: 'article_idarticle', referencedColumnName: 'idarticle')]
     #[ORM\InverseJoinColumn(name: 'media_idmedia', referencedColumnName: 'idmedia')]
@@ -222,7 +222,7 @@ class Article
     /**
      * @var Collection<int, Cadre> Cadres associés à cet article (owning side).
      */
-    #[ORM\ManyToMany(targetEntity: Cadre::class, inversedBy: 'articles', cascade: ['persist', 'merge'])]
+    #[ORM\ManyToMany(targetEntity: Cadre::class, inversedBy: 'articles', cascade: ['persist'])] // Utiliser seulement 'persist' pour la cascade
     #[ORM\JoinTable(name: 'positionner')]
     #[ORM\JoinColumn(name: 'article_idarticle', referencedColumnName: 'idarticle')]
     #[ORM\InverseJoinColumn(name: 'cadre_idcadre', referencedColumnName: 'idcadre')]

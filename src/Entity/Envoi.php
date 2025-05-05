@@ -88,9 +88,9 @@ class Envoi
     /**
      * L'utilisateur qui a initié l'envoi (peut être null si initié par un abonné?).
      */
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'envois', cascade: ['persist'])]
-    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'idutilisateur', nullable: true)] // Gardé nullable
-    private ?Utilisateur $utilisateur = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'envois', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'id', nullable: true)]
+    private ?User $utilisateur = null;
 
     /**
      * Le message client concerné par cet envoi.
@@ -231,12 +231,12 @@ class Envoi
 
     // --- Getters/Setters pour les relations ---
 
-    public function getUtilisateur(): ?Utilisateur // Type retour corrigé
+    public function getUtilisateur(): ?User // Type retour corrigé
     {
         return $this->utilisateur;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self // Type param corrigé
+    public function setUtilisateur(?User $utilisateur): self // Type param corrigé
     {
         $this->utilisateur = $utilisateur;
         return $this;

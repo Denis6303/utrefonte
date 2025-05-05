@@ -102,10 +102,17 @@ class Internaute
     #[ORM\JoinColumn(name: 'idpays', referencedColumnName: 'idpays', nullable: true)] // Gardé nullable
     private ?Pays $pays = null;
 
+    /**
+     * Abonnés liés à cet internaute.
+     * @var Collection<int, Abonne>
+     */
+    #[ORM\OneToMany(mappedBy: 'internaute', targetEntity: Abonne::class)]
+    private Collection $abonnes;
 
     public function __construct()
     {
         $this->messages = new ArrayCollection();
+        $this->abonnes = new ArrayCollection();
         $this->typeInternaute = 0; // Valeur par défaut (ex: visiteur)
         $this->dateInscription = new DateTimeImmutable(); // Date d'inscription par défaut
         $this->etat = 1; // Actif par défaut
@@ -239,6 +246,34 @@ class Internaute
     public function setPays(?Pays $pays): self // Type param corrigé
     {
         $this->pays = $pays;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Abonne>
+     */
+    public function getAbonnes(): Collection
+    {
+        return $this->abonnes;
+    }
+
+    public function addAbonne(Abonne $abonne): self
+    {
+        if (!$this->abonnes->contains($abonne)) {
+            $this->abonnes->add($abonne);
+            $abonne->setInternaute($this);
+        }
+        return $this;
+    }
+
+    public function removeAbonne(Abonne $abonne): self
+    {
+        if ($this->abonnes->removeElement($abonne)) {
+            // set the owning side to null (unless already changed)
+            if ($abonne->getInternaute() === $this) {
+                $abonne->setInternaute(null);
+            }
+        }
         return $this;
     }
 
