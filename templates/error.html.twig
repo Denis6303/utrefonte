@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur - UTB</title>
+    
+    {# Styles CSS #}
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">
+                    <h1>Une erreur s'est produite</h1>
+                    <p>{{ message }}</p>
+                    <a href="{{ path('app_site_index', {'locale': app.request.locale}) }}" class="btn btn-primary">
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

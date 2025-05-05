@@ -42,7 +42,7 @@ class Internaute
 
     #[ORM\Column(name: 'prenom', type: Types::STRING, length: 50)]
     #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
-     #[Assert\Length(
+    #[Assert\Length(
         min: 2,
         max: 50,
         minMessage: "Le prénom doit contenir au moins {{ limit }} caractères.",
@@ -84,6 +84,15 @@ class Internaute
     #[Assert\NotNull]
     // Optionnel : #[Assert\Choice(choices: [0, 1, 2], message: "État invalide.")]
     private ?int $etat = 1; // Initialisé à 1 (actif) par défaut
+
+    #[ORM\Column(name: 'objet', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $objet = null;
+
+    #[ORM\Column(name: 'message', type: Types::TEXT, nullable: true)]
+    private ?string $message = null;
+
+    #[ORM\Column(name: 'date_envoi', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $dateEnvoi = null;
 
     // --- RELATIONS ---
 
@@ -205,6 +214,50 @@ class Internaute
         return $this;
     }
 
+    public function getObjet(): ?string
+    {
+        return $this->objet;
+    }
+
+    public function setObjet(?string $objet): self
+    {
+        $this->objet = $objet;
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(?string $message): self
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function getDateEnvoi(): ?\DateTime
+    {
+        return $this->dateEnvoi;
+    }
+
+    public function setDateEnvoi(\DateTime $dateEnvoi): self
+    {
+        $this->dateEnvoi = $dateEnvoi;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->mailInternaute;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->mailInternaute = $email;
+        return $this;
+    }
+
     // --- Gestion de la collection Messages ---
 
     /**
@@ -277,7 +330,7 @@ class Internaute
         return $this;
     }
 
-     // --- Méthode __toString ---
+    // --- Méthode __toString ---
     public function __toString(): string
     {
         // Fournit une représentation textuelle simple de l'objet

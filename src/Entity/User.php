@@ -86,6 +86,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Envoi::class)]
     private Collection $envois;
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: HistoriqueConnexion::class)]
+    private Collection $historiques;
+
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
@@ -93,6 +96,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->adresses = new ArrayCollection();
         $this->messagereponses = new ArrayCollection();
         $this->envois = new ArrayCollection();
+        $this->historiques = new ArrayCollection();
         $this->salt = md5(uniqid('', true));
         $this->isActive = true;
         $this->roles = ['ROLE_USER'];
@@ -464,6 +468,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $envoi->setUtilisateur(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HistoriqueConnexion>
+     */
+    public function getHistoriques(): Collection
+    {
+        return $this->historiques;
+    }
+
+    public function addHistorique(HistoriqueConnexion $historique): self
+    {
+        if (!$this->historiques->contains($historique)) {
+            $this->historiques->add($historique);
+            $historique->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistorique(HistoriqueConnexion $historique): self
+    {
+        if ($this->historiques->removeElement($historique)) {
+            // set the owning side to null (unless already changed)
+            if ($historique->getUtilisateur() === $this) {
+                $historique->setUtilisateur(null);
+            }
+        }
+
         return $this;
     }
 }
