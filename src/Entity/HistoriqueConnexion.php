@@ -57,9 +57,9 @@ class HistoriqueConnexion
     /**
      * L'Utilisateur qui s'est connecté (peut être null si c'est un Abonne?).
      */
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'historiques', cascade: ['persist'])] // Merge est moins courant ici
-    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'idutilisateur', nullable: true)] // Gardé nullable
-    private ?Utilisateur $utilisateur = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'historiques', cascade: ['persist'])] // Merge est moins courant ici
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'iduser', nullable: true)] // Gardé nullable
+    private ?User $utilisateur = null;
 
     /**
      * L'Abonne qui s'est connecté (peut être null si c'est un Utilisateur?).
@@ -142,12 +142,12 @@ class HistoriqueConnexion
 
     // --- Getters/Setters pour les relations ---
 
-    public function getUtilisateur(): ?Utilisateur // Type retour corrigé
+    public function getUtilisateur(): ?User // Type retour corrigé
     {
         return $this->utilisateur;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self // Type param corrigé
+    public function setUtilisateur(?User $utilisateur): self // Type param corrigé
     {
         $this->utilisateur = $utilisateur;
         return $this;
@@ -168,7 +168,7 @@ class HistoriqueConnexion
     public function __toString(): string
     {
         // Fournit une représentation textuelle simple de l'objet
-        $userIdentifier = $this->utilisateur ? 'Utilisateur:'.$this->utilisateur->getId() : ($this->abonne ? 'Abonne:'.$this->abonne->getId() : 'Inconnu');
+        $userIdentifier = $this->utilisateur ? 'User:'.$this->utilisateur->getId() : ($this->abonne ? 'Abonne:'.$this->abonne->getId() : 'Inconnu');
         $dateStr = $this->dateDeb ? $this->dateDeb->format('Y-m-d H:i') : 'N/A';
         return 'Connexion ' . $userIdentifier . ' le ' . $dateStr;
     }

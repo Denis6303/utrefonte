@@ -129,7 +129,7 @@ class Media
     #[ORM\JoinColumn(name: 'iddimension', referencedColumnName: 'iddimension', nullable: true)] // Rendu nullable
     private ?Dimension $dimension = null;
 
-    #[ORM\ManyToOne(targetEntity: Rubrique::class, inversedBy: 'medias', cascade: ['persist', 'merge'])]
+    #[ORM\ManyToOne(targetEntity: Rubrique::class, inversedBy: 'medias', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'idrubrique', referencedColumnName: 'idrubrique', nullable: true)] // Rendu nullable
     private ?Rubrique $rubrique = null;
 

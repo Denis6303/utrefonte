@@ -15,36 +15,53 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'user')]
+#[ORM\Table(name: '`user`')]
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'iduser', type: 'integer')]
-    private ?int $idUser = null;
+    #[ORM\Column]
+    private ?int $id = null;
 
-    #[ORM\Column(name: 'username', type: 'string', length: 50)]
-    #[Assert\NotBlank]
-    private ?string $username = null;
-
-    #[ORM\Column(name: 'password', type: 'string', length: 50)]
-    #[Assert\NotBlank]
-    private ?string $password = null;
-
-    #[ORM\Column(name: 'salt', type: 'string', length: 32)]
-    private ?string $salt = null;
-
-    #[ORM\Column(name: 'email', type: 'string', length: 50)]
-    #[Assert\NotBlank]
-    #[Assert\Email]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(name: 'is_active', type: 'boolean')]
-    private ?bool $isActive = null;
-
-    #[ORM\Column(name: 'roles', type: 'json')]
+    #[ORM\Column]
     private array $roles = [];
+
+    #[ORM\Column]
+    private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $telephone = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $codePostal = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $pays = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commande::class)]
+    private Collection $commandes;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Avis::class)]
+    private Collection $avis;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Adresse::class)]
+    private Collection $adresses;
 
     #[ORM\OneToOne(targetEntity: Abonne::class)]
     #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne')]
@@ -66,9 +83,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private string $uploadDir = 'upload/photos/';
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Envoi::class)]
+    private Collection $envois;
+
     public function __construct()
     {
+        $this->commandes = new ArrayCollection();
+        $this->avis = new ArrayCollection();
+        $this->adresses = new ArrayCollection();
         $this->messagereponses = new ArrayCollection();
+        $this->envois = new ArrayCollection();
         $this->salt = md5(uniqid('', true));
         $this->isActive = true;
         $this->roles = ['ROLE_USER'];
@@ -123,30 +147,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->uploadDir;
     }
 
-    public function getIdUser(): ?int
+    public function getId(): ?int
     {
-        return $this->idUser;
+        return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getEmail(): ?string
     {
-        return $this->username;
+        return $this->email;
     }
 
-    public function setUsername(string $username): self
+    public function setEmail(string $email): static
     {
-        $this->username = $username;
+        $this->email = $email;
+
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -161,14 +207,174 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getNom(): ?string
     {
-        return $this->email;
+        return $this->nom;
     }
 
-    public function setEmail(string $email): self
+    public function setNom(string $nom): static
     {
-        $this->email = $email;
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): static
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(string $telephone): static
+    {
+        $this->telephone = $telephone;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(string $pays): static
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): static
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): static
+    {
+        if ($this->commandes->removeElement($commande)) {
+            if ($commande->getUser() === $this) {
+                $commande->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            if ($avi->getUser() === $this) {
+                $avi->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Adresse>
+     */
+    public function getAdresses(): Collection
+    {
+        return $this->adresses;
+    }
+
+    public function addAdress(Adresse $adress): static
+    {
+        if (!$this->adresses->contains($adress)) {
+            $this->adresses->add($adress);
+            $adress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdress(Adresse $adress): static
+    {
+        if ($this->adresses->removeElement($adress)) {
+            if ($adress->getUser() === $this) {
+                $adress->setUser(null);
+            }
+        }
+
         return $this;
     }
 
@@ -180,17 +386,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
         return $this;
     }
 
@@ -242,5 +437,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+    }
+
+    /**
+     * @return Collection<int, Envoi>
+     */
+    public function getEnvois(): Collection
+    {
+        return $this->envois;
+    }
+
+    public function addEnvoi(Envoi $envoi): self
+    {
+        if (!$this->envois->contains($envoi)) {
+            $this->envois->add($envoi);
+            $envoi->setUtilisateur($this);
+        }
+        return $this;
+    }
+
+    public function removeEnvoi(Envoi $envoi): self
+    {
+        if ($this->envois->removeElement($envoi)) {
+            // set the owning side to null (unless already changed)
+            if ($envoi->getUtilisateur() === $this) {
+                $envoi->setUtilisateur(null);
+            }
+        }
+        return $this;
     }
 }

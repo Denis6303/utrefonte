@@ -6,8 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\MessageReponseRepository;
+use Doctrine\DBAL\Types\Types;
 
-#[ORM\Entity(repositoryClass: App\Repository\MessageReponseRepository::class)]
+#[ORM\Entity(repositoryClass: MessageReponseRepository::class)]
 #[ORM\Table(name: 'messagereponse')]
 class MessageReponse
 {
@@ -21,10 +23,10 @@ class MessageReponse
     #[ORM\Column(name: 'idmessagereponse', type: 'integer')]
     private ?int $idMessageReponse = null;
 
-    #[ORM\Column(name: 'datereponse', type: 'datetime')]
+    #[ORM\Column(name: 'datereponse', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateReponse = null;
 
-    #[ORM\Column(name: 'contenu', type: 'text')]
+    #[ORM\Column(name: 'contenu', type: Types::TEXT)]
     #[Assert\NotBlank]
     private ?string $contenu = null;
 

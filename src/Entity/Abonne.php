@@ -129,7 +129,7 @@ class Abonne implements UserInterface, PasswordAuthenticatedUserInterface // Ajo
      * Sinon, ajustez le nom et la cible.
      */
     #[ORM\ManyToOne(targetEntity: ProfilClient::class)]
-    #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil', nullable: true)] // Supposant que idprofil existe sur ProfilClient
+    #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil', nullable: true)]
     private ?ProfilClient $profil = null;
 
     #[ORM\OneToMany(mappedBy: 'abonne', targetEntity: Compte::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -174,11 +174,11 @@ class Abonne implements UserInterface, PasswordAuthenticatedUserInterface // Ajo
     private ?\DateTimeImmutable $dateInscription = null;
 
     #[ORM\ManyToOne(targetEntity: Internaute::class, inversedBy: 'abonnes')]
-    #[ORM\JoinColumn(name: 'idinternaute', referencedColumnName: 'idinternaute', nullable: true)] // Rendu nullable si un abonné peut ne pas avoir d'internaute lié
+    #[ORM\JoinColumn(name: 'mailinternaute', referencedColumnName: 'mailinternaute', nullable: true)]
     private ?Internaute $internaute = null;
 
-    #[ORM\ManyToOne(targetEntity: ProfilClient::class)] // Potentiellement redondant avec $profil ? Vérifier la logique métier.
-    #[ORM\JoinColumn(name: 'idprofilclient', referencedColumnName: 'idprofilclient', nullable: true)] // Supposant que idprofilclient existe sur ProfilClient
+    #[ORM\ManyToOne(targetEntity: ProfilClient::class)]
+    #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil', nullable: true)]
     private ?ProfilClient $profilClient = null;
 
     // Pas de propriété `isActive` définie, mais utilisée dans le constructeur. A ajouter si nécessaire.
