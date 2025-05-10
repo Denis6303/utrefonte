@@ -1,4 +1,4 @@
-
+{% set listeLiens = listeLiens is defined ? listeLiens : [] %}
 		<div class="span-24 footer">     
 			<div class="span-7 footerbox1">
 				<div class="leftSpace">
@@ -7,7 +7,7 @@
 						<li class="info-phone">00 228 22 23 43 00 / 44 00</li>
 						<!--li class="info-mail">info@utb.tg</li -->
 						<li class="info-adress">{{ 'acceuil.siege'|trans({}, 'site') }} : UTB Circulaire <br/>Bd. du 13 janvier - Nyekonakpoè <br/>BP 359 LOME</li>
-                                                <li class="info-mail"><a href="{{ path('utb_site_contact',{'locale': locale}) }}">{{ 'acceuil.nous'|trans({}, 'site') }}</a></li>
+                                                {# <li class="info-mail"><a href="{{ path('app_site_contact',{'locale': locale}) }}">{{ 'acceuil.nous'|trans({}, 'site') }}</a></li> #}
 					</ul>
 				</div>
 			</div>				
@@ -26,9 +26,9 @@
 									<a href="{{ "http//"~mF.url}}" title="{{mF.libelle}}">
 								{% elseif mF.url == "utb_site_homepage" or mF.url == "utb_admin_resultatFAQ"%}
 									<a href="{{ path(mF.url,{'locale': locale})}}" title="{{mF.libelle}}">
-								{% elseif mF.url == "utb_site_contact" %}
-									<a href="{{ path(mF.url,{'locale': locale})}}" title="{{mF.libelle}}">
-                                                                {% elseif mF.url == "utb_site_reclamations" %}
+								{% elseif mF.url == "app_site_contact" %}
+									{# <a href="{{ path(mF.url,{'locale': locale})}}" title="{{mF.libelle}}"> #}
+								{% elseif mF.url == "utb_site_reclamations" %}
 									<a href="{{ path(mF.url,{'locale': locale})}}" title="{{mF.libelle}}">
 								{% elseif mF.url == "utb_site_alertes" %}
 									<a href="{{ path(mF.url,{'locale': locale})}}" title="{{mF.libelle}}">

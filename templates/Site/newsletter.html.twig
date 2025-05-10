@@ -1,5 +1,5 @@
 
-    <form action="{{ path('utb_site_contact',{'type': 1, 'locale':locale}) }}" method="post">
+    <form action="{{ path('app_site_contact',{'type': 1, 'locale':locale}) }}" method="post">
        {#% if reponse == "oui"%} Votre mail existe {% endif %#}
 
          {{ form_widget(form.mailInternaute) }}

@@ -52,11 +52,12 @@ class ArticleRepository extends EntityRepository
      * 
      * @param <string> $locale : Variable passee pour gerer le multilingue sur le site
      * @param <integer> $type :   Variable pour avoir l'identifiant de la rubrique  dans laquelle se trouve l'article
+     * @param <integer> $limit :  Variable intervenant dans la pagination
      * 
      * @return <string> return le  resultat d'une requete
      * 
      */
-    public function getListeByParentRubriqueLocale($type, $locale = 'en', $limit)
+    public function getListeByParentRubriqueLocale($type, $limit, $locale = 'en')
     {
         $param = array();
         //Make a Select query
@@ -91,11 +92,12 @@ class ArticleRepository extends EntityRepository
      * 
      * @param <string> $locale : Variable passee pour gerer le multilingue sur le site
      * @param <integer> $type :   Variable pour avoir l'identifiant de la rubrique  dans laquelle se trouve l'article
+     * @param <integer> $limit :  Variable intervenant dans la pagination
      * 
      * @return <string> return le  resultat d'une requete
      * 
      */
-    public function getListeByParentRubriqueAccueilLocale($type, $locale = 'en', $limit)
+    public function getListeByParentRubriqueAccueilLocale($type, $limit, $locale = 'en')
     {
         $param = array();
         //Make a Select query

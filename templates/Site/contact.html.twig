@@ -10,7 +10,7 @@
                   <div class="leftSpace blocArPartContact">
                        <div class="lookupCategorie active-lookupCategorie coinsArrondis border-gris2 ">
                             <div>
-                                <h4> <a href="{{ path("utb_site_contact",{'locale': locale})}}">{{ 'acceuil.nous'|trans({}, 'site') }}</a> </h4>
+                                <h4> <a href="{{ path("app_site_contact",{'locale': locale})}}">{{ 'acceuil.nous'|trans({}, 'site') }}</a> </h4>
                             </div>
                         </div>                        
                        <div class="lookupCategorie coinsArrondis border-gris2 ">
@@ -41,7 +41,7 @@
             
                <div class="bolder"><i>{{ 'contact.champs'|trans({}, 'site') }}</i></div>
                 <div class="formContact">
-                    <form action="{{ path('utb_site_contact',{'type': 0, 'locale':locale}) }}" method="post" id="formContact">
+                    <form action="{{ path('app_site_contact',{'type': 0, 'locale':locale}) }}" method="post" id="formContact">
                        {% if reponse == "oui"%} {{ 'contact.mail'|trans({}, 'site') }} {% endif %}
                        <p>
                            <input type="checkbox" name="recevoir" value="oui" id="recevoir"/> <label for="recevoir"> {{ 'contact.copie'|trans({}, 'site') }}</label>

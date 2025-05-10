@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
-use App\Service\ArticleService;
 use App\Form\ArticleType;
 
 /**
@@ -36,95 +35,24 @@ class ArticleController extends AbstractController
     private AccessControl $accessControl;
     private RequestStack $requestStack;
     private TranslatorInterface $translator;
-    private ArticleService $articleService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         AccessControl $accessControl,
         RequestStack $requestStack,
-        TranslatorInterface $translator,
-        ArticleService $articleService
+        TranslatorInterface $translator
     ) {
         $this->entityManager = $entityManager;
         $this->accessControl = $accessControl;
         $this->requestStack = $requestStack;
         $this->translator = $translator;
-        $this->articleService = $articleService;
     }
-
-    protected function addFlash(string $type, mixed $message): void
-    {
-        $this->requestStack->getCurrentRequest()->getSession()->getFlashBag()->add($type, $message);
-    }
-
-    private function getSession()
-    {
-        return $this->requestStack->getCurrentRequest()->getSession();
-    }
-
-    /**
-     * Methode qui s'occupe de l'ajout d'un article 
-     * 
-     * Les Formulaires varient suivant  la rubrique 
-     * 
-     * type = 2 -- Pour le Formulaire d'ajout d'actualite(ajoutArticleArtualite.html.twig)
-     * 
-     * type = 3 -- Pour le Formulaire d'ajout Presentation(ajoutArticleRubrique.html.twig)
-     * 
-     * @param string $locale Variable passee pour gerer le multilingue sur le site
-     * @param string $type   Identifiant de la rubrique  dans laquelle se trouve l'article
-     * 
-     * @return Response le twig d'ajout de formulaire d'un article suivant la rubrique (ajoutArticle.html.twig)
-     */
-    #[Route('/article/ajout/{locale}/{type}', name: 'ajout_article')]
-    public function ajoutArticleAction(string $locale, string $type): Response
-    {
-        // Code pour gerer la gestion des droits
-        $em = $this->entityManager;
-        $checkAcces = $this->accessControl->verifAcces($em, 'ajoutArticleAction');
-
-        if (!$checkAcces) {
-            $this->addFlash('accesdenied', "admin.layout.accesdenied");
-            return $this->redirectToRoute('utb_admin_accueil', ['locale' => $locale]);
-        }
-
-        $id = $type;
-        $request = $this->requestStack->getCurrentRequest();
-        $form = $this->createForm(ArticleType::class);
-
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-
-            $verifSaisie = $this->articleService->verifSaisie($form->get('titreArticle')->getData(), array('/', '%'));
-
-            if ((trim($form->get('descriptionArticle')->getData()) == '' && $type != 4) || (!$verifSaisie)) {
-                if (trim($form->get('descriptionArticle')->getData()) == '' && $type != 4) {
-                    $this->addFlash('notice', 'errorajtartdescvide');
-                }
-
-                if (!$verifSaisie) {
-                    $this->addFlash('notice', 'errorajtartcarfaux');
-                }
-
-                if ($type == 2) {
-                    return $this->render('utbAdminBundle/Article/ajoutArticleActualite.html.twig', array(
-                        'form' => $form->createView(),
-                        'locale' => $locale,
-                        'type' => $type
-                    ));
-                }
-            }
-
-            // ... rest of the method implementation ...
-        }
-
-        // ... rest of the method implementation ...
 
     #[Route('/article/ajouter/{locale}/{type}', name: 'app_article_ajouter')]
     public function ajouter(Request $request, string $locale, string $type): Response
     {
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
+
         if (!$this->accessControl->isLogged()) {
             return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
@@ -152,7 +80,7 @@ class ArticleController extends AbstractController
     public function liste(string $locale, string $type): Response
     {
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
+
         if (!$this->accessControl->isLogged()) {
             return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
@@ -170,13 +98,13 @@ class ArticleController extends AbstractController
     public function modifier(Request $request, int $id, string $locale, string $type): Response
     {
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
+
         if (!$this->accessControl->isLogged()) {
             return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
 
         $article = $this->entityManager->getRepository(Article::class)->find($id);
-        
+
         if (!$article) {
             throw $this->createNotFoundException('article.not_found');
         }
@@ -203,13 +131,13 @@ class ArticleController extends AbstractController
     public function supprimer(int $id, string $locale, string $type): Response
     {
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
+
         if (!$this->accessControl->isLogged()) {
             return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
 
         $article = $this->entityManager->getRepository(Article::class)->find($id);
-        
+
         if (!$article) {
             throw $this->createNotFoundException('article.not_found');
         }
@@ -220,4 +148,4 @@ class ArticleController extends AbstractController
         $this->addFlash('success', 'article.suppr_success');
         return $this->redirectToRoute('app_article_liste', ['locale' => $locale, 'type' => $type]);
     }
-} 
+}

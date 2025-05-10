@@ -219,7 +219,7 @@ class SiteController extends AbstractController
 
             $listecorrespondance = $em
                 ->getRepository('App\Entity\Article')
-                ->getListeByParentRubriqueAccueilLocale(9, $locale, 6);
+                ->getListeByParentRubriqueAccueilLocale(9, 6, $locale);
 
             return $this->render('Site/index.html.twig', [
                 'locale' => $locale,
@@ -322,7 +322,7 @@ class SiteController extends AbstractController
 
         $listecorrespondance = $em
             ->getRepository('App\Entity\Article')
-            ->getListeByParentRubriqueAccueilLocale(9, $locale, 6);
+            ->getListeByParentRubriqueAccueilLocale(9, 6, $locale);
 
         return $this->render('Site/indexVideo.html.twig', array(
             'locale' => $locale,
@@ -600,7 +600,7 @@ class SiteController extends AbstractController
 
             $listecorrespondanceEtranger = $em
                 ->getRepository('App\Entity\Article')
-                ->getListeByParentRubriqueAccueilLocale(9, $locale, 6);
+                ->getListeByParentRubriqueAccueilLocale(9, 6, $locale);
         }
         // dans les presentation 1 
         if (($type == 1) || ($type == 12) || ($type == 13)  || ($type == 17)) {
@@ -841,6 +841,8 @@ class SiteController extends AbstractController
                 array('listeBreve' => $listeBreve, 'larubrique' => $larubrique, 'listearticle' => $listearticle, 'solutiongenerale' => $solutiongenerale, 'listesousrub' => $listesousrub, 'locale' => $locale, 'listeBanniere' => $listeBanniere, 'listeactualite' => $listeactualite, 'listefaq' => $listefaq, 'image' => $image, 'listecateg' => $listecateg,)
             );
         }
+
+        return new Response();
     }
 
     /**
@@ -952,7 +954,7 @@ class SiteController extends AbstractController
         // permet d'afficher les sous menu permettant d'aller plus rapidement dans les autres presentation de rubrique
         $listecorrespondance = $em
             ->getRepository('App\Entity\Article')
-            ->getListeByParentRubriqueAccueilLocale(9, $locale, 6);
+            ->getListeByParentRubriqueAccueilLocale(9, 6, $locale);
 
         if ($votrecategorie != null && $votrecategorie->getIdgrandparent() != 0) {
             $listecateg = $this->entityManager
