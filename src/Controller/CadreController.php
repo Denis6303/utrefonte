@@ -68,7 +68,7 @@ class CadreController extends AbstractController
     {
         // Code qui vérifie si l'utilisateur courant a accès à cette action
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'ajoutCadreAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -127,7 +127,7 @@ class CadreController extends AbstractController
             $em->persist($uncadre);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('utb_admin_listecadre', ['locale' => $locale]));
+            return $this->redirectToRoute('app_cadre_liste', ['locale' => $locale]);
         }
 
         return $this->render('utbAdminBundle/Cadre/ajoutCadre.html.twig', [
@@ -150,7 +150,7 @@ class CadreController extends AbstractController
     {
         // Code qui vérifie si l'utilisateur courant a accès à cette action
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'listeCadreAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -189,7 +189,7 @@ class CadreController extends AbstractController
     {
         // Code qui vérifie si l'utilisateur courant a accès à cette action
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'modifierCadreAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -244,7 +244,7 @@ class CadreController extends AbstractController
     {
         // Code qui vérifie si l'utilisateur courant a accès à cette action
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'modifierCadreRubriqueBanniereAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -299,7 +299,7 @@ class CadreController extends AbstractController
     {
         // Code qui vérifie si l'utilisateur courant a accès à cette action
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'modifierCadreArticleAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -357,7 +357,7 @@ class CadreController extends AbstractController
     public function supprAllCadresAction(): Response
     {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'supprAllCadresAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -380,7 +380,7 @@ class CadreController extends AbstractController
     public function gererAllCadresAction(): Response
     {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'gererAllCadresAction', $this->container->get);
 
         if (!$checkAcces) {
@@ -424,7 +424,7 @@ class CadreController extends AbstractController
     public function modifMediaCadreAction(int $id, int $idmedia, string $locale): Response
     {
         $em = $this->entityManager;
-        $AccessControl = $this->utb_admin.AccessControl;
+        $AccessControl = $this->utb_admin . AccessControl;
         $checkAcces = $AccessControl->verifAcces($em, 'modifMediaCadreAction', $this->container->get);
 
         if (!$checkAcces) {

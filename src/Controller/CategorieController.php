@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\CategorieCompte;
-use App\Entity\CategorieCompteType;
-use Symfony\Component\HttpFoundation\Response;
+use App\Form\CategorieCompteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
@@ -37,224 +37,102 @@ class CategorieController extends AbstractController
         $this->accessControl = $accessControl;
         $this->requestStack = $requestStack;
         $this->translator = $translator;
-
-        // Configuration des en-têtes de cache
-        $response = new Response();
-        $response->headers->addCacheControlDirective('no-cache', true);
-        $response->headers->addCacheControlDirective('max-age', 0);
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->headers->addCacheControlDirective('no-store', true);
     }
 
-    public function ajoutCategorieAction(string $locale): Response
+    #[Route('/categorie/ajouter/{locale}', name: 'app_categorie_ajouter')]
+    public function ajouter(Request $request, string $locale): Response
     {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager;
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
 
-        $listeActions = $currentConnete["listeActions_abonne"];
-        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $categorie = new CategorieCompte();
+        $form = $this->createForm(CategorieCompteType::class, $categorie);
+        $form->handleRequest($request);
 
-        $unecategorie = new CategorieCompte();
-        $form = $this->createForm(CategorieCompteType::class, $unecategorie);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $categorie->setSicarte(0);
+            $categorie->setSicheque(0);
 
-        $request = $this->requestStack->getCurrentRequest();
+            $this->entityManager->persist($categorie);
+            $this->entityManager->flush();
 
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $unecategorie = $form->getData();
-            $unecategorie->setSicarte(0);
-            $unecategorie->setSicheque(0);
-
-            if ($unecategorie->getLibCategorie() == "") {
-                return $this->render('utbClientBundle/Categorie/ajoutCategorie.html.twig', [
-                    'form' => $form->createView(),
-                    'locale' => $locale,
-                ]);
-            }
-
-            $em->persist($unecategorie);
-            $em->flush();
-
-            $msgnotification = $this->translator->trans('notification.ajout');
-            $this->addFlash('notice', $msgnotification);
-
-            return $this->redirect($this->generateUrl('utb_client_listecategorie', ['locale' => $locale]));
+            $this->addFlash('success', 'categorie.ajout_success');
+            return $this->redirectToRoute('app_categorie_liste', ['locale' => $locale]);
         }
 
-        return $this->render('utbClientBundle/Categorie/ajoutCategorie.html.twig', [
+        return $this->render('categorie/ajouter.html.twig', [
             'form' => $form->createView(),
-            'locale' => $locale,
+            'locale' => $locale
         ]);
     }
 
-    public function listeCategorieAction(string $locale): Response
+    #[Route('/categorie/liste/{locale}', name: 'app_categorie_liste')]
+    public function liste(string $locale): Response
     {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager;
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
 
-        $listeActions = $currentConnete["listeActions_abonne"];
-        
-        $this->requestStack->getCurrentRequest()->setLocale($locale);     
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $categories = $this->entityManager->getRepository(CategorieCompte::class)->findAll();
 
-        $listeCategorie = $em->getRepository("utbClientBundle:CategorieCompte")->getAllCateg($locale, 1, 20);
-
-        return $this->render('utbClientBundle/Categorie/listeCategorie.html.twig', [
-            'listeCategorie' => $listeCategorie,
-            'locale' => $locale,
+        return $this->render('categorie/liste.html.twig', [
+            'categories' => $categories,
+            'locale' => $locale
         ]);
     }
 
-    public function supprCategorieAction(int $id, string $locale): Response
+    #[Route('/categorie/modifier/{id}/{locale}', name: 'app_categorie_modifier')]
+    public function modifier(Request $request, int $id, string $locale): Response
     {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager;
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
+        $categorie = $this->entityManager->getRepository(CategorieCompte::class)->find($id);
 
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
+        if (!$categorie) {
+            throw $this->createNotFoundException('categorie.not_found');
         }
 
-        $listeActions = $currentConnete["listeActions_abonne"];
-        
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $form = $this->createForm(CategorieCompteType::class, $categorie);
+        $form->handleRequest($request);
 
-        $unecategorie = $em->getRepository("utbClientBundle:CategorieCompte")->find($id);
-        if (!$unecategorie) {
-            throw $this->createNotFoundException('Catégorie non trouvée');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'categorie.modif_success');
+            return $this->redirectToRoute('app_categorie_liste', ['locale' => $locale]);
         }
 
-        $em->remove($unecategorie);
-        $em->flush();
-
-        $msgnotification = $this->translator->trans('notification.suppression');
-        $this->addFlash('notice', $msgnotification);
-
-        return $this->redirect($this->generateUrl('utb_client_listecategorie', ['locale' => $locale]));
-    }
-
-    public function gererAllCategorieAction(): Response
-    {
-        $em = $this->entityManager;
-        $request = $this->requestStack->getCurrentRequest();
-        $locale = $request->getLocale();
-
-        $categorieIds = $request->request->get('categorieIds');
-        $etat = $request->request->get('etat');
-
-        if (!empty($categorieIds)) {
-            $categorieIds = explode('|', $categorieIds);
-            foreach ($categorieIds as $id) {
-                if (!empty($id)) {
-                    $unecategorie = $em->getRepository("utbClientBundle:CategorieCompte")->find($id);
-                    if ($unecategorie) {
-                        $unecategorie->setEtatCategorie($etat);
-                        $em->persist($unecategorie);
-                    }
-                }
-            }
-            $em->flush();
-        }
-
-        return $this->redirect($this->generateUrl('utb_client_listecategorie', ['locale' => $locale]));
-    }
-
-    public function modifierCategorieAction(int $id, string $locale): Response
-    {
-        $em = $this->entityManager;
-        $authManager = $this->Auth.Manager;
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_logout', ['locale' => $locale]));
-        }
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-
-        $unecategorie = $em->getRepository("utbClientBundle:CategorieCompte")->find($id);
-        if (!$unecategorie) {
-            throw $this->createNotFoundException('Catégorie non trouvée');
-        }
-
-        $form = $this->createForm(CategorieCompteType::class, $unecategorie);
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $unecategorie = $form->getData();
-            $em->persist($unecategorie);
-            $em->flush();
-
-            $msgnotification = $this->translator->trans('notification.modification');
-            $this->addFlash('notice', $msgnotification);
-
-            return $this->redirect($this->generateUrl('utb_client_listecategorie', ['locale' => $locale]));
-        }
-
-        return $this->render('utbClientBundle/Categorie/modifierCategorie.html.twig', [
+        return $this->render('categorie/modifier.html.twig', [
             'form' => $form->createView(),
-            'locale' => $locale,
-            'unecategorie' => $unecategorie,
+            'categorie' => $categorie,
+            'locale' => $locale
         ]);
     }
 
-    public function corbeilleCategorieAction(): Response
+    #[Route('/categorie/supprimer/{id}/{locale}', name: 'app_categorie_supprimer')]
+    public function supprimer(int $id, string $locale): Response
     {
-        $em = $this->entityManager;
-        $request = $this->requestStack->getCurrentRequest();
-        $locale = $request->getLocale();
-
-        $listeCategorie = $em->getRepository("utbClientBundle:CategorieCompte")->findBy(['etatCategorie' => 0]);
-
-        return $this->render('utbClientBundle/Categorie/corbeille.html.twig', [
-            'listeCategorie' => $listeCategorie,
-            'locale' => $locale,
-        ]);
-    }
-
-    private function infoUtilisateur(EntityManagerInterface $em, $authManager, array $currentConnete, string $user, string $locale): void
-    {
-        if ($user == 'utilisateur') {
-            $utilisateur = $em->getRepository("utbClientBundle:Utilisateur")->find($currentConnete["id_abonne"]);
-            if (!$utilisateur) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Utilisateur non trouvé');
-            }
-        } else {
-            $abonne = $em->getRepository("utbClientBundle:Abonne")->find($currentConnete["id_abonne"]);
-            if (!$abonne) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Abonné non trouvé');
-            }
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $categorie = $this->entityManager->getRepository(CategorieCompte::class)->find($id);
+
+        if (!$categorie) {
+            throw $this->createNotFoundException('categorie.not_found');
+        }
+
+        $this->entityManager->remove($categorie);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'categorie.suppr_success');
+        return $this->redirectToRoute('app_categorie_liste', ['locale' => $locale]);
     }
 }

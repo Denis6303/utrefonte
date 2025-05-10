@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -13,10 +14,12 @@ use Doctrine\Common\Collections\ArrayCollection;
  * #[ORM\Entity](repositoryClass="App\Entity\OperationRepository")
  * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: App\Repository\OperationRepository::class)]
+#[ORM\Table(name: 'operation')]
 class Operation {
 
     function __construct() {
-        
+        $this->dateOperation = new \DateTime();
     }
 
     /**
@@ -25,13 +28,18 @@ class Operation {
      * #[ORM\Column(name="idoperation", type="integer")]
      * #[ORM\GeneratedValue](strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idoperation', type: 'integer')]
+    private ?int $idOperation = null;
 
     /**
      * @var string $libOperation
      * #[ORM\Column(name="liboperation",type="string",length=100)]
      */
-    private $libOperation;
+    #[ORM\Column(name: 'libelleoperation', type: 'string', length: 100)]
+    #[Assert\NotBlank]
+    private ?string $libelleOperation = null;
 
     /**
      * @var datetime $dateValeur
@@ -43,7 +51,8 @@ class Operation {
      * @var datetime $dateOperation
      * #[ORM\Column(name="dateoperation",type="datetime",length=100)]
      */
-    private $dateOperation;
+    #[ORM\Column(name: 'dateoperation', type: 'datetime')]
+    private ?\DateTimeInterface $dateOperation = null;
 
     /**
      * @var datetime $dateCompta
@@ -55,7 +64,10 @@ class Operation {
      * @var float $montant
      * #[ORM\Column(name="montant",type="float")]
      */
-    private $montant;
+    #[ORM\Column(name: 'montant', type: 'decimal', precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private ?string $montant = null;
 
     /**
      * @var Compte $compte
@@ -64,7 +76,9 @@ class Operation {
      * @ORM\JoinColumn(name="numerocompte", referencedColumnName="numerocompte")
      * })
      */
-    private $compte;
+    #[ORM\ManyToOne(targetEntity: Compte::class, inversedBy: 'operations')]
+    #[ORM\JoinColumn(name: 'idcompte', referencedColumnName: 'idcompte')]
+    private ?Compte $compte = null;
 
     /**
      * @var string $sensOperation
@@ -254,9 +268,9 @@ class Operation {
      *
      * @return integer 
      */
-    public function getId(): ?string
+    public function getIdOperation(): ?int
     {
-        return $this->id;
+        return $this->idOperation;
     }
 
     /**
@@ -265,9 +279,9 @@ class Operation {
      * @param string $libOperation
      * @return Operation
      */
-    public function setLibOperation(string $libOperation): self
+    public function setLibelleOperation(string $libelleOperation): self
     {
-        $this->libOperation = $libOperation;
+        $this->libelleOperation = $libelleOperation;
     
         return $this;
     }
@@ -277,9 +291,9 @@ class Operation {
      *
      * @return string 
      */
-    public function getLibOperation(): ?string
+    public function getLibelleOperation(): ?string
     {
-        return $this->libOperation;
+        return $this->libelleOperation;
     }
 
     /**
@@ -311,7 +325,7 @@ class Operation {
      * @param \DateTime $dateOperation
      * @return Operation
      */
-    public function setDateOperation(string $dateOperation): self
+    public function setDateOperation(\DateTimeInterface $dateOperation): self
     {
         $this->dateOperation = $dateOperation;
     
@@ -323,7 +337,7 @@ class Operation {
      *
      * @return \DateTime 
      */
-    public function getDateOperation(): ?string
+    public function getDateOperation(): ?\DateTimeInterface
     {
         return $this->dateOperation;
     }
@@ -587,7 +601,7 @@ class Operation {
      * @param \App\Entity\Compte $compte
      * @return Operation
      */
-    public function setCompte(\App\Entity\Compte $compte = null)
+    public function setCompte(?Compte $compte): self
     {
         $this->compte = $compte;
     
@@ -599,7 +613,7 @@ class Operation {
      *
      * @return \App\Entity\Compte 
      */
-    public function getCompte(): ?string
+    public function getCompte(): ?Compte
     {
         return $this->compte;
     }

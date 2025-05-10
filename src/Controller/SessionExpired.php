@@ -1,21 +1,30 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Response as ResponseInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Description of SessionExpired
- *
+ * Gestion de l'expiration de session
+ * 
  * @author edem
  */
-class SessionExpired {
-    //put your code here
-    public function SessionExpired() {
-        
-        return $this->render('utbClientBundle/Client/sessionExpired.html.twig', array('locale' => $locale));
-        
+class SessionExpired extends AbstractController
+{
+    #[Route(
+        path: '/session/expired/{locale}',
+        name: 'app_session_expired',
+        requirements: ['locale' => '[a-z]{2}']
+    )]
+    public function expired(Request $request, string $locale): ResponseInterface
+    {
+        return $this->render('client/session_expired.html.twig', [
+            'locale' => $locale
+        ]);
     }
 }

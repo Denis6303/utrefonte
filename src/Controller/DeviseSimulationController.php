@@ -99,11 +99,11 @@ class DeviseSimulationController extends AbstractController
      */
     public function delete(Request $request, DeviseSimulation $simulation): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$simulation->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $simulation->getId(), $request->request->get('_token'))) {
             $this->entityManager->remove($simulation);
             $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('devise_simulation_index');
     }
-} 
+}

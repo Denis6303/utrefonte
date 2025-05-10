@@ -4,25 +4,25 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\ProfilClient;
-use App\Entity\ProfilType;
 use App\Entity\Facturation;
-use App\Entity\FacturationType;
 use App\Entity\Module;
-use App\Entity\ModuleType;
 use App\Entity\Controleur;
-use App\Entity\ControleurType;
 use App\Entity\Action;
 use App\Entity\Abonne;
-use App\Entity\ActionType;
-use App\Entity\ActionClientType;
-use App\Entity\ComptePrRibType;
+use App\Entity\ActionClient;
+use App\Entity\ComptePrRib;
 use App\Entity\HistoriqueConnexion;
-use utb\ClientBundle\Controller\SessionExpired;
-use utb\ClientBundle\Types\TypeParametre;
-use Symfony\Component\HttpFoundation\Response;
+use App\Form\ProfilType;
+use App\Form\FacturationType;
+use App\Form\ModuleType;
+use App\Form\ControleurType;
+use App\Form\ActionType;
+use App\Form\ActionClientType;
+use App\Form\ComptePrRibType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
@@ -51,74 +51,133 @@ class ClientController extends AbstractController
         $this->accessControl = $accessControl;
         $this->requestStack = $requestStack;
         $this->translator = $translator;
-
-        // Configuration des en-têtes de cache
-        $response = new Response();
-        $response->headers->addCacheControlDirective('no-cache', true);
-        $response->headers->addCacheControlDirective('max-age', 0);
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->headers->addCacheControlDirective('no-store', true);
     }
 
-    public function indexAction(string $locale, $typePre): Response
+    #[Route('/client/accueil/{locale}', name: 'app_client_accueil')]
+    public function accueil(string $locale): Response
     {
-        $em = $this->entityManager;
-        $type_user = "";
-        $nomPrenom = "";
-        $profil = "";
-        $last_connexion = "";
-
-        $authManager = $this->Auth.Manager;
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_login', ['locale' => $locale]));
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
 
-        $currentID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'abonne', $locale);
-        
         $this->requestStack->getCurrentRequest()->setLocale($locale);
 
-        if (isset($currentConnete["id_abonne"]) && $currentConnete["id_abonne"] != "") {
-            $id_abonne = $currentConnete["id_abonne"];
-            $type_user = $currentConnete["type_user"];
-            $nomPrenom = $currentConnete["nomPrenom_abonne"];
-            $profil = $currentConnete["profil_abonne"];
-            $last_connexion = $currentConnete["last_connexion"];
-            $listeActions = $currentConnete["listeActions_abonne"];
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login', ['locale' => $locale]);
         }
 
-        $this->requestStack->getCurrentRequest()->attributes->set('id_abonne', $id_abonne);
-        $this->requestStack->getCurrentRequest()->attributes->set('type_user', $type_user);
-        $this->requestStack->getCurrentRequest()->attributes->set('nomPrenom', $nomPrenom);
-        $this->requestStack->getCurrentRequest()->attributes->set('profil', $profil);
-        $this->requestStack->getCurrentRequest()->attributes->set('last_connexion', $last_connexion);
-        $this->requestStack->getCurrentRequest()->attributes->set('listeActions', $listeActions);
+        $abonne = null;
+        $type = 'utilisateur';
+        if ($user instanceof Abonne) {
+            $abonne = $user;
+            $type = 'abonne';
+        }
 
-        return $this->render('utbClientBundle/Client/index.html.twig', [
-            'type_user' => $type_user,
-            'nomPrenom' => $nomPrenom,
-            'profil' => $profil,
-            'last_connexion' => $last_connexion,
-            'locale' => $locale,
-            'typePre' => $typePre,
+        $historiques = $this->entityManager->getRepository(HistoriqueConnexion::class)
+            ->findBy(['utilisateur' => $user], ['dateConnexion' => 'DESC'], 5);
+
+        return $this->render('client/accueil.html.twig', [
+            'user' => $user,
+            'abonne' => $abonne,
+            'type' => $type,
+            'historiques' => $historiques,
+            'locale' => $locale
         ]);
     }
 
-    private function infoUtilisateur(EntityManagerInterface $em, $authManager, array $currentConnete, string $user, string $locale): void
+    #[Route('/client/module/liste/{locale}', name: 'app_client_module_liste')]
+    public function listeModule(string $locale): Response
     {
-        if ($user == 'utilisateur') {
-            $utilisateur = $em->getRepository("utbClientBundle:Utilisateur")->find($currentConnete["id_abonne"]);
-            if (!$utilisateur) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Utilisateur non trouvé');
-            }
-        } else {
-            $abonne = $em->getRepository("utbClientBundle:Abonne")->find($currentConnete["id_abonne"]);
-            if (!$abonne) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Abonné non trouvé');
-            }
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $modules = $this->entityManager->getRepository(Module::class)->findAll();
+
+        return $this->render('client/module/liste.html.twig', [
+            'modules' => $modules,
+            'locale' => $locale
+        ]);
     }
-} 
+
+    #[Route('/client/module/ajouter/{locale}', name: 'app_client_module_ajouter')]
+    public function ajouterModule(Request $request, string $locale): Response
+    {
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+
+        $module = new Module();
+        $form = $this->createForm(ModuleType::class, $module);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->persist($module);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'module.ajout_success');
+            return $this->redirectToRoute('app_client_module_liste', ['locale' => $locale]);
+        }
+
+        return $this->render('client/module/ajouter.html.twig', [
+            'form' => $form->createView(),
+            'locale' => $locale
+        ]);
+    }
+
+    #[Route('/client/module/modifier/{id}/{locale}', name: 'app_client_module_modifier')]
+    public function modifierModule(Request $request, int $id, string $locale): Response
+    {
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $module = $this->entityManager->getRepository(Module::class)->find($id);
+
+        if (!$module) {
+            throw $this->createNotFoundException('module.not_found');
+        }
+
+        $form = $this->createForm(ModuleType::class, $module);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'module.modif_success');
+            return $this->redirectToRoute('app_client_module_liste', ['locale' => $locale]);
+        }
+
+        return $this->render('client/module/modifier.html.twig', [
+            'form' => $form->createView(),
+            'module' => $module,
+            'locale' => $locale
+        ]);
+    }
+
+    #[Route('/client/module/supprimer/{id}/{locale}', name: 'app_client_module_supprimer')]
+    public function supprimerModule(int $id, string $locale): Response
+    {
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $module = $this->entityManager->getRepository(Module::class)->find($id);
+
+        if (!$module) {
+            throw $this->createNotFoundException('module.not_found');
+        }
+
+        $this->entityManager->remove($module);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'module.suppr_success');
+        return $this->redirectToRoute('app_client_module_liste', ['locale' => $locale]);
+    }
+}

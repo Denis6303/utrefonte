@@ -4,173 +4,84 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * #[ORM\Entity](repositoryClass="App\Entity\TypeCompteRepository")
- * #[ORM\Table(name="typecompte")]
- */
-class TypeCompte {
-
-    function __construct() {
-        
+#[ORM\Entity(repositoryClass: App\Repository\TypeCompteRepository::class)]
+#[ORM\Table(name: 'typecompte')]
+class TypeCompte
+{
+    public function __construct()
+    {
+        $this->comptes = new ArrayCollection();
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Column(name="idtypecompte", type="integer")]
-     * #[ORM\Id]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'idtypecompte', type: 'integer')]
+    private ?int $idTypeCompte = null;
 
-    /**
-     * 
-     * @var string $libTypeCompte
-     * #[ORM\Column(name="libtypecompte",type="string",length=70)]
-     * #[Assert\NotBlank(message=" Le libellé du profil ne peut être vide ")]
-     * @Assert\MinLength(3)
-     */
-    private $libTypeCompte;
+    #[ORM\Column(name: 'libelletypecompte', type: 'string', length: 50)]
+    #[Assert\NotBlank]
+    private ?string $libelleTypeCompte = null;
 
-    /**
-     * @var ArrayCollection Compte $comptes
-     * #[ORM\OneToMany(targetEntity: App\Entity\Compte::class, mappedBy="typeCompte")]
-     * 
-     */
-    private $comptes;
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @var ArrayCollection CompteInexistant $compteInexistants
-     * #[ORM\OneToMany(targetEntity: App\Entity\CompteInexistant::class, mappedBy="typeCompte")]
-     * 
-     */
-    private $compteInexistants;
+    #[ORM\OneToMany(targetEntity: Compte::class, mappedBy: 'typeCompte')]
+    private Collection $comptes;
 
-    /**
-     * @var ArrayCollection Chargement $chargements
-     * #[ORM\OneToMany(targetEntity: App\Entity\Chargement::class, mappedBy="typeCompte")]
-     * 
-     */
-    private $chargements;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
-        return $this->id;
+    public function getIdTypeCompte(): ?int
+    {
+        return $this->idTypeCompte;
     }
 
-    /**
-     * Set libTypeCompte
-     *
-     * @param string $libTypeCompte
-     * @return TypeCompte
-     */
-    public function setLibTypeCompte(string $libTypeCompte): self {
-        $this->libTypeCompte = $libTypeCompte;
+    public function getLibelleTypeCompte(): ?string
+    {
+        return $this->libelleTypeCompte;
+    }
 
+    public function setLibelleTypeCompte(string $libelleTypeCompte): self
+    {
+        $this->libelleTypeCompte = $libelleTypeCompte;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 
     /**
-     * Get libTypeCompte
-     *
-     * @return string 
+     * @return Collection<int, Compte>
      */
-    public function getLibTypeCompte(): ?string {
-        return $this->libTypeCompte;
-    }
-
-    /**
-     * Add comptes
-     *
-     * @param \App\Entity\Compte $comptes
-     * @return TypeCompte
-     */
-    public function addCompte(\App\Entity\Compte $comptes) {
-        $this->comptes[] = $comptes;
-
-        return $this;
-    }
-
-    /**
-     * Remove comptes
-     *
-     * @param \App\Entity\Compte $comptes
-     */
-    public function removeCompte(\App\Entity\Compte $comptes) {
-        $this->comptes->removeElement($comptes);
-    }
-
-    /**
-     * Get comptes
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getComptes(): ?string {
+    public function getComptes(): Collection
+    {
         return $this->comptes;
     }
 
-    /**
-     * Add compteInexistants
-     *
-     * @param \App\Entity\CompteInexistant $compteInexistants
-     * @return TypeCompte
-     */
-    public function addCompteInexistant(\App\Entity\CompteInexistant $compteInexistants) {
-        $this->compteInexistants[] = $compteInexistants;
-
+    public function addCompte(Compte $compte): self
+    {
+        if (!$this->comptes->contains($compte)) {
+            $this->comptes->add($compte);
+            $compte->setTypeCompte($this);
+        }
         return $this;
     }
 
-    /**
-     * Remove compteInexistants
-     *
-     * @param \App\Entity\CompteInexistant $compteInexistants
-     */
-    public function removeCompteInexistant(\App\Entity\CompteInexistant $compteInexistants) {
-        $this->compteInexistants->removeElement($compteInexistants);
-    }
-
-    /**
-     * Get compteInexistants
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCompteInexistants(): ?string {
-        return $this->compteInexistants;
-    }
-
-    /**
-     * Add chargements
-     *
-     * @param \App\Entity\Chargement $chargements
-     * @return TypeCompte
-     */
-    public function addChargement(\App\Entity\Chargement $chargements) {
-        $this->chargements[] = $chargements;
-
+    public function removeCompte(Compte $compte): self
+    {
+        if ($this->comptes->removeElement($compte)) {
+            if ($compte->getTypeCompte() === $this) {
+                $compte->setTypeCompte(null);
+            }
+        }
         return $this;
     }
-
-    /**
-     * Remove chargements
-     *
-     * @param \App\Entity\Chargement $chargements
-     */
-    public function removeChargement(\App\Entity\Chargement $chargements) {
-        $this->chargements->removeElement($chargements);
-    }
-
-    /**
-     * Get chargements
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getChargements(): ?string {
-        return $this->chargements;
-    }
-
 }

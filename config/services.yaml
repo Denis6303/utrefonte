@@ -6,6 +6,7 @@
 parameters:
     app.upload_dir: '%kernel.project_dir%/public/uploads'
     app.max_file_size: 5242880 # 5MB
+    app.user_photos_directory: '%kernel.project_dir%/public/uploads/users'
 
 services:
     # default configuration for services in *this* file
@@ -22,56 +23,15 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # Services spécifiques
-    App\Service\AccessControl:
-        public: true
+    # Configuration explicite pour le ChargementController
+    App\Controller\ChargementController:
         arguments:
-            $entityManager: '@doctrine.orm.entity_manager'
-            $security: '@security.token_storage'
-            $translator: '@translator'
+            $projectDir: '%kernel.project_dir%'
 
-    # Configuration des contrôleurs
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
-        public: true
-        calls:
-            - [setContainer, ['@service_container']]
-
-    # Configuration des repositories
-    App\Repository\:
-        resource: '../src/Repository'
-        tags: ['doctrine.repository_service']
-
-    # Configuration des formulaires
-    App\Form\:
-        resource: '../src/Form'
-        tags: ['form.type']
-
-    # Configuration des listeners
-    App\EventListener\:
-        resource: '../src/EventListener'
-        tags: ['kernel.event_listener']
-
-    # Configuration des services de sécurité
-    security.token_storage:
-        class: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
-        public: true
-
-    # Configuration des services de traduction
-    translator:
-        class: Symfony\Contracts\Translation\TranslatorInterface
-        public: true
-
-    # Configuration des services de session
-    session:
-        class: Symfony\Component\HttpFoundation\Session\SessionInterface
-        public: true
-
-    # Configuration des services de routage
-    router:
-        class: Symfony\Component\Routing\RouterInterface
-        public: true
+    # Configuration explicite pour le UserController
+    App\Controller\UserController:
+        arguments:
+            $userPhotosDirectory: '%app.user_photos_directory%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

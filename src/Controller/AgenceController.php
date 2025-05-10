@@ -8,9 +8,9 @@ use App\Entity\AgenceType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Response;
 use App\Service\AccessControl;
 
 class AgenceController extends AbstractController
@@ -32,9 +32,15 @@ class AgenceController extends AbstractController
         $this->translator = $translator;
     }
 
-    #[Route('/{_locale}/agence/ajout', name: 'agence_ajout')]
-    public function ajoutAgence(Request $request): Response
+    #[Route('/agence/ajouter/{locale}', name: 'app_agence_ajouter')]
+    public function ajouter(Request $request, string $locale): Response
     {
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
         $agence = new Agence();
         $form = $this->createForm(AgenceType::class, $agence);
         $form->handleRequest($request);
@@ -43,51 +49,84 @@ class AgenceController extends AbstractController
             $this->entityManager->persist($agence);
             $this->entityManager->flush();
 
-            $this->addFlash('success', $this->translator->trans('agence.created_success'));
-            return $this->redirectToRoute('agence_list');
+            $this->addFlash('success', 'agence.ajout_success');
+            return $this->redirectToRoute('app_agence_liste', ['locale' => $locale]);
         }
 
-        return $this->render('agence/ajout.html.twig', [
+        return $this->render('agence/ajouter.html.twig', [
             'form' => $form->createView(),
+            'locale' => $locale
         ]);
     }
 
-    #[Route('/{_locale}/agence/liste', name: 'agence_list')]
-    public function listeAgence(): Response
+    #[Route('/agence/liste/{locale}', name: 'app_agence_liste')]
+    public function liste(string $locale): Response
     {
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
         $agences = $this->entityManager->getRepository(Agence::class)->findAll();
 
         return $this->render('agence/liste.html.twig', [
             'agences' => $agences,
+            'locale' => $locale
         ]);
     }
 
-    #[Route('/{_locale}/agence/{id}/supprimer', name: 'agence_delete')]
-    public function supprAgence(Agence $agence): Response
+    #[Route('/agence/modifier/{id}/{locale}', name: 'app_agence_modifier')]
+    public function modifier(Request $request, int $id, string $locale): Response
     {
-        $this->entityManager->remove($agence);
-        $this->entityManager->flush();
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
 
-        $this->addFlash('success', $this->translator->trans('agence.deleted_success'));
-        return $this->redirectToRoute('agence_list');
-    }
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
 
-    #[Route('/{_locale}/agence/{id}/modifier', name: 'agence_edit')]
-    public function modifierAgence(Request $request, Agence $agence): Response
-    {
+        $agence = $this->entityManager->getRepository(Agence::class)->find($id);
+
+        if (!$agence) {
+            throw $this->createNotFoundException('agence.not_found');
+        }
+
         $form = $this->createForm(AgenceType::class, $agence);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            $this->addFlash('success', $this->translator->trans('agence.updated_success'));
-            return $this->redirectToRoute('agence_list');
+            $this->addFlash('success', 'agence.modif_success');
+            return $this->redirectToRoute('app_agence_liste', ['locale' => $locale]);
         }
 
         return $this->render('agence/modifier.html.twig', [
             'form' => $form->createView(),
             'agence' => $agence,
+            'locale' => $locale
         ]);
+    }
+
+    #[Route('/agence/supprimer/{id}/{locale}', name: 'app_agence_supprimer')]
+    public function supprimer(int $id, string $locale): Response
+    {
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
+        $agence = $this->entityManager->getRepository(Agence::class)->find($id);
+
+        if (!$agence) {
+            throw $this->createNotFoundException('agence.not_found');
+        }
+
+        $agence->setSuppr(true);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'agence.suppr_success');
+        return $this->redirectToRoute('app_agence_liste', ['locale' => $locale]);
     }
 }

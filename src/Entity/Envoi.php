@@ -2,372 +2,273 @@
 
 namespace App\Entity;
 
+use App\Repository\EnvoiRepository; // Importer le Repository
+use Doctrine\DBAL\Types\Types;      // Importer Types
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable; // Utiliser les objets immuables
+// Importer les entités liées si nécessaire
+// use App\Entity\Utilisateur;
+// use App\Entity\MessageClient;
+// use App\Entity\Abonne;
 
 /**
- * App\Entity
- *
- * #[ORM\Table(name="envoi")]
- * #[ORM\Entity](repositoryClass="App\Entity\EnvoiRepository")
- * @ORM\HasLifecycleCallbacks
+ * Entité représentant un enregistrement d'envoi de message.
  */
-class Envoi {
+#[ORM\Entity(repositoryClass: EnvoiRepository::class)]
+#[ORM\Table(name: 'envoi')]
+#[ORM\HasLifecycleCallbacks] // Conserver pour le PrePersist
+class Envoi
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue] // strategy: 'AUTO' est la valeur par défaut
+    #[ORM\Column(name: 'idenvoi', type: Types::INTEGER)]
+    private ?int $id = null; // Renommé pour suivre les conventions
 
-    function __construct() {
-        $this->typeMessage=0;
+    /**
+     * ID du destinataire Utilisateur (si applicable).
+     * Relation ManyToOne serait mieux si un Envoi a UN destinataire spécifique.
+     * Sinon, garder comme ID.
+     */
+    #[ORM\Column(name: 'destutil', type: Types::INTEGER, nullable: true)] // Rendu nullable car destAb existe aussi
+    // NotBlank supprimé car potentiellement null si destAb est défini
+    private ?int $destUtil = null;
+
+    /**
+     * ID du destinataire Abonne (si applicable).
+     */
+    #[ORM\Column(name: 'destab', type: Types::INTEGER, nullable: true)] // Rendu nullable
+    private ?int $destAb = null;
+
+    /**
+     * Statut du message (côté réception/traitement?).
+     */
+    #[ORM\Column(name: 'statutmsg', type: Types::INTEGER, nullable: true)]
+    private ?int $statutMsg = null;
+
+    /**
+     * Statut de l'envoi effectif du message.
+     */
+    #[ORM\Column(name: 'statutmsgenvoye', type: Types::INTEGER, nullable: true)]
+    private ?int $statutMsgEnvoye = null;
+
+    /**
+     * ID du message parent (pour les conversations/réponses).
+     * Envisager une relation ManyToOne self-référencée si c'est un lien direct.
+     */
+    #[ORM\Column(name: 'msgparent', type: Types::INTEGER, nullable: true)]
+    private ?int $msgParent = null;
+
+    /**
+     * Indicateur de lecture (0=non lu, 1=lu).
+     */
+    #[ORM\Column(name: 'msglu', type: Types::BOOLEAN)] // Changé en BOOLEAN
+    #[Assert\NotNull]
+    private ?bool $msgLu = false; // Initialisé à non lu
+
+    /**
+     * Type d'envoi (ex: email, notification, etc.).
+     */
+    #[ORM\Column(name: 'typeenvoi', type: Types::INTEGER, nullable: true)]
+    private ?int $typeEnvoi = null;
+
+    #[ORM\Column(name: 'dateenvoimsg', type: Types::DATETIME_IMMUTABLE)] // Non nullable, géré par PrePersist
+    #[Assert\NotNull]
+    private ?DateTimeImmutable $dateEnvoiMsg = null; // Changé en DateTimeImmutable
+
+    /**
+     * Type de message (catégorisation).
+     */
+    #[ORM\Column(name: 'typemessage', type: Types::INTEGER)]
+    #[Assert\NotNull]
+    private ?int $typeMessage = 0; // Initialisé dans le constructeur
+
+    // --- RELATIONS ---
+
+    /**
+     * L'utilisateur qui a initié l'envoi (peut être null si initié par un abonné?).
+     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'envois', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idutilisateur', referencedColumnName: 'id', nullable: true)]
+    private ?User $utilisateur = null;
+
+    /**
+     * Le message client concerné par cet envoi.
+     */
+    #[ORM\ManyToOne(targetEntity: MessageClient::class, inversedBy: 'envois', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idmessageclient', referencedColumnName: 'idmessageclient', nullable: true)] // Gardé nullable
+    private ?MessageClient $messageclient = null;
+
+    /**
+     * L'abonné qui a initié l'envoi (peut être null si initié par un utilisateur?).
+     */
+    #[ORM\ManyToOne(targetEntity: Abonne::class, inversedBy: 'envois', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne', nullable: true)] // Gardé nullable
+    private ?Abonne $abonne = null;
+
+
+    public function __construct()
+    {
+        $this->typeMessage = 0; // Valeur par défaut
+        $this->msgLu = false;  // Non lu par défaut
+        // dateEnvoiMsg sera défini dans PrePersist
     }
 
-    /**
-     * @var integer $id
-     * #[ORM\Id]
-     * #[ORM\Column(name="idenvoi", type="integer")]
-     * #[ORM\GeneratedValue](strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\PrePersist]
+    public function setDateOnPrePersist(): void
+    {
+        if ($this->dateEnvoiMsg === null) { // Défini seulement s'il n'existe pas déjà
+             $this->dateEnvoiMsg = new DateTimeImmutable();
+        }
+    }
 
-    /**
-     * @var Utulisateur $utilisateur
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Utilisateur::class, inversedBy="envois", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idutilisateur", referencedColumnName="idutilisateur")
-     * })
-     */
-    private $utilisateur;
+    // --- GETTERS & SETTERS ---
 
-    /**
-     * @var MessageClient $messageclient
-     * #[ORM\ManyToOne(targetEntity: App\Entity\MessageClient::class, inversedBy="envois", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idmessageclient", referencedColumnName="idmessageclient")
-     * })
-     */
-    private $messageclient;
-
-    /**
-     * @var Abonne $abonne
-     * #[ORM\ManyToOne(targetEntity: App\Entity\Abonne::class, inversedBy="envois", cascade={"persist"})]
-     * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="idabonne", referencedColumnName="idabonne")
-     * })
-     */
-    private $abonne;
-
-    /**
-     * @var integer $destUtil
-     * #[ORM\Column(name="destutil", type="integer")]
-     * #[Assert\NotBlank()]  
-     */
-    private $destUtil;
-
-    /**
-     * @var integer $destAb
-     * #[ORM\Column(name="destab", type="integer")]  
-     */
-    private $destAb;
-
-    /**
-     * @var integer $statutMsg
-     * #[ORM\Column(name="statutmsg", type="integer")]  
-     */
-    private $statutMsg;
-
-    /**
-     * @var integer $statutMsgEnvoye
-     * #[ORM\Column(name="statutmsgenvoye", type="integer")]  
-     */
-    private $statutMsgEnvoye;
-
-    /**
-     * @var integer $msgParent
-     * #[ORM\Column(name="msgparent", type="integer")]  
-     */
-    private $msgParent;
-
-    /**
-     * @var integer $msgLu
-     * #[ORM\Column(name="msglu", type="integer")]  
-     */
-    private $msgLu;
-
-    /**
-     * @var integer $typeEnvoi
-     * #[ORM\Column(name="typeenvoi", type="integer")]  
-     */
-    private $typeEnvoi;
-
-    /**
-     * @var datetime $dateEnvoiMsg
-     * #[ORM\Column(name="dateenvoimsg", type="datetime")]  
-     */
-    private $dateEnvoiMsg;
-
-    /**
-     * @var integer $typeMessage
-     * #[ORM\Column(name="typemessage", type="integer")]  
-     */
-    private $typeMessage;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId(): ?string {
+    public function getId(): ?int // Nom et type retour standardisés
+    {
         return $this->id;
     }
 
-    /**
-     * Set destUtil
-     *
-     * @param integer $destUtil
-     * @return Envoi
-     */
-    public function setDestUtil(string $destUtil): self {
-        $this->destUtil = $destUtil;
-
-        return $this;
-    }
-
-    /**
-     * Get destUtil
-     *
-     * @return integer 
-     */
-    public function getDestUtil(): ?string {
+    public function getDestUtil(): ?int // Type retour corrigé
+    {
         return $this->destUtil;
     }
 
-    /**
-     * Set destAb
-     *
-     * @param integer $destAb
-     * @return Envoi
-     */
-    public function setDestAb(string $destAb): self {
-        $this->destAb = $destAb;
-
+    public function setDestUtil(?int $destUtil): self // Type param corrigé, accepte null
+    {
+        $this->destUtil = $destUtil;
         return $this;
     }
 
-    /**
-     * Get destAb
-     *
-     * @return integer 
-     */
-    public function getDestAb(): ?string {
+    public function getDestAb(): ?int // Type retour corrigé
+    {
         return $this->destAb;
     }
 
-    /**
-     * Set utilisateur
-     *
-     * @param \App\Entity\Utilisateur $utilisateur
-     * @return Envoi
-     */
-    public function setUtilisateur(\App\Entity\Utilisateur $utilisateur = null) {
-        $this->utilisateur = $utilisateur;
-
+    public function setDestAb(?int $destAb): self // Type param corrigé, accepte null
+    {
+        $this->destAb = $destAb;
         return $this;
     }
 
-    /**
-     * Get utilisateur
-     *
-     * @return \App\Entity\Utilisateur 
-     */
-    public function getUtilisateur(): ?string {
-        return $this->utilisateur;
-    }
-
-    /**
-     * Set messageclient
-     *
-     * @param \App\Entity\MessageClient $messageclient
-     * @return Envoi
-     */
-    public function setMessageclient(\App\Entity\MessageClient $messageclient = null) {
-        $this->messageclient = $messageclient;
-
-        return $this;
-    }
-
-    /**
-     * Get messageclient
-     *
-     * @return \App\Entity\MessageClient 
-     */
-    public function getMessageclient(): ?string {
-        return $this->messageclient;
-    }
-
-    /**
-     * Set abonne
-     *
-     * @param \App\Entity\Abonne $abonne
-     * @return Envoi
-     */
-    public function setAbonne(\App\Entity\Abonne $abonne = null) {
-        $this->abonne = $abonne;
-
-        return $this;
-    }
-
-    /**
-     * Get abonne
-     *
-     * @return \App\Entity\Abonne 
-     */
-    public function getAbonne(): ?string {
-        return $this->abonne;
-    }
-
-    /**
-     * Set statutMsg
-     *
-     * @param integer $statutMsg
-     * @return Envoi
-     */
-    public function setStatutMsg(string $statutMsg): self {
-        $this->statutMsg = $statutMsg;
-
-        return $this;
-    }
-
-    /**
-     * Get statutMsg
-     *
-     * @return integer 
-     */
-    public function getStatutMsg(): ?string {
+    public function getStatutMsg(): ?int // Type retour corrigé
+    {
         return $this->statutMsg;
     }
 
-    /**
-     * Set msgParent
-     *
-     * @param integer $msgParent
-     * @return Envoi
-     */
-    public function setMsgParent(string $msgParent): self {
-        $this->msgParent = $msgParent;
-
+    public function setStatutMsg(?int $statutMsg): self // Type param corrigé, accepte null
+    {
+        $this->statutMsg = $statutMsg;
         return $this;
     }
 
-    /**
-     * Get msgParent
-     *
-     * @return integer 
-     */
-    public function getMsgParent(): ?string {
-        return $this->msgParent;
-    }
-
-    /**
-     * Set msgLu
-     *
-     * @param integer $msgLu
-     * @return Envoi
-     */
-    public function setMsgLu(string $msgLu): self {
-        $this->msgLu = $msgLu;
-
-        return $this;
-    }
-
-    /**
-     * Get msgLu
-     *
-     * @return integer 
-     */
-    public function getMsgLu(): ?string {
-        return $this->msgLu;
-    }
-
-    /**
-     * Set typeEnvoi
-     *
-     * @param integer $typeEnvoi
-     * @return Envoi
-     */
-    public function setTypeEnvoi(string $typeEnvoi): self {
-        $this->typeEnvoi = $typeEnvoi;
-
-        return $this;
-    }
-
-    /**
-     * Get typeEnvoi
-     *
-     * @return integer 
-     */
-    public function getTypeEnvoi(): ?string {
-        return $this->typeEnvoi;
-    }
-
-    /**
-     * Set dateEnvoiMsg
-     *
-     * @param \DateTime $dateEnvoiMsg
-     * @return Envoi
-     */
-    public function setDateEnvoiMsg(string $dateEnvoiMsg): self {
-        $this->dateEnvoiMsg = $dateEnvoiMsg;
-
-        return $this;
-    }
-
-    /**
-     * Get dateEnvoiMsg
-     *
-     * @return \DateTime 
-     */
-    public function getDateEnvoiMsg(): ?string {
-        return $this->dateEnvoiMsg;
-    }
-
-    /**
-     * Set statutMsgEnvoye
-     *
-     * @param integer $statutMsgEnvoye
-     * @return Envoi
-     */
-    public function setStatutMsgEnvoye(string $statutMsgEnvoye): self {
-        $this->statutMsgEnvoye = $statutMsgEnvoye;
-
-        return $this;
-    }
-
-    /**
-     * Get statutMsgEnvoye
-     *
-     * @return integer 
-     */
-    public function getStatutMsgEnvoye(): ?string {
+    public function getStatutMsgEnvoye(): ?int // Type retour corrigé
+    {
         return $this->statutMsgEnvoye;
     }
 
-    /**
-     * Set typeMessage
-     *
-     * @param integer $typeMessage
-     * @return Envoi
-     */
-    public function setTypeMessage(string $typeMessage): self {
-        $this->typeMessage = $typeMessage;
-
+    public function setStatutMsgEnvoye(?int $statutMsgEnvoye): self // Type param corrigé, accepte null
+    {
+        $this->statutMsgEnvoye = $statutMsgEnvoye;
         return $this;
     }
 
-    /**
-     * Get typeMessage
-     *
-     * @return integer 
-     */
-    public function getTypeMessage(): ?string {
+    public function getMsgParent(): ?int // Type retour corrigé
+    {
+        return $this->msgParent;
+    }
+
+    public function setMsgParent(?int $msgParent): self // Type param corrigé, accepte null
+    {
+        $this->msgParent = $msgParent;
+        return $this;
+    }
+
+    public function isMsgLu(): ?bool // Getter standard pour booléen
+    {
+        return $this->msgLu;
+    }
+
+    public function setMsgLu(bool $msgLu): self // Type param corrigé en bool
+    {
+        $this->msgLu = $msgLu;
+        return $this;
+    }
+
+    public function getTypeEnvoi(): ?int // Type retour corrigé
+    {
+        return $this->typeEnvoi;
+    }
+
+    public function setTypeEnvoi(?int $typeEnvoi): self // Type param corrigé, accepte null
+    {
+        $this->typeEnvoi = $typeEnvoi;
+        return $this;
+    }
+
+    public function getDateEnvoiMsg(): ?DateTimeImmutable // Type retour corrigé
+    {
+        return $this->dateEnvoiMsg;
+    }
+
+    // Setter retiré car géré par PrePersist
+    // public function setDateEnvoiMsg(DateTimeImmutable $dateEnvoiMsg): self
+    // {
+    //     $this->dateEnvoiMsg = $dateEnvoiMsg;
+    //     return $this;
+    // }
+
+    public function getTypeMessage(): ?int // Type retour corrigé
+    {
         return $this->typeMessage;
     }
 
+    public function setTypeMessage(int $typeMessage): self // Type param corrigé en int
+    {
+        $this->typeMessage = $typeMessage;
+        return $this;
+    }
+
+    // --- Getters/Setters pour les relations ---
+
+    public function getUtilisateur(): ?User // Type retour corrigé
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?User $utilisateur): self // Type param corrigé
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
+    public function getMessageclient(): ?MessageClient // Type retour corrigé
+    {
+        return $this->messageclient;
+    }
+
+    public function setMessageclient(?MessageClient $messageclient): self // Type param corrigé
+    {
+        $this->messageclient = $messageclient;
+        return $this;
+    }
+
+    public function getAbonne(): ?Abonne // Type retour corrigé
+    {
+        return $this->abonne;
+    }
+
+    public function setAbonne(?Abonne $abonne): self // Type param corrigé
+    {
+        $this->abonne = $abonne;
+        return $this;
+    }
+
+     // --- Méthode __toString ---
+    public function __toString(): string
+    {
+        // Fournit une représentation textuelle simple de l'objet
+        $dateStr = $this->dateEnvoiMsg ? $this->dateEnvoiMsg->format('Y-m-d H:i') : 'N/A';
+        return 'Envoi #' . $this->id . ' (' . $dateStr . ')';
+    }
 }

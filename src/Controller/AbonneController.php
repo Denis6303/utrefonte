@@ -23,40 +23,62 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use PHPExcel;
+use PHPExcel_IOFactory;
 
 /**
  * AbonneController 
  * 
  * Le controleur gerant la pluspart des fonctionnalités du module "Gestion des Abonné"
  */
-#[Route('/{_locale}')]
 class AbonneController extends AbstractController
 {
-    public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly AccessControl $accessControl,
-        private readonly RequestStack $requestStack,
-        private readonly TranslatorInterface $translator
-    ) {}
+    private EntityManagerInterface $entityManager;
+    private AccessControl $accessControl;
+    private RequestStack $requestStack;
+    private TranslatorInterface $translator;
 
-    #[Route('/abonne/edit', name: 'abonne_edit')]
-    #[IsGranted('ROLE_EDIT_ABONNE', message: 'Accès refusé à cette section.')]
-    public function edit(Request $request): Response
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        AccessControl $accessControl,
+        RequestStack $requestStack,
+        TranslatorInterface $translator
+    ) {
+        $this->entityManager = $entityManager;
+        $this->accessControl = $accessControl;
+        $this->requestStack = $requestStack;
+        $this->translator = $translator;
+    }
+
+    #[Route("/{locale}/abonne/edit", name: "abonne_edit")]
+    public function edit(string $locale, Request $request): Response
     {
+        $em = $this->entityManager;
+        $accessControl = $this->accessControl;
+        $checkAcces = $accessControl->verifAcces($em, 'EditAction');
+
+        if (!$checkAcces) {
+            $this->addFlash('accesdenied', "admin.layout.accesdenied");
+            return $this->redirect($this->generateUrl('admin_dashboard', ['locale' => $locale]));
+        }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
         $abonne = new Abonne();
         $form = $this->createForm(AbonneType::class, $abonne);
-        
-        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
-            $this->entityManager->persist($abonne);
-            $this->entityManager->flush();
-            
-            $this->addFlash('success', $this->translator->trans('abonne.created.success'));
-            return $this->redirectToRoute('abonne_list');
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->persist($abonne);
+                $em->flush();
+                $this->addFlash('success', 'Abonné créé avec succès');
+                return $this->redirectToRoute('abonne_list', ['locale' => $locale]);
+            }
         }
 
         return $this->render('abonne/edit.html.twig', [
             'form' => $form->createView(),
+            'locale' => $locale
         ]);
     }
 } 

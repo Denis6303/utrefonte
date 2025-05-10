@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,15 +10,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\AccessControl;
-use App\Entity\Chargement;
-use App\Entity\ChargementType;
-use App\Entity\PrerequisChargementType;
-use App\Entity\Abonne;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Finder;
-use Doctrine\ORM\EntityManager;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
  * ChargementController pour les actions de chargement de fichiers
@@ -28,6 +20,7 @@ use Doctrine\ORM\EntityManager;
  * @copyright 2013 Ace3i
  * @link      http://www.utb.tg
  */
+
 class ChargementController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
@@ -40,180 +33,127 @@ class ChargementController extends AbstractController
         EntityManagerInterface $entityManager,
         AccessControl $accessControl,
         RequestStack $requestStack,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        string $projectDir
     ) {
         $this->entityManager = $entityManager;
         $this->accessControl = $accessControl;
         $this->requestStack = $requestStack;
         $this->translator = $translator;
-        $this->uploadDir = __DIR__ . '/../../../../web/upload/logsite';
-
-        // Configuration des en-têtes de cache
-        $response = new Response();
-        $response->headers->addCacheControlDirective('no-cache', true);
-        $response->headers->addCacheControlDirective('max-age', 0);
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->headers->addCacheControlDirective('no-store', true);
+        $this->uploadDir = $projectDir . '/public/upload/chargement';
     }
 
-    public function saveFileAction(string $locale, string $type): Response
+    #[Route('/chargement/ajouter/{locale}/{type}', name: 'app_chargement_ajouter')]
+    public function ajouter(Request $request, string $locale, string $type): Response
     {
-        $em = $this->entityManager;
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        $authManager = $this->Auth.Manager;
 
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
+        $chargement = new Chargement();
+        $form = $this->createForm(ChargementType::class, $chargement);
+        $form->handleRequest($request);
 
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('fichier')->getData();
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-        $listeActions = $currentConnete["listeActions_abonne"];
-        if (!in_array('saveFileAction', $listeActions)) {
-            $this->addFlash('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
-
-        $fileidtype = 0;
-        $unchargement = new Chargement();
-        $form = $this->createForm(ChargementType::class, $unchargement);
-        $listeFile = $em->getRepository("utbClientBundle/Chargement")->findBy(['archive' => 0], ['id' => 'DESC']);
-
-        $request = $this->requestStack->getCurrentRequest();
-        $extensions = 'txt';
-        $lesoper = [];
-
-        if (!file_exists(__DIR__ . "/../../../../web/upload/chargement/uwebj.txt")) {
-            $lesoper[0][0] = 0;
-        }
-
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $unchargement = $form->getData();
-
-            // Traitement du fichier
-            if ($unchargement->getFile() !== null) {
-                if ($unchargement->getFile()->guessExtension() !== $extensions) {
-                    $this->addFlash('notice', 'errortypfic');
-                    return $this->redirect($this->generateUrl('utb_client_savefile', ['locale' => $locale]));
+                try {
+                    $file->move($this->uploadDir, $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'chargement.upload_error');
+                    return $this->redirectToRoute('app_chargement_ajouter', ['locale' => $locale, 'type' => $type]);
                 }
 
-                $unchargement->setDateChargement(new \DateTime());
-                $unchargement->setUtilisateur($currentUtilID);
-                $unchargement->setArchive(0);
-                $unchargement->setEtatChargement(0);
+                $chargement->setNomFichier($newFilename);
+                $chargement->setTypeChargement($type);
+                $chargement->setDateAjout(new \DateTime());
+                $chargement->setArchive(false);
 
-                $em->persist($unchargement);
-                $em->flush();
+                $this->entityManager->persist($chargement);
+                $this->entityManager->flush();
 
-                return $this->redirect($this->generateUrl('utb_client_savefile', ['locale' => $locale]));
+                $this->addFlash('success', 'chargement.ajout_success');
+                return $this->redirectToRoute('app_chargement_liste', ['locale' => $locale, 'type' => $type]);
             }
         }
 
-        return $this->render('utbClientBundle/Chargement/ajoutChargementFile.html.twig', [
+        return $this->render('chargement/ajouter.html.twig', [
             'form' => $form->createView(),
-            'listeFile' => $listeFile,
             'locale' => $locale,
-            'type' => $type,
+            'type' => $type
         ]);
     }
 
-    public function envoieFileAction(string $locale, string $type): Response
+    #[Route('/chargement/liste/{locale}/{type}', name: 'app_chargement_liste')]
+    public function liste(string $locale, string $type): Response
     {
-        $em = $this->entityManager;
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
         $this->requestStack->getCurrentRequest()->setLocale($locale);
-        $authManager = $this->Auth.Manager;
+        $chargements = $this->entityManager->getRepository(Chargement::class)->findBy([
+            'typeChargement' => $type,
+            'archive' => false
+        ], ['dateAjout' => 'DESC']);
 
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        if (!in_array('envoieFileAction', $listeActions)) {
-            $this->addFlash('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
-
-        $request = $this->requestStack->getCurrentRequest();
-        $fileidtype = $request->request->get('fileidtype');
-
-        if ($fileidtype) {
-            $unchargement = $em->getRepository("utbClientBundle:Chargement")->find($fileidtype);
-            if (!$unchargement) {
-                throw $this->createNotFoundException('Chargement non trouvé');
-            }
-
-            $unchargement->setEtatChargement(1);
-            $em->persist($unchargement);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('utb_client_savefile', ['locale' => $locale]));
-        }
-
-        return $this->redirect($this->generateUrl('utb_client_savefile', ['locale' => $locale]));
-    }
-
-    public function prerequisFileAction(string $locale, string $type): Response
-    {
-        $em = $this->entityManager;
-        $this->requestStack->getCurrentRequest()->setLocale($locale);
-        $authManager = $this->Auth.Manager;
-
-        $currentUtilID = $authManager->getCurrentId();
-        $currentConnete = $authManager->getFlash("utb_client_data");
-        $this->infoUtilisateur($em, $authManager, $currentConnete, 'utilisateur', $locale);
-
-        if (!$authManager->isLogged()) {
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
-
-        $listeActions = $currentConnete["listeActions_abonne"];
-        if (!in_array('prerequisFileAction', $listeActions)) {
-            $this->addFlash('accesdenied', "admin.layout.accesdenied");
-            return $this->redirect($this->generateUrl('utb_client_accueil', ['locale' => $locale]));
-        }
-
-        $unprerequisChargement = new PrerequisChargementType();
-        $form = $this->createForm(PrerequisChargementType::class, $unprerequisChargement);
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $unprerequisChargement = $form->getData();
-
-            $em->persist($unprerequisChargement);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('utb_client_prerequisfile', ['locale' => $locale]));
-        }
-
-        return $this->render('utbClientBundle/Chargement/prerequisChargementFile.html.twig', [
-            'form' => $form->createView(),
+        return $this->render('chargement/liste.html.twig', [
+            'chargements' => $chargements,
             'locale' => $locale,
+            'type' => $type
         ]);
     }
 
-    private function infoUtilisateur(EntityManagerInterface $em, $authManager, array $currentConnete, string $user, string $locale): void
+    #[Route('/chargement/supprimer/{id}/{locale}/{type}', name: 'app_chargement_supprimer')]
+    public function supprimer(int $id, string $locale, string $type): Response
     {
-        if ($user == 'utilisateur') {
-            $utilisateur = $em->getRepository("utbClientBundle:Utilisateur")->find($currentConnete["id_abonne"]);
-            if (!$utilisateur) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Utilisateur non trouvé');
-            }
-        } else {
-            $abonne = $em->getRepository("utbClientBundle:Abonne")->find($currentConnete["id_abonne"]);
-            if (!$abonne) {
-                $authManager->logout();
-                throw $this->createNotFoundException('Abonné non trouvé');
-            }
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
         }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $chargement = $this->entityManager->getRepository(Chargement::class)->find($id);
+
+        if (!$chargement) {
+            throw $this->createNotFoundException('chargement.not_found');
+        }
+
+        $filePath = $this->uploadDir . '/' . $chargement->getNomFichier();
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        $this->entityManager->remove($chargement);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'chargement.suppr_success');
+        return $this->redirectToRoute('app_chargement_liste', ['locale' => $locale, 'type' => $type]);
     }
-} 
+
+    #[Route('/chargement/archiver/{id}/{locale}/{type}', name: 'app_chargement_archiver')]
+    public function archiver(int $id, string $locale, string $type): Response
+    {
+        if (!$this->accessControl->isLogged()) {
+            return $this->redirectToRoute('app_logout', ['locale' => $locale]);
+        }
+
+        $this->requestStack->getCurrentRequest()->setLocale($locale);
+        $chargement = $this->entityManager->getRepository(Chargement::class)->find($id);
+
+        if (!$chargement) {
+            throw $this->createNotFoundException('chargement.not_found');
+        }
+
+        $chargement->setArchive(true);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'chargement.archive_success');
+        return $this->redirectToRoute('app_chargement_liste', ['locale' => $locale, 'type' => $type]);
+    }
+}

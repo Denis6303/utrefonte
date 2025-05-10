@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Profil;
+use App\Entity\ProfilClient;
 use App\Entity\MessageReponse;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,51 +13,63 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'fos_user')]
+#[ORM\Table(name: '`user`')]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\NotBlank(message: 'Please enter a username')]
-    #[Assert\Length(min: 3, max: 180)]
-    private ?string $username = null;
-
-    #[ORM\Column(type: 'string', length: 50)]
-    #[Assert\NotBlank(message: 'Please enter your name')]
-    #[Assert\Length(min: 2, max: 50)]
-    private ?string $nameUser = null;
-
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\NotBlank(message: 'Please enter your email')]
-    #[Assert\Email(message: 'Please enter a valid email address')]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column]
     private ?string $password = null;
 
-    #[Assert\NotBlank(message: 'Please enter your password', groups: ['Registration'])]
-    #[Assert\Length(min: 6, max: 4096)]
-    private ?string $plainPassword = null;
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private bool $isVerified = false;
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
 
-    #[ORM\ManyToOne(targetEntity: Profil::class, inversedBy: 'users')]
+    #[ORM\Column(length: 255)]
+    private ?string $telephone = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $codePostal = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $pays = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commande::class)]
+    private Collection $commandes;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Avis::class)]
+    private Collection $avis;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Adresse::class)]
+    private Collection $adresses;
+
+    #[ORM\OneToOne(targetEntity: Abonne::class)]
+    #[ORM\JoinColumn(name: 'idabonne', referencedColumnName: 'idabonne')]
+    private ?Abonne $abonne = null;
+
+    #[ORM\ManyToOne(targetEntity: ProfilClient::class)]
     #[ORM\JoinColumn(name: 'idprofil', referencedColumnName: 'idprofil')]
-    private ?Profil $profil = null;
+    private ?ProfilClient $profil = null;
 
     #[ORM\OneToMany(targetEntity: MessageReponse::class, mappedBy: 'user')]
     private Collection $messagereponses;
@@ -74,10 +86,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private string $uploadDir = 'upload/photos/';
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Envoi::class)]
+    private Collection $envois;
+
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: HistoriqueConnexion::class)]
+    private Collection $historiques;
+
     public function __construct()
     {
+        $this->commandes = new ArrayCollection();
+        $this->avis = new ArrayCollection();
+        $this->adresses = new ArrayCollection();
         $this->messagereponses = new ArrayCollection();
-        $this->roles = ['ROLE_USER'];
+        $this->envois = new ArrayCollection();
+        $this->historiques = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -85,20 +107,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getEmail(): ?string
     {
-        return $this->username;
+        return $this->email;
     }
 
-    public function setUsername(string $username): self
+    public function setEmail(string $email): static
     {
-        $this->username = $username;
+        $this->email = $email;
+
         return $this;
     }
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string) $this->email;
     }
 
     public function getRoles(): array
@@ -109,9 +132,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
+
         return $this;
     }
 
@@ -120,67 +144,201 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
+
         return $this;
     }
 
-    public function getPlainPassword(): ?string
+    public function getNom(): ?string
     {
-        return $this->plainPassword;
+        return $this->nom;
     }
 
-    public function setPlainPassword(?string $plainPassword): self
+    public function setNom(string $nom): static
     {
-        $this->plainPassword = $plainPassword;
+        $this->nom = $nom;
+
         return $this;
     }
 
-    public function eraseCredentials(): void
+    public function getPrenom(): ?string
     {
-        $this->plainPassword = null;
+        return $this->prenom;
     }
 
-    public function isVerified(): bool
+    public function setPrenom(string $prenom): static
     {
-        return $this->isVerified;
-    }
+        $this->prenom = $prenom;
 
-    public function setIsVerified(bool $isVerified): self
-    {
-        $this->isVerified = $isVerified;
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getTelephone(): ?string
     {
-        return $this->email;
+        return $this->telephone;
     }
 
-    public function setEmail(string $email): self
+    public function setTelephone(string $telephone): static
     {
-        $this->email = $email;
+        $this->telephone = $telephone;
+
         return $this;
     }
 
-    public function getNameUser(): ?string
+    public function getAdresse(): ?string
     {
-        return $this->nameUser;
+        return $this->adresse;
     }
 
-    public function setNameUser(string $nameUser): self
+    public function setAdresse(string $adresse): static
     {
-        $this->nameUser = $nameUser;
+        $this->adresse = $adresse;
+
         return $this;
     }
 
-    public function getProfil(): ?Profil
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(string $pays): static
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): static
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): static
+    {
+        if ($this->commandes->removeElement($commande)) {
+            if ($commande->getUser() === $this) {
+                $commande->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            if ($avi->getUser() === $this) {
+                $avi->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Adresse>
+     */
+    public function getAdresses(): Collection
+    {
+        return $this->adresses;
+    }
+
+    public function addAdress(Adresse $adress): static
+    {
+        if (!$this->adresses->contains($adress)) {
+            $this->adresses->add($adress);
+            $adress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdress(Adresse $adress): static
+    {
+        if ($this->adresses->removeElement($adress)) {
+            if ($adress->getUser() === $this) {
+                $adress->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAbonne(): ?Abonne
+    {
+        return $this->abonne;
+    }
+
+    public function setAbonne(?Abonne $abonne): self
+    {
+        $this->abonne = $abonne;
+        return $this;
+    }
+
+    public function getProfil(): ?ProfilClient
     {
         return $this->profil;
     }
 
-    public function setProfil(?Profil $profil): self
+    public function setProfil(?ProfilClient $profil): self
     {
         $this->profil = $profil;
         return $this;
@@ -210,25 +368,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUrlPhoto(): ?string
+    public function eraseCredentials(): void {}
+
+    /**
+     * @return Collection<int, Envoi>
+     */
+    public function getEnvois(): Collection
     {
-        return $this->urlPhoto;
+        return $this->envois;
     }
 
-    public function setUrlPhoto(?string $urlPhoto): self
+    public function addEnvoi(Envoi $envoi): self
     {
-        $this->urlPhoto = $urlPhoto;
+        if (!$this->envois->contains($envoi)) {
+            $this->envois->add($envoi);
+            $envoi->setUtilisateur($this);
+        }
         return $this;
     }
 
-    public function getPhoto(): ?File
+    public function removeEnvoi(Envoi $envoi): self
     {
-        return $this->photo;
+        if ($this->envois->removeElement($envoi)) {
+            // set the owning side to null (unless already changed)
+            if ($envoi->getUtilisateur() === $this) {
+                $envoi->setUtilisateur(null);
+            }
+        }
+
+        return $this;
     }
 
-    public function setPhoto(?File $photo): self
+    /**
+     * @return Collection<int, HistoriqueConnexion>
+     */
+    public function getHistoriques(): Collection
     {
-        $this->photo = $photo;
+        return $this->historiques;
+    }
+
+    public function addHistorique(HistoriqueConnexion $historique): self
+    {
+        if (!$this->historiques->contains($historique)) {
+            $this->historiques->add($historique);
+            $historique->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistorique(HistoriqueConnexion $historique): self
+    {
+        if ($this->historiques->removeElement($historique)) {
+            // set the owning side to null (unless already changed)
+            if ($historique->getUtilisateur() === $this) {
+                $historique->setUtilisateur(null);
+            }
+        }
+
         return $this;
     }
 

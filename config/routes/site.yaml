@@ -1,0 +1,4 @@
+app_site:
+  resource: "../../src/Controller/SiteController.php"
+  type: attribute
+  prefix: /
